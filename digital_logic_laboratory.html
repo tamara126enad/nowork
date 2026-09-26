@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="htmlRoot">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مختبر المنطق الرقمي — Digital Logic Laboratory | Tamara Alshabatat</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter & Amiri -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: '#FEA405',
+                        'gold-dark': '#d48803',
+                        'gold-light': '#ffc042',
+                        academicGreen: '#8AA624',
+                        'academicGreen-dark': '#6f851b',
+                        sage: '#A2AF9B',
+                        'sage-light': '#c8d1c4',
+                        bgWarm: '#F7F5EF',
+                        neutralLight: '#EEF0EC',
+                        darkText: '#20251F',
+                        burgundy: '#733B4B',
+                        academicBlue: '#427AB5'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Amiri', 'sans-serif'],
+                        amiri: ['Amiri', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', 'Amiri', sans-serif; background-color: #F7F5EF; color: #20251F; }
+        .kmap-cell { transition: all 0.2s ease; cursor: pointer; user-select: none; }
+        .kmap-cell:hover { filter: brightness(0.95); }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #EEF0EC; }
+        ::-webkit-scrollbar-thumb { background: #FEA405; border-radius: 3px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-gold selection:text-darkText">
+
+    <!-- Top Academic Navigation Bar -->
+    <header class="bg-darkText text-white shadow-md border-b-4 border-gold sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center">
+            <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                <div class="bg-gold text-darkText p-2.5 rounded-xl shadow font-bold text-xl flex items-center justify-center">
+                    <i class="fa-solid fa-microchip"></i>
+                </div>
+                <div>
+                    <h1 id="navTitle" class="text-base sm:text-lg font-bold tracking-wide">مختبر المنطق الرقمي الجامعي</h1>
+                    <p id="navSubtitle" class="text-xs text-sage">Digital Logic Laboratory • Interactive Academic Environment</p>
+                </div>
+            </div>
+
+            <!-- Mode Switcher, Language Switcher & Controls -->
+            <div class="flex flex-wrap items-center gap-2 mt-2 sm:mt-0">
+                <!-- Language Switcher -->
+                <div class="bg-darkText/80 border border-sage/30 rounded-lg p-1 flex items-center text-xs">
+                    <button id="btnLangAr" onclick="switchLanguage('ar')" class="px-2.5 py-1 rounded font-medium transition bg-gold text-darkText shadow">العربية</button>
+                    <button id="btnLangEn" onclick="switchLanguage('en')" class="px-2.5 py-1 rounded font-medium transition text-sage hover:text-white">English</button>
+                </div>
+
+                <!-- Mode Switcher -->
+                <div class="bg-darkText/80 border border-sage/30 rounded-lg p-1 flex items-center text-xs">
+                    <button id="btnStudentMode" onclick="switchMode('student')" class="px-3 py-1 rounded font-medium transition bg-academicGreen text-white shadow" data-i18n="studentModeBtn">وضع الطالب</button>
+                    <button id="btnLecturerMode" onclick="switchMode('lecturer')" class="px-3 py-1 rounded font-medium transition text-sage hover:text-white" data-i18n="lecturerModeBtn">وضع المحاضر</button>
+                </div>
+
+                <button onclick="openModal('modalDashboard')" class="bg-gold hover:bg-gold-light text-darkText px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow">
+                    <i class="fa-solid fa-chart-line"></i> <span data-i18n="dashboardBtn">لوحة القيادة</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Application Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 my-4">
+
+        <!-- Left / Sidebar Column: Modules Navigation -->
+        <aside class="lg:col-span-3 space-y-4">
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-sage/40">
+                <h2 class="text-sm font-bold text-darkText border-b border-neutralLight pb-2 mb-3 flex items-center justify-between">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-book-open text-gold"></i> <span data-i18n="modulesTitle">الوحدات التعليمية</span></span>
+                    <span id="modulesCountBadge" class="text-xs bg-sage/20 text-darkText px-2 py-0.5 rounded-full font-normal">7 مجالات</span>
+                </h2>
+                <nav id="moduleList" class="space-y-1.5 text-xs">
+                    <!-- Injected by JS -->
+                </nav>
+            </div>
+
+            <!-- Contextual Quick Controls Card (Dynamic per mode) -->
+            <div id="quickControlsCard" class="bg-white rounded-2xl p-4 shadow-sm border border-sage/40 space-y-3">
+                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider" data-i18n="sessionControls">تحكم الجلسة</h3>
+                <!-- Content changes depending on Student vs Lecturer mode -->
+            </div>
+        </aside>
+
+        <!-- Center Column: Dynamic Workspace (Student Practice or Lecturer Theory) -->
+        <section class="lg:col-span-9 space-y-4" id="mainWorkspaceSection">
+            <!-- Injected by JS based on active mode -->
+        </section>
+
+    </main>
+
+    <!-- Dashboard Modal -->
+    <div id="modalDashboard" class="fixed inset-0 bg-darkText/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border-t-4 border-gold space-y-4">
+            <div class="flex justify-between items-center border-b border-neutralLight pb-3">
+                <h3 class="text-base font-bold text-darkText flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie text-gold"></i> <span data-i18n="dashboardTitle">تحليل الأداء الأكاديمي</span>
+                </h3>
+                <button onclick="closeModal('modalDashboard')" class="text-gray-400 hover:text-darkText"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="space-y-4 text-xs">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div class="bg-neutralLight p-3 rounded-xl border border-sage/30 text-center">
+                        <div class="text-gray-500 mb-1" data-i18n="statSolvedLabel">الحالات المحلولة</div>
+                        <div id="dashTotalSolved" class="text-lg font-bold text-darkText">0</div>
+                    </div>
+                    <div class="bg-neutralLight p-3 rounded-xl border border-sage/30 text-center">
+                        <div class="text-gray-500 mb-1" data-i18n="statAccuracyLabel">نسبة الدقة</div>
+                        <div id="dashAccuracy" class="text-lg font-bold text-academicGreen">0%</div>
+                    </div>
+                    <div class="bg-neutralLight p-3 rounded-xl border border-sage/30 text-center">
+                        <div class="text-gray-500 mb-1" data-i18n="statAttemptsLabel">المحاولات</div>
+                        <div id="dashAttempts" class="text-lg font-bold text-academicBlue">0</div>
+                    </div>
+                    <div class="bg-neutralLight p-3 rounded-xl border border-sage/30 text-center">
+                        <div class="text-gray-500 mb-1" data-i18n="statMasteryLabel">مستوى الكفاءة</div>
+                        <div id="dashMastery" class="text-sm font-bold text-gold-dark mt-1" data-i18n="masteryFoundation">أساسي</div>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <h4 class="font-bold text-darkText" data-i18n="domainCompetency">الكفاءة حسب المجالات</h4>
+                    <div class="space-y-2" id="domainCompetencyList"></div>
+                </div>
+            </div>
+            <div class="flex justify-end pt-2 border-t border-neutralLight">
+                <button onclick="closeModal('modalDashboard')" class="bg-darkText text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-black transition" data-i18n="closeModal">إغلاق اللوحة</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert / Hint Modal -->
+    <div id="modalAlert" class="fixed inset-0 bg-darkText/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border-t-4 border-gold space-y-4">
+            <h3 id="modalAlertTitle" class="text-base font-bold text-darkText flex items-center gap-2">
+                <i class="fa-solid fa-circle-info text-gold"></i> <span data-i18n="academicNotice">تنبيه أكاديمي</span>
+            </h3>
+            <p id="modalAlertBody" class="text-xs text-gray-700 leading-relaxed"></p>
+            <div class="flex justify-end pt-2 border-t border-neutralLight">
+                <button onclick="closeModal('modalAlert')" class="bg-darkText text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-black transition" data-i18n="okBtn">موافق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-sage/30 mt-auto py-4 text-center text-xs text-gray-500 space-y-1">
+        <div class="font-medium text-darkText" data-i18n="footerTitle">مختبر المنطق الرقمي والتجريب التفاعلي للخوارزميات المنطقية وخريطة كارنو</div>
+        <div>جميع الحقوق محفوظة لتمارا الشباطات — 2026 © Tamara Alshbatat — All Rights Reserved</div>
+    </footer>
+
+    <script>
+        // Dictionary for Bilingual Support (Arabic & English)
+        const i18n = {
+            ar: {
+                navTitle: "مختبر المنطق الرقمي الجامعي",
+                navSubtitle: "Digital Logic Laboratory • Interactive Academic Environment",
+                studentModeBtn: "وضع الطالب",
+                lecturerModeBtn: "وضع المحاضر",
+                dashboardBtn: "لوحة القيادة",
+                modulesTitle: "الوحدات التعليمية",
+                sessionControls: "تحكم الجلسة",
+                newCaseBtn: "حالة تدريبية جديدة",
+                hintBtn: "طلب تلميح أكاديمي",
+                resetBtn: "إعادة ضبط",
+                verifyBtn: "تحقق من الإجابة",
+                explanationTitle: "التفسير والقواعد الأكاديمية",
+                explanationPlaceholder: "قم بحل التدريب أو اضغط على «تحقق» لعرض الشرح الأكاديمي التفصيلي.",
+                academicPerformance: "الأداء الأكاديمي",
+                totalSolved: "الحالات المحلولة",
+                accuracyRate: "نسبة الدقة",
+                currentMastery: "المستوى الحالي",
+                attempts: "المحاولات",
+                dashboardTitle: "تحليل الأداء الأكاديمي",
+                statSolvedLabel: "الحالات المحلولة",
+                statAccuracyLabel: "نسبة الدقة",
+                statAttemptsLabel: "المحاولات الكلية",
+                statMasteryLabel: "مستوى الكفاءة",
+                domainCompetency: "تحليل المجالات الدراسية",
+                closeModal: "إغلاق اللوحة",
+                academicNotice: "تنبيه أكاديمي",
+                okBtn: "موافق",
+                footerTitle: "مختبر المنطق الرقمي والتجريب التفاعلي للخوارزميات المنطقية وخريطة كارنو",
+                masteryFoundation: "أساسي (Foundation)",
+                masteryDeveloping: "متطور (Developing)",
+                masteryCompetent: "متمكن (Competent)",
+                masteryAdvanced: "متقدم (Advanced)",
+                masteryMastery: "احتراف (Mastery)",
+                lecturerModeHeader: "وضع المحاضر — المنصة النظرية والعرض الصفي",
+                presentationModeBtn: "وضع العرض (Presentation Mode)",
+                lecturerNotesTitle: "ملاحظات المحاضر وتوجيهات الشرح الصفي",
+                teachingObjective: "الهدف التعليمي:",
+                commonMisconception: "الأخطاء الشائعة للطلاب:",
+                classroomDiscussion: "سؤال للنقاش الصفي:",
+                definition: "التعريف الأكاديمي",
+                symbol: "الرمز المنطقي",
+                booleanExpr: "التعبير البولياني",
+                truthTable: "جدول الحقيقة",
+                logicalBehavior: "السلوك المنطقي",
+                example: "مثال تطبيقي",
+                keyObservation: "ملاحظة رئيسية",
+                whyItWorks: "لماذا يعمل هذا القانون؟",
+                commonMistake: "الخطأ الشائع",
+                stepByStepTitle: "التنفيذ الخطي خطوة بخطوة (Step-by-Step Execution)",
+                nextStep: "الخطوة التالية",
+                prevStep: "الخطوة السابقة",
+                stepOf: "خطوة {current} من {total}",
+                correctVerification: "إجابة صحيحة (Correct Verification)",
+                incorrectVerification: "إجابة غير صحيحة (Incorrect Answer)"
+            },
+            en: {
+                navTitle: "University Digital Logic Lab",
+                navSubtitle: "Digital Logic Laboratory • Interactive Academic Environment",
+                studentModeBtn: "Student Mode",
+                lecturerModeBtn: "Lecturer Mode",
+                dashboardBtn: "Dashboard",
+                modulesTitle: "Academic Modules",
+                sessionControls: "Session Controls",
+                newCaseBtn: "New Training Case",
+                hintBtn: "Request Academic Hint",
+                resetBtn: "Reset Workspace",
+                verifyBtn: "Verify Answer",
+                explanationTitle: "Academic Explanation & Rules",
+                explanationPlaceholder: "Solve the exercise or click 'Verify' to inspect detailed academic reasoning.",
+                academicPerformance: "Academic Performance",
+                totalSolved: "Total Solved",
+                accuracyRate: "Accuracy Rate",
+                currentMastery: "Mastery Level",
+                attempts: "Attempts",
+                dashboardTitle: "Academic Performance Analytics",
+                statSolvedLabel: "Solved Cases",
+                statAccuracyLabel: "Accuracy Rate",
+                statAttemptsLabel: "Total Attempts",
+                statMasteryLabel: "Mastery Level",
+                domainCompetency: "Domain Competency Analysis",
+                closeModal: "Close Dashboard",
+                academicNotice: "Academic Notice",
+                okBtn: "OK",
+                footerTitle: "Digital Logic Laboratory & Interactive K-Map Simulation",
+                masteryFoundation: "Foundation",
+                masteryDeveloping: "Developing",
+                masteryCompetent: "Competent",
+                masteryAdvanced: "Advanced",
+                masteryMastery: "Mastery",
+                lecturerModeHeader: "Lecturer Mode — Theoretical & Classroom Presentation Platform",
+                presentationModeBtn: "Presentation Mode",
+                lecturerNotesTitle: "Lecturer Notes & Classroom Teaching Guidelines",
+                teachingObjective: "Teaching Objective:",
+                commonMisconception: "Common Student Misconception:",
+                classroomDiscussion: "Classroom Discussion Question:",
+                definition: "Academic Definition",
+                symbol: "Logic Symbol",
+                booleanExpr: "Boolean Expression",
+                truthTable: "Truth Table",
+                logicalBehavior: "Logical Behavior",
+                example: "Applied Example",
+                keyObservation: "Key Observation",
+                whyItWorks: "Why This Law Works",
+                commonMistake: "Common Mistake",
+                stepByStepTitle: "Step-by-Step Execution Workflow",
+                nextStep: "Next Step",
+                prevStep: "Previous Step",
+                stepOf: "Step {current} of {total}",
+                correctVerification: "Correct Verification",
+                incorrectVerification: "Incorrect Answer"
+            }
+        };
+
+        // Theoretical Data for Lecturer Mode (Modules 1 to 7)
+        const lecturerModulesData = [
+            {
+                id: 1,
+                nameAr: "المجال 01: مقدمة في المنطق الرقمي",
+                nameEn: "Module 01: Introduction to Digital Logic",
+                subtitleAr: "Digital Logic Foundations & Binary Systems",
+                subtitleEn: "Digital Logic Foundations & Binary Systems",
+                content: {
+                    definitionAr: "المنطق الرقمي هو فرع من الهندسة الكهربائية وعلوم الكمبيوتر يتعامل مع معالجة الإشارات المنفصلة (Digital Signals) الممثلة بقيمتين ثنائيتين أساسيتين: 0 (LOW / False) و 1 (HIGH / True).",
+                    definitionEn: "Digital logic is the foundation of digital electronics and computer architecture, operating on discrete signals represented by binary values: 0 (LOW / False) and 1 (HIGH / True).",
+                    keyObservationAr: "تعتمد الدوائر الرقمية على ترانزستورات تعمل كمفاتيح إلكترونية، مما يوفر مناعة عالية ضد التشويش مقارنة بالأنظمة التناظرية (Analog Systems).",
+                    keyObservationEn: "Digital circuits utilize transistors operating as electronic switches, offering superior noise immunity compared to analog systems.",
+                    exampleAr: "أنظمة الحاسوب الحديثة، المعגלات، والهواتف الذكية تعتمد بالكامل على البوابات المنطقية الأساسية.",
+                    exampleEn: "Modern computing systems, microprocessors, and smart devices rely entirely on fundamental logic gates.",
+                    teachingObjectiveAr: "توضيح الفرق الجوهري بين الأنظمة التناظرية والرقمية، وأهمية النظام الثنائي (Binary System).",
+                    teachingObjectiveEn: "Clarify the fundamental distinction between analog and digital systems, and the importance of the binary numbering system.",
+                    commonMisconceptionAr: "الاعتقاد بأن الجهد الكهربائي في المنطق الرقمي هو إما 0 فولت تماماً أو 5 فولت تماماً، بينما يوجد نطاق مسموح (Noise Margins).",
+                    commonMisconceptionEn: "Believing that digital voltage is strictly 0V or 5V, when in practice defined voltage ranges exist (Noise Margins).",
+                    classroomDiscussionAr: "لماذا تحولت صناعة الحوسبة الحديثة بالكامل من المعالجات التناظرية إلى المعالجات الرقمية الثنائية؟",
+                    classroomDiscussionEn: "Why did modern computing entirely transition from analog to binary digital processors?"
+                }
+            },
+            {
+                id: 2,
+                nameAr: "المجال 02: البوابات المنطقية",
+                nameEn: "Module 02: Logic Gates",
+                subtitleAr: "Logic Gates, Symbols, Truth Tables & Behaviors",
+                subtitleEn: "Logic Gates, Symbols, Truth Tables & Behaviors",
+                gates: [
+                    {
+                        nameAr: "بوابة AND", nameEn: "AND Gate",
+                        expr: "Y = A · B",
+                        descAr: "تعطي نخرجاً قيمته 1 فقط إذا كانت جميع المدخلات تساوي 1.",
+                        descEn: "Produces HIGH (1) output only if all inputs are HIGH (1).",
+                        truth: "0·0=0, 0·1=0, 1·0=0, 1·1=1"
+                    },
+                    {
+                        nameAr: "بوابة OR", nameEn: "OR Gate",
+                        expr: "Y = A + B",
+                        descAr: "تعطي نخرجاً قيمته 1 إذا كان مدخل واحد على الأقل يساوي 1.",
+                        descEn: "Produces HIGH (1) output if at least one input is HIGH (1).",
+                        truth: "0+0=0, 0+1=1, 1+0=1, 1+1=1"
+                    },
+                    {
+                        nameAr: "بوابة NOT (العاكس)", nameEn: "NOT Gate (Inverter)",
+                        expr: "Y = A'",
+                        descAr: "تعكس حالة المدخل، إذا كان المدخل 1 يصبح النخرج 0 والعكس صحيح.",
+                        descEn: "Inverts the input state: 0 becomes 1, and 1 becomes 0.",
+                        truth: "0→1, 1→0"
+                    },
+                    {
+                        nameAr: "بوابة NAND", nameEn: "NAND Gate",
+                        expr: "Y = (A · B)'",
+                        descAr: "بوابة AND متبوعة بعاكس NOT. تعطي 0 فقط إذا كانت جميع المدخلات 1.",
+                        descEn: "AND gate followed by a NOT. Outputs 0 only when all inputs are 1 (Universal Gate).",
+                        truth: "0·0=1, 0·1=1, 1·0=1, 1·1=0"
+                    },
+                    {
+                        nameAr: "بوابة NOR", nameEn: "NOR Gate",
+                        expr: "Y = (A + B)'",
+                        descAr: "بوابة OR متبوعة بعاكس NOT. تعطي 1 فقط إذا كانت جميع المدخلات 0.",
+                        descEn: "OR gate followed by a NOT. Outputs 1 only when all inputs are 0 (Universal Gate).",
+                        truth: "0+0=1, 0+1=0, 1+0=0, 1+1=0"
+                    },
+                    {
+                        nameAr: "بوابة XOR (الاستثناء)", nameEn: "XOR Gate (Exclusive-OR)",
+                        expr: "Y = A ⊕ B",
+                        descAr: "تعطي 1 إذا كان المدخلان مختلفين، و 0 إذا كانا متطابقين.",
+                        descEn: "Outputs 1 when inputs are different, and 0 when identical.",
+                        truth: "0⊕0=0, 0⊕1=1, 1⊕0=1, 1⊕1=0"
+                    }
+                ],
+                content: {
+                    teachingObjectiveAr: "فهم الخصائص الكهربائية والمنطقية للبوابات الأساسية والعالمية (Universal Gates).",
+                    teachingObjectiveEn: "Understand the electrical and logical characteristics of fundamental and universal gates.",
+                    commonMisconceptionAr: "الخلط بين جدول حقيقة NAND و NOR.",
+                    commonMisconceptionEn: "Confusing the truth tables of NAND and NOR gates."
+                }
+            },
+            {
+                id: 3,
+                nameAr: "المجال 03: جداول الحقيقة المتقدمة",
+                nameEn: "Module 03: Advanced Truth Tables",
+                subtitleAr: "Truth Table Construction & Combinational Analysis",
+                subtitleEn: "Truth Table Construction & Combinational Analysis",
+                content: {
+                    definitionAr: "جدول الحقيقة هو تمثيل رياضي يعرض جميع القيم الممكنة للمدخلات في الدوائر التوافقية (Combinational Circuits) وما يقابلها من نواتج.",
+                    definitionEn: "A truth table is a mathematical table displaying all possible input combinations and their corresponding outputs in combinational circuits.",
+                    keyObservationAr: "عدد الأسطر في جدول الحقيقة لدائرة تحتوي على $n$ من المتغيرات يساوي دائماً $2^n$.",
+                    keyObservationEn: "The number of rows in a truth table for $n$ variables is always $2^n$.",
+                    teachingObjectiveAr: "تمكين الطلاب من بناء جداول الحقيقة لأي تعبير منطقي معقد وتحويله إلى صيغة جبرية.",
+                    teachingObjectiveEn: "Empower students to construct truth tables for complex logic expressions and convert them into algebraic forms."
+                }
+            },
+            {
+                id: 4,
+                nameAr: "المجال 04: الجبر البولياني وقوانينه",
+                nameEn: "Module 04: Boolean Algebra Laws",
+                subtitleAr: "Boolean Identities, Algebraic Simplification & De Morgan's Laws",
+                subtitleEn: "Boolean Identities, Algebraic Simplification & De Morgan's Laws",
+                laws: [
+                    { nameAr: "قانون الهوية (Identity Law)", nameEn: "Identity Law", formula: "A · 1 = A, A + 0 = A", descAr: "ربط المتغير بـ 1 في AND أو بـ 0 في OR لا يغير قيمته." },
+                    { nameAr: "قانون الامتصاص (Absorption Law)", nameEn: "Absorption Law", formula: "A + AB = A, A(A + B) = A", descAr: "المتغير الإضافي يُمتص بواسطة المتغير الأساسي." },
+                    { nameAr: "قانون ديمورغان (De Morgan's Laws)", nameEn: "De Morgan's Laws", formula: "(A + B)' = A' · B' , (A · B)' = A' + B'", descAr: "توزيع النفي يعكس العملية بين الضرب والجمع." }
+                ],
+                content: {
+                    teachingObjectiveAr: "إتقان تبسيط التعبيرات المنطقية رياضياً لتقليل عدد البوابات المطلوبة في التصميم الفعلي.",
+                    teachingObjectiveEn: "Master algebraic simplification of logic expressions to minimize required hardware gates."
+                }
+            },
+            {
+                id: 5,
+                nameAr: "المجال 05: المينترم والماكسترْم (SOP / POS)",
+                nameEn: "Module 05: Minterms & Maxterms (SOP/POS)",
+                subtitleAr: "Canonical Expressions, Sum of Products & Product of Sums",
+                subtitleEn: "Canonical Expressions, Sum of Products & Product of Sums",
+                content: {
+                    definitionAr: "المينترم (Minterm) هو حاصل ضرب (AND) لجميع متغيرات الدائرة بحيث تأخذ القيمة 1 عندما تكون النتيجة 1 (Sum of Products - SOP). الماكسترْم (Maxterm) هو مجموع (OR) للمتغيرات (Product of Sums - POS).",
+                    definitionEn: "A Minterm is a product term where all variables appear in complemented or uncomplemented form yielding 1 (SOP). A Maxterm is a sum term yielding 0 (POS)."
+                }
+            },
+            {
+                id: 6,
+                nameAr: "المجال 06: خرائط كارنو (K-Maps)",
+                nameEn: "Module 06: Karnaugh Map Simplification",
+                subtitleAr: "2, 3, and 4-Variable K-Maps, Adjacency, Grouping & Edge Wrapping",
+                subtitleEn: "2, 3, and 4-Variable K-Maps, Adjacency, Grouping & Edge Wrapping",
+                content: {
+                    definitionAr: "خريطة كارنو (K-Map) هي تمثيل رسومي لجدول الحقيقة يتيح تبسيط التعبيرات البوليانية بسهولة بالاعتماد على كود جراي (Gray Code) والتجمعات المتجاورة (Powers of 2: 1, 2, 4, 8).",
+                    definitionEn: "A Karnaugh Map is a graphical representation of a truth table enabling rapid Boolean minimization using Gray code adjacency and powers of 2 grouping.",
+                    keyObservationAr: "خاصية الالتفاف (Edge Wrapping) تعني أن الخلايا في أطراف الخريطة تعتبر متجاورة رياضياً.",
+                    keyObservationEn: "Edge wrapping dictates that cells on opposite borders are logically adjacent."
+                }
+            },
+            {
+                id: 7,
+                nameAr: "المجال 07: تصميم الدوائر والتشخيص",
+                nameEn: "Module 07: Circuit Design & Fault Diagnosis",
+                subtitleAr: "Combinational Design, Testing & Stuck-at Fault Models",
+                subtitleEn: "Combinational Design, Testing & Stuck-at Fault Models",
+                content: {
+                    definitionAr: "مرحلة تصميم الدوائر واختبار الأعطال (مثل عطل الالتصاق Stuck-at-0 و Stuck-at-1) لضمان الموثوقية الصناعية للأنظمة الرقمية.",
+                    definitionEn: "Circuit design and fault testing (such as Stuck-at-0 and Stuck-at-1 models) to ensure industrial reliability of digital systems."
+                }
+            }
+        ];
+
+        // Modules Data Structure for Student Practice
+        const studentModulesData = [
+            { id: 1, nameAr: "المجال 01: الأساسيات", nameEn: "Module 01: Foundations", stages: 10, range: [1, 10] },
+            { id: 2, nameAr: "المجال 02: البوابات", nameEn: "Module 02: Logic Gates", stages: 15, range: [11, 25] },
+            { id: 3, nameAr: "المجال 03: جداول الحقيقة", nameEn: "Module 03: Truth Tables", stages: 15, range: [26, 40] },
+            { id: 4, nameAr: "المجال 04: الجبر البولياني", nameEn: "Module 04: Boolean Laws", stages: 15, range: [41, 55] },
+            { id: 5, nameAr: "المجال 05: المينترم والماكسترْم", nameEn: "Module 05: SOP / POS", stages: 15, range: [56, 70] },
+            { id: 6, nameAr: "المجال 06: خرائط كارنو", nameEn: "Module 06: Karnaugh Maps", stages: 20, range: [71, 90] },
+            { id: 7, nameAr: "المجال 07: التشخيص والتصميم", nameEn: "Module 07: Design & Faults", stages: 10, range: [91, 100] }
+        ];
+
+        // Application State
+        let appState = {
+            lang: 'ar', // 'ar' or 'en'
+            mode: 'student', // 'student' or 'lecturer'
+            currentStage: 71,
+            lecturerActiveModuleId: 1,
+            caseId: 'DL-KMAP-2026-9281',
+            solvedCount: 0,
+            totalAttempts: 0,
+            correctAttempts: 0,
+            domainStats: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 },
+            currentCaseData: null
+        };
+
+        // Initialize on window load
+        window.onload = function() {
+            loadProgress();
+            applyLanguage();
+            renderActiveMode();
+        };
+
+        // Load progress from localStorage
+        function loadProgress() {
+            const saved = localStorage.getItem('tamara_dl_lab_state');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    appState.solvedCount = parsed.solvedCount || 0;
+                    appState.totalAttempts = parsed.totalAttempts || 0;
+                    appState.correctAttempts = parsed.correctAttempts || 0;
+                    appState.domainStats = parsed.domainStats || appState.domainStats;
+                } catch(e) { console.error(e); }
+            }
+        }
+
+        function saveProgress() {
+            localStorage.setItem('tamara_dl_lab_state', JSON.stringify({
+                solvedCount: appState.solvedCount,
+                totalAttempts: appState.totalAttempts,
+                correctAttempts: appState.correctAttempts,
+                domainStats: appState.domainStats
+            }));
+        }
+
+        // Language Switcher Function
+        function switchLanguage(lang) {
+            appState.lang = lang;
+            const htmlRoot = document.getElementById('htmlRoot');
+            const btnAr = document.getElementById('btnLangAr');
+            const btnEn = document.getElementById('btnLangEn');
+
+            if (lang === 'ar') {
+                htmlRoot.setAttribute('dir', 'rtl');
+                htmlRoot.setAttribute('lang', 'ar');
+                btnAr.className = "px-2.5 py-1 rounded font-medium transition bg-gold text-darkText shadow";
+                btnEn.className = "px-2.5 py-1 rounded font-medium transition text-sage hover:text-white";
+            } else {
+                htmlRoot.setAttribute('dir', 'ltr');
+                htmlRoot.setAttribute('lang', 'en');
+                btnEn.className = "px-2.5 py-1 rounded font-medium transition bg-gold text-darkText shadow";
+                btnAr.className = "px-2.5 py-1 rounded font-medium transition text-sage hover:text-white";
+            }
+
+            applyLanguage();
+            renderActiveMode();
+        }
+
+        // Apply UI translations based on active dictionary
+        function applyLanguage() {
+            const dict = i18n[appState.lang];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (dict[key]) el.innerText = dict[key];
+            });
+        }
+
+        // Switch Mode (Student vs Lecturer)
+        function switchMode(mode) {
+            appState.mode = mode;
+            const btnStudent = document.getElementById('btnStudentMode');
+            const btnLecturer = document.getElementById('btnLecturerMode');
+
+            if (mode === 'lecturer') {
+                btnLecturer.className = "px-3 py-1 rounded font-medium transition bg-academicGreen text-white shadow";
+                btnStudent.className = "px-3 py-1 rounded font-medium transition text-sage hover:text-white";
+            } else {
+                btnStudent.className = "px-3 py-1 rounded font-medium transition bg-academicGreen text-white shadow";
+                btnLecturer.className = "px-3 py-1 rounded font-medium transition text-sage hover:text-white";
+            }
+
+            renderActiveMode();
+        }
+
+        // Render Active Mode (Student Workspace vs Lecturer Theory Platform)
+        function renderActiveMode() {
+            renderSidebar();
+            if (appState.mode === 'lecturer') {
+                renderLecturerWorkspace();
+            } else {
+                if (!appState.currentCaseData) generateNewStudentCase();
+                renderStudentWorkspace();
+            }
+            updateDashboardUI();
+        }
+
+        // Render Sidebar Navigation
+        function renderSidebar() {
+            const listContainer = document.getElementById('moduleList');
+            listContainer.innerHTML = '';
+            const quickCard = document.getElementById('quickControlsCard');
+
+            if (appState.mode === 'lecturer') {
+                document.getElementById('modulesCountBadge').innerText = appState.lang === 'ar' ? "7 مجالات نظرية" : "7 Theory Modules";
+                quickCard.innerHTML = `
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">${appState.lang === 'ar' ? 'تحكم العرض الصفي' : 'Presentation Controls'}</h3>
+                    <button onclick="openPresentationMode()" class="w-full bg-academicGreen hover:bg-academicGreen-dark text-white py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm">
+                        <i class="fa-solid fa-person-chalkboard"></i> ${appState.lang === 'ar' ? 'وضع العرض الصفي (Presentation)' : 'Classroom Presentation'}
+                    </button>
+                `;
+
+                lecturerModulesData.forEach(mod => {
+                    const isActive = appState.lecturerActiveModuleId === mod.id;
+                    const item = document.createElement('div');
+                    item.className = `p-2.5 rounded-xl text-xs cursor-pointer transition flex items-center justify-between ${isActive ? 'bg-darkText text-white font-bold shadow-sm' : 'bg-neutralLight hover:bg-sage/20 text-darkText'}`;
+                    item.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid ${isActive ? 'fa-bookmark text-gold' : 'fa-circle text-[6px] text-gray-400'}"></i>
+                            <span>${appState.lang === 'ar' ? mod.nameAr : mod.nameEn}</span>
+                        </div>
+                    `;
+                    item.onclick = () => {
+                        appState.lecturerActiveModuleId = mod.id;
+                        renderLecturerWorkspace();
+                        renderSidebar();
+                    };
+                    listContainer.appendChild(item);
+                });
+
+            } else {
+                document.getElementById('modulesCountBadge').innerText = appState.lang === 'ar' ? "7 مجالات تدريبية" : "7 Training Domains";
+                quickCard.innerHTML = `
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider" data-i18n="sessionControls">${i18n[appState.lang].sessionControls}</h3>
+                    <button onclick="generateNewStudentCase()" class="w-full bg-gold hover:bg-gold-light text-darkText py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm">
+                        <i class="fa-solid fa-dice"></i> <span data-i18n="newCaseBtn">${i18n[appState.lang].newCaseBtn}</span>
+                    </button>
+                    <button onclick="requestStudentHint()" class="w-full bg-academicBlue hover:bg-academicBlue/90 text-white py-2 px-3 rounded-xl text-xs font-medium transition flex items-center justify-center gap-2 shadow-sm">
+                        <i class="fa-solid fa-lightbulb"></i> <span data-i18n="hintBtn">${i18n[appState.lang].hintBtn}</span>
+                    </button>
+                    <button onclick="generateNewStudentCase()" class="w-full bg-neutralLight hover:bg-sage/20 text-darkText py-2 px-3 rounded-xl text-xs font-medium transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> <span data-i18n="resetBtn">${i18n[appState.lang].resetBtn}</span>
+                    </button>
+                `;
+
+                studentModulesData.forEach(mod => {
+                    const isActive = appState.currentStage >= mod.range[0] && appState.currentStage <= mod.range[1];
+                    const item = document.createElement('div');
+                    item.className = `p-2.5 rounded-xl text-xs cursor-pointer transition flex items-center justify-between ${isActive ? 'bg-darkText text-white font-bold shadow-sm' : 'bg-neutralLight hover:bg-sage/20 text-darkText'}`;
+                    item.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid ${isActive ? 'fa-chevron-left rtl:fa-chevron-right text-gold' : 'fa-circle text-[6px] text-gray-400'}"></i>
+                            <span>${appState.lang === 'ar' ? mod.nameAr : mod.nameEn}</span>
+                        </div>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded ${isActive ? 'bg-gold text-darkText font-bold' : 'bg-sage/20 text-gray-600'}">${mod.range[0]}-${mod.range[1]}</span>
+                    `;
+                    item.onclick = () => {
+                        appState.currentStage = mod.range[0];
+                        generateNewStudentCase();
+                        renderSidebar();
+                    };
+                    listContainer.appendChild(item);
+                });
+            }
+        }
+
+        // ================= LECTURER MODE IMPLEMENTATION =================
+        function renderLecturerWorkspace() {
+            const section = document.getElementById('mainWorkspaceSection');
+            const mod = lecturerModulesData.find(m => m.id === appState.lecturerActiveModuleId) || lecturerModulesData[0];
+            const dict = i18n[appState.lang];
+
+            section.innerHTML = `
+                <!-- Lecturer Banner Card -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-sage/40 space-y-3">
+                    <div class="flex flex-wrap justify-between items-start gap-2">
+                        <div>
+                            <span class="text-xs font-semibold bg-academicGreen/10 text-academicGreen px-3 py-1 rounded-lg">${dict.lecturerModeHeader}</span>
+                            <h2 class="text-xl font-bold text-darkText mt-2">${appState.lang === 'ar' ? mod.nameAr : mod.nameEn}</h2>
+                            <p class="text-xs text-gray-600 mt-1">${appState.lang === 'ar' ? mod.subtitleAr : mod.subtitleEn}</p>
+                        </div>
+                        <div class="bg-neutralLight px-3 py-1.5 rounded-xl border border-sage/30 text-xs font-mono text-darkText">
+                            Module ID: <span class="font-bold text-academicGreen">0${mod.id}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Theoretical Content Presentation -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                    <!-- Main Theory Panel -->
+                    <div class="md:col-span-8 space-y-4">
+                        <div class="bg-white rounded-2xl p-5 shadow-sm border border-sage/40 space-y-4">
+                            <h3 class="text-sm font-bold text-darkText border-b border-neutralLight pb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-graduation-cap text-gold"></i> ${dict.definition}
+                            </h3>
+                            <p class="text-sm text-gray-700 leading-relaxed bg-neutralLight p-4 rounded-xl border border-sage/20">
+                                ${appState.lang === 'ar' ? mod.content.definitionAr || mod.subtitleAr : mod.content.definitionEn || mod.subtitleEn}
+                            </p>
+
+                            ${mod.gates ? renderLecturerGatesTable(mod.gates) : ''}
+                            ${mod.laws ? renderLecturerLawsTable(mod.laws) : ''}
+
+                            <div class="space-y-2 pt-2">
+                                <h4 class="text-xs font-bold text-darkText uppercase tracking-wider">${dict.keyObservation}</h4>
+                                <div class="text-xs bg-gold/10 border border-gold/30 p-3 rounded-xl text-darkText leading-relaxed">
+                                    ${appState.lang === 'ar' ? (mod.content.keyObservationAr || "يعتمد هذا المجال على القواعد الرياضية الصارمة للمنطق الرقمي.") : (mod.content.keyObservationEn || "This domain relies on strict mathematical rules of digital logic.")}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lecturer Notes Panel -->
+                    <div class="md:col-span-4 space-y-4">
+                        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 shadow-sm space-y-3">
+                            <h3 class="text-xs font-bold text-amber-900 flex items-center gap-2">
+                                <i class="fa-solid fa-chalkboard-user text-amber-700"></i> ${dict.lecturerNotesTitle}
+                            </h3>
+                            <div class="space-y-2 text-xs text-amber-900 leading-relaxed">
+                                <div>
+                                    <strong class="block text-amber-800">${dict.teachingObjective}</strong>
+                                    <span>${appState.lang === 'ar' ? mod.content.teachingObjectiveAr : mod.content.teachingObjectiveEn}</span>
+                                </div>
+                                <div class="pt-2 border-t border-amber-200">
+                                    <strong class="block text-amber-800">${dict.commonMisconception}</strong>
+                                    <span>${appState.lang === 'ar' ? (mod.content.commonMisconceptionAr || "لا توجد أخطاء شائعة محددة.") : (mod.content.commonMisconceptionEn || "No specific misconceptions noted.")}</span>
+                                </div>
+                                <div class="pt-2 border-t border-amber-200">
+                                    <strong class="block text-amber-800">${dict.classroomDiscussion}</strong>
+                                    <span class="italic">${appState.lang === 'ar' ? (mod.content.classroomDiscussionAr || "ناقش مع الطلاب التطبيق العملي.") : (mod.content.classroomDiscussionEn || "Discuss practical application with students.")}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderLecturerGatesTable(gates) {
+            let html = `<div class="space-y-3 pt-2"><h4 class="text-xs font-bold text-darkText uppercase tracking-wider">${appState.lang === 'ar' ? 'جدول البوابات المنطقية' : 'Logic Gates Overview'}</h4><div class="grid grid-cols-1 sm:grid-cols-2 gap-3">`;
+            gates.forEach(g => {
+                html += `
+                    <div class="bg-neutralLight p-3 rounded-xl border border-sage/30 space-y-1">
+                        <div class="flex justify-between items-center"><strong class="text-xs text-darkText">${appState.lang === 'ar' ? g.nameAr : g.nameEn}</strong><span class="font-mono text-[11px] bg-gold/20 text-darkText px-2 py-0.5 rounded font-bold">${g.expr}</span></div>
+                        <p class="text-[11px] text-gray-600">${appState.lang === 'ar' ? g.descAr : g.descEn}</p>
+                        <div class="text-[10px] font-mono text-academicGreen pt-1">Truth: ${g.truth}</div>
+                    </div>
+                `;
+            });
+            html += `</div></div>`;
+            return html;
+        }
+
+        function renderLecturerLawsTable(laws) {
+            let html = `<div class="space-y-3 pt-2"><h4 class="text-xs font-bold text-darkText uppercase tracking-wider">${appState.lang === 'ar' ? 'قوانين الجبر البولياني' : 'Boolean Laws'}</h4><div class="space-y-2">`;
+            laws.forEach(l => {
+                html += `
+                    <div class="bg-neutralLight p-3 rounded-xl border border-sage/30 flex justify-between items-center">
+                        <div>
+                            <strong class="text-xs text-darkText block">${appState.lang === 'ar' ? l.nameAr : l.nameEn}</strong>
+                            <span class="text-[11px] text-gray-600">${appState.lang === 'ar' ? l.descAr : l.descEn}</span>
+                        </div>
+                        <span class="font-mono text-xs bg-gold/20 text-darkText px-2 py-1 rounded font-bold">${l.formula}</span>
+                    </div>
+                `;
+            });
+            html += `</div></div>`;
+            return html;
+        }
+
+        function openPresentationMode() {
+            const mod = lecturerModulesData.find(m => m.id === appState.lecturerActiveModuleId) || lecturerModulesData[0];
+            const dict = i18n[appState.lang];
+            const modal = document.getElementById('modalAlert');
+            document.getElementById('modalAlertTitle').innerHTML = `<i class="fa-solid fa-person-chalkboard text-academicGreen"></i> ${dict.presentationModeBtn} — ${appState.lang === 'ar' ? mod.nameAr : mod.nameEn}`;
+            document.getElementById('modalAlertBody').innerHTML = `
+                <div class="space-y-3 text-xs leading-relaxed">
+                    <p class="font-bold text-darkText">${appState.lang === 'ar' ? mod.subtitleAr : mod.subtitleEn}</p>
+                    <div class="bg-neutralLight p-3 rounded-xl border border-sage/30">
+                        ${appState.lang === 'ar' ? mod.content.definitionAr : mod.content.definitionEn}
+                    </div>
+                    <p class="text-gray-600 italic">اضغط على موافق للعودة للمنصة العادية.</p>
+                </div>
+            `;
+            openModal('modalAlert');
+        }
+
+
+        // ================= STUDENT MODE IMPLEMENTATION =================
+        function generateNewStudentCase() {
+            appState.caseId = 'DL-KMAP-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
+            
+            if (appState.currentStage >= 71 && appState.currentStage <= 90) {
+                appState.currentCaseData = generateKMapCase();
+            } else if (appState.currentStage >= 41 && appState.currentStage <= 55) {
+                appState.currentCaseData = generateBooleanLawCase();
+            } else {
+                appState.currentCaseData = generateFoundationCase();
+            }
+
+            renderStudentWorkspace();
+            
+            // Safely update explanation content if the element exists in the DOM
+            const explanationContent = document.getElementById('explanationContent');
+            if (explanationContent) {
+                explanationContent.innerHTML = `<div class="text-gray-400 italic text-center py-6">${i18n[appState.lang].explanationPlaceholder}</div>`;
+            }
+        }
+
+        function generateKMapCase() {
+            const varsCount = Math.random() > 0.5 ? 3 : 4;
+            const totalCells = Math.pow(2, varsCount);
+            const mintermsCount = Math.floor(Math.random() * 4) + (varsCount === 3 ? 3 : 5);
+            let minterms = [];
+            while(minterms.length < mintermsCount) {
+                let m = Math.floor(Math.random() * totalCells);
+                if(!minterms.includes(m)) minterms.push(m);
+            }
+            minterms.sort((a,b) => a-b);
+
+            let gridCells = {};
+            for(let i=0; i<totalCells; i++) {
+                gridCells[i] = minterms.includes(i) ? 1 : 0;
+            }
+
+            return {
+                type: 'kmap',
+                varsCount: varsCount,
+                minterms: minterms,
+                gridCells: gridCells,
+                titleAr: varsCount === 3 ? "خريطة كارنو 3 متغيرات" : "خريطة كارنو 4 متغيرات",
+                titleEn: varsCount === 3 ? "3-Variable Karnaugh Map" : "4-Variable Karnaugh Map",
+                promptAr: `قم بتبسيط التعبير البولياني باستخدام خريطة كارنو (${varsCount} متغيرات) للمينترمات التالية: F = Σ(${minterms.join(', ')}). انقر على الخلايا للتعديل والتجميع.`,
+                promptEn: `Simplify the Boolean expression using a ${varsCount}-variable K-Map for minterms: F = Σ(${minterms.join(', ')}). Click cells to toggle.`,
+                explanationAr: `تمثل خريطة كارنو (${varsCount} متغيرات) طريقة بصرية لتبسيط التعبيرات البوليانية. المينترمات المفعلة هي [${minterms.join(', ')}].`,
+                explanationEn: `The ${varsCount}-variable K-Map visually minimizes Boolean expressions for active minterms [${minterms.join(', ')}].`
+            };
+        }
+
+        function generateBooleanLawCase() {
+            return {
+                type: 'choice',
+                titleAr: "تبسيط الجبر البولياني",
+                titleEn: "Boolean Algebra Simplification",
+                promptAr: "ما هو ناتج تبسيط التعبير البولياني التالي حسب قوانين الجبر: F = A + AB ؟",
+                promptEn: "What is the simplified result of the Boolean expression: F = A + AB ?",
+                options: [
+                    { id: 'b1', textAr: "F = A (قانون الامتصاص)", textEn: "F = A (Absorption Law)", correct: true },
+                    { id: 'b2', textAr: "F = B", textEn: "F = B", correct: false },
+                    { id: 'b3', textAr: "F = AB", textEn: "F = AB", correct: false }
+                ],
+                explanationAr: "حسب قانون الامتصاص (Absorption Law): A + AB = A. بإخراج A عامل مشترك يصبح F = A(1 + B) = A.",
+                explanationEn: "According to the Absorption Law: A + AB = A. Factoring out A yields F = A(1 + B) = A."
+            };
+        }
+
+        function generateFoundationCase() {
+            return {
+                type: 'choice',
+                titleAr: "أساسيات المنطق الثنائي",
+                titleEn: "Binary Logic Foundations",
+                promptAr: "إذا كان المدخل A = 1 والمدخل B = 0، فما هو ناتج بوابة AND وبوابة OR على التوالي؟",
+                promptEn: "If input A = 1 and input B = 0, what are the outputs of AND and OR gates respectively?",
+                options: [
+                    { id: 'f1', textAr: "AND = 0, OR = 1", textEn: "AND = 0, OR = 1", correct: true },
+                    { id: 'f2', textAr: "AND = 1, OR = 0", textEn: "AND = 1, OR = 0", correct: false },
+                    { id: 'f3', textAr: "AND = 1, OR = 1", textEn: "AND = 1, OR = 1", correct: false }
+                ],
+                explanationAr: "بوابة AND تعطي 1 فقط إذا تساوت جميع المدخلات 1 (1·0=0). بوابة OR تعطي 1 إذا كان مدخل واحد على الأقل 1 (1+0=1).",
+                explanationEn: "AND outputs 1 only when all inputs are 1 (1·0=0). OR outputs 1 if at least one input is 1 (1+0=1)."
+            };
+        }
+
+        function renderStudentWorkspace() {
+            const section = document.getElementById('mainWorkspaceSection');
+            const data = appState.currentCaseData;
+            const dict = i18n[appState.lang];
+
+            section.innerHTML = `
+                <!-- Stage Header Card -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-sage/40 space-y-3">
+                    <div class="flex justify-between items-start gap-2">
+                        <div>
+                            <span class="text-xs font-semibold bg-gold/20 text-darkText px-3 py-1 rounded-lg">Case ID: ${appState.caseId}</span>
+                            <h2 class="text-lg font-bold text-darkText mt-2">${appState.lang === 'ar' ? data.titleAr : data.titleEn}</h2>
+                        </div>
+                        <span class="text-xs font-mono bg-academicGreen/10 text-academicGreen px-3 py-1 rounded-lg border border-academicGreen/30">Stage ${appState.currentStage}</span>
+                    </div>
+                    <p class="text-sm text-gray-700 bg-neutralLight p-4 rounded-xl border border-sage/30 leading-relaxed">
+                        ${appState.lang === 'ar' ? data.promptAr : data.promptEn}
+                    </p>
+                </div>
+
+                <!-- Interactive Workspace Area -->
+                <div id="interactiveWorkspace" class="bg-white rounded-2xl p-5 shadow-sm border border-sage/40 min-h-[300px] flex flex-col justify-between">
+                    ${data.type === 'kmap' ? renderKMapWorkspaceHTML(data) : renderChoiceWorkspaceHTML(data)}
+                </div>
+
+                <!-- Submission & Explanation Toolbar -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                    <div class="md:col-span-8 bg-white rounded-2xl p-4 shadow-sm border border-sage/40 space-y-2">
+                        <h3 class="text-xs font-bold text-darkText flex items-center gap-2 border-b border-neutralLight pb-2">
+                            <i class="fa-solid fa-graduation-cap text-gold"></i> ${dict.explanationTitle}
+                        </h3>
+                        <div id="explanationContent" class="text-xs text-gray-700 leading-relaxed min-h-[80px]">
+                            ${dict.explanationPlaceholder}
+                        </div>
+                    </div>
+                    <div class="md:col-span-4 bg-white rounded-2xl p-4 shadow-sm border border-sage/40 flex flex-col justify-center gap-3">
+                        <button onclick="verifyStudentAnswer()" class="w-full bg-academicGreen hover:bg-academicGreen-dark text-white py-3 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-check"></i> ${dict.verifyBtn}
+                        </button>
+                        <button onclick="generateNewStudentCase()" class="w-full bg-neutralLight hover:bg-sage/20 text-darkText py-2.5 px-4 rounded-xl text-xs font-medium transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-dice"></i> ${dict.newCaseBtn}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderKMapWorkspaceHTML(data) {
+            const varsCount = data.varsCount;
+            let html = `<div class="flex flex-col items-center space-y-4 my-2">`;
+            html += `<div class="text-xs text-darkText font-semibold bg-gold/10 px-3 py-1.5 rounded-xl border border-gold/30 text-center">Active Minterms: [${data.minterms.join(', ')}]</div>`;
+            html += `<div class="grid gap-2 p-3 bg-neutralLight rounded-xl border border-sage/30 shadow-inner" style="grid-template-columns: repeat(5, minmax(0, 1fr));">`;
+
+            if (varsCount === 3) {
+                html += `<div class="text-xs font-bold text-gray-400 text-center p-2">A \\ BC</div>`;
+                ['00', '01', '11', '10'].forEach(col => {
+                    html += `<div class="text-xs font-bold text-darkText text-center p-2 bg-gold/20 rounded">${col}</div>`;
+                });
+                [['0', [0,1,3,2]], ['1', [4,5,7,6]]].forEach(([rVal, mArr]) => {
+                    html += `<div class="text-xs font-bold text-darkText flex items-center justify-center bg-gold/20 rounded">${rVal}</div>`;
+                    mArr.forEach(mIdx => {
+                        let val = data.gridCells[mIdx];
+                        html += `<div onclick="toggleKMapCell(${mIdx})" class="kmap-cell h-14 rounded-xl flex flex-col items-center justify-center border font-mono text-sm shadow-sm ${val === 1 ? 'bg-gold text-darkText font-bold border-gold' : 'bg-white text-darkText border-sage/30'}"><span class="text-[10px] opacity-70">m${mIdx}</span><span class="text-base">${val}</span></div>`;
+                    });
+                });
+            } else {
+                html += `<div class="text-xs font-bold text-gray-400 text-center p-2">AB \\ CD</div>`;
+                ['00', '01', '11', '10'].forEach(col => {
+                    html += `<div class="text-xs font-bold text-darkText text-center p-2 bg-gold/20 rounded">${col}</div>`;
+                });
+                const rMap = {'00': [0,1,3,2], '01': [4,5,7,6], '11': [12,13,15,14], '10': [8,9,11,10]};
+                Object.entries(rMap).forEach(([rCode, mArr]) => {
+                    html += `<div class="text-xs font-bold text-darkText flex items-center justify-center bg-gold/20 rounded">${rCode}</div>`;
+                    mArr.forEach(mIdx => {
+                        let val = data.gridCells[mIdx];
+                        html += `<div onclick="toggleKMapCell(${mIdx})" class="kmap-cell h-14 rounded-xl flex flex-col items-center justify-center border font-mono text-sm shadow-sm ${val === 1 ? 'bg-gold text-darkText font-bold border-gold' : 'bg-white text-darkText border-sage/30'}"><span class="text-[10px] opacity-70">m${mIdx}</span><span class="text-base">${val}</span></div>`;
+                    });
+                });
+            }
+
+            html += `</div></div>`;
+            return html;
+        }
+
+        function toggleKMapCell(idx) {
+            if (appState.currentCaseData && appState.currentCaseData.gridCells) {
+                appState.currentCaseData.gridCells[idx] = appState.currentCaseData.gridCells[idx] === 1 ? 0 : 1;
+                renderStudentWorkspace();
+            }
+        }
+
+        function renderChoiceWorkspaceHTML(data) {
+            let html = `<div class="space-y-3 my-2"><div class="space-y-2">`;
+            data.options.forEach(opt => {
+                html += `
+                    <label class="flex items-center gap-3 p-3.5 bg-neutralLight hover:bg-sage/20 rounded-xl border border-sage/30 cursor-pointer transition">
+                        <input type="radio" name="studentOption" value="${opt.id}" class="text-gold focus:ring-gold h-4 w-4">
+                        <span class="text-xs font-medium text-darkText">${appState.lang === 'ar' ? opt.textAr : opt.textEn}</span>
+                    </label>
+                `;
+            });
+            html += `</div></div>`;
+            return html;
+        }
+
+        function verifyStudentAnswer() {
+            appState.totalAttempts++;
+            let isCorrect = false;
+            const data = appState.currentCaseData;
+            const dict = i18n[appState.lang];
+
+            if (data.type === 'kmap') {
+                let match = true;
+                for (let k in data.gridCells) {
+                    let expected = data.minterms.includes(parseInt(k)) ? 1 : 0;
+                    if (data.gridCells[k] !== expected) { match = false; break; }
+                }
+                isCorrect = match;
+            } else {
+                const selected = document.querySelector('input[name="studentOption"]:checked');
+                if (selected) {
+                    const opt = data.options.find(o => o.id === selected.value);
+                    if (opt && opt.correct) isCorrect = true;
+                }
+            }
+
+            const expBox = document.getElementById('explanationContent');
+            if (isCorrect) {
+                appState.correctAttempts++;
+                appState.solvedCount++;
+                appState.domainStats[6]++;
+                saveProgress();
+                updateDashboardUI();
+
+                expBox.innerHTML = `
+                    <div class="bg-academicGreen/10 border border-academicGreen/30 p-3 rounded-xl text-academicGreen space-y-1">
+                        <div class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-circle-check"></i> ${dict.correctVerification}</div>
+                        <p class="text-xs text-darkText">${appState.lang === 'ar' ? data.explanationAr : data.explanationEn}</p>
+                    </div>
+                `;
+            } else {
+                saveProgress();
+                updateDashboardUI();
+
+                expBox.innerHTML = `
+                    <div class="bg-red-50 border border-red-200 p-3 rounded-xl text-burgundy space-y-1">
+                        <div class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark"></i> ${dict.incorrectVerification}</div>
+                        <p class="text-xs text-darkText">${appState.lang === 'ar' ? "راجع المدخلات وقواعد التبسيط المنطقي وتجربة الحالة مرة أخرى." : "Review your inputs and logic simplification rules, then retry."}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function requestStudentHint() {
+            showAlertModal(i18n[appState.lang].hintBtn, appState.lang === 'ar' ? "تلميح: تأكد من تجميع أكبر عدد ممكن من الواحدات المضاعفة للأس 2 في خريطة كارنو ومراعاة الأطراف." : "Hint: Ensure grouping largest possible powers of 2 (1, 2, 4, 8) in the K-map with edge wrapping.");
+        }
+
+        function updateDashboardUI() {
+            document.getElementById('dashTotalSolved').innerText = appState.solvedCount;
+            const acc = appState.totalAttempts > 0 ? Math.round((appState.correctAttempts / appState.totalAttempts) * 100) : 0;
+            document.getElementById('dashAccuracy').innerText = acc + '%';
+            document.getElementById('dashAttempts').innerText = appState.totalAttempts;
+
+            let masteryKey = 'masteryFoundation';
+            if (appState.solvedCount >= 10) masteryKey = 'masteryDeveloping';
+            if (appState.solvedCount >= 25) masteryKey = 'masteryCompetent';
+            if (appState.solvedCount >= 40) masteryKey = 'masteryAdvanced';
+            if (appState.solvedCount >= 60) masteryKey = 'masteryMastery';
+            document.getElementById('dashMastery').innerText = i18n[appState.lang][masteryKey];
+
+            const domainList = document.getElementById('domainCompetencyList');
+            domainList.innerHTML = '';
+            studentModulesData.forEach(mod => {
+                let solved = appState.domainStats[mod.id] || 0;
+                let pct = Math.min(100, Math.round((solved / 5) * 100));
+                domainList.innerHTML = domainList.innerHTML + `
+                    <div class="flex items-center justify-between bg-neutralLight p-2.5 rounded-xl border border-sage/30">
+                        <span class="text-darkText font-medium">${appState.lang === 'ar' ? mod.nameAr : mod.nameEn}</span>
+                        <div class="flex items-center gap-2 w-1/3">
+                            <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
+                                <div class="bg-academicGreen h-full" style="width: ${pct}%"></div>
+                            </div>
+                            <span class="font-mono text-[10px] text-gray-500">${solved}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Modals Utility
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function showAlertModal(title, msg) {
+            document.getElementById('modalAlertTitle').innerHTML = `<i class="fa-solid fa-circle-info text-gold"></i> ${title}`;
+            document.getElementById('modalAlertBody').innerText = msg;
+            openModal('modalAlert');
+        }
+    </script>
+</body>
+</html>
