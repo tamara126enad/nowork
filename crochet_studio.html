@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atelier Crochet — Interactive Haute Couture Learning Studio</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        atelier: {
+                            50: '#fcfbfa',
+                            100: '#f5f2ed',
+                            200: '#e8e2d5',
+                            300: '#d4c9b3',
+                            400: '#b8a88c',
+                            500: '#9c8868',
+                            600: '#826f50',
+                            700: '#68563c',
+                            800: '#4e402c',
+                            900: '#352b1e',
+                            950: '#211a12'
+                        },
+                        yarn: {
+                            rose: '#e0a9a7',
+                            sage: '#a3b19b',
+                            cream: '#f4f1de',
+                            camel: '#c69c6d',
+                            charcoal: '#3d3a37',
+                            lavender: '#b5a3b9',
+                            terracotta: '#d97b66'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'Georgia', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'system-ui', '-apple-system', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        };
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom styling for tactile crochet textures and smooth animations */
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f5f2ed;
+            color: #352b1e;
+            overflow-x: hidden;
+        }
+        .font-serif {
+            font-family: 'Playfair Display', Georgia, serif;
+        }
+        .yarn-texture {
+            background-image: radial-gradient(circle at 50% 50%, rgba(198, 156, 109, 0.15) 0%, transparent 60%),
+                              repeating-linear-gradient(45deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 2px, transparent 2px, transparent 4px);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 201, 179, 0.4);
+        }
+        .dark-glass {
+            background: rgba(33, 26, 18, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(130, 111, 80, 0.3);
+        }
+        @keyframes pulse-gentle {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.03); opacity: 0.9; }
+        }
+        .animate-pulse-gentle {
+            animation: pulse-gentle 4s ease-in-out infinite;
+        }
+        @keyframes stitch-appear {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-stitch {
+            animation: stitch-appear 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f5f2ed;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d4c9b3;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b8a88c;
+        }
+    </style>
+</head>
+<body class="min-h-full flex flex-col selection:bg-atelier-300 selection:text-atelier-950">
+
+    <!-- Top Navigation & Branding -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-atelier-200/60 px-4 lg:px-12 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-full bg-atelier-900 text-atelier-100 flex items-center justify-center font-serif text-xl shadow-md">
+                A
+            </div>
+            <div>
+                <h1 class="font-serif text-lg lg:text-xl font-bold tracking-wide text-atelier-900">ATELIER CROCHET</h1>
+                <p class="text-xs text-atelier-600 tracking-wider uppercase">Haute Couture Craft Academy</p>
+            </div>
+        </div>
+
+        <!-- Stage Progress Indicator (Desktop & Tablet) -->
+        <nav aria-label="Learning Stages" class="hidden xl:flex items-center space-x-1 bg-atelier-100/80 p-1.5 rounded-full border border-atelier-200 shadow-inner" id="stage-nav-desktop">
+            <!-- Dynamically populated by JS -->
+        </nav>
+
+        <div class="flex items-center space-x-3">
+            <button onclick="app.toggleSoundGuide()" id="sound-guide-btn" class="hidden sm:flex items-center space-x-2 text-xs font-medium text-atelier-700 bg-atelier-100 hover:bg-atelier-200 px-3 py-2 rounded-full transition-all border border-atelier-200">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-atelier-600"></i>
+                <span id="guide-mode-text">Guidance: On</span>
+            </button>
+            <button onclick="app.resetJourney()" class="text-xs text-atelier-500 hover:text-atelier-900 underline transition-colors px-2 py-1">
+                Reset Journey
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Progress Bar -->
+    <div class="xl:hidden bg-atelier-200/50 border-b border-atelier-200 px-4 py-2.5 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+            <span class="text-xs font-semibold uppercase tracking-wider text-atelier-700" id="mobile-stage-label">Stage 1 of 6</span>
+            <span class="text-atelier-400">•</span>
+            <span class="text-xs font-serif italic text-atelier-900" id="mobile-stage-title">Meet the Yarn & Hook</span>
+        </div>
+        <div class="flex items-center space-x-1" id="stage-dots-mobile">
+            <!-- Mobile dots -->
+        </div>
+    </div>
+
+    <!-- Main Interactive Studio Container -->
+    <main class="flex-1 flex flex-col max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8" id="main-container">
+        <!-- Dynamic Stage Content rendered here -->
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-6 px-6 text-center border-t border-atelier-200 text-xs text-atelier-600 bg-atelier-100/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+            <p class="font-serif italic text-atelier-800">"Every masterpiece begins with a single loop."</p>
+        </div>
+        <div class="flex items-center space-x-6">
+            <span class="flex items-center space-x-1 text-atelier-700">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-atelier-600"></i>
+                <span>Beginner-First Certified</span>
+            </span>
+            <span class="flex items-center space-x-1 text-atelier-700">
+                <i data-lucide="heart" class="w-3.5 h-3.5 text-rose-500 fill-rose-500"></i>
+                <span>Handmade Craft Experience</span>
+            </span>
+        </div>
+    </footer>
+
+    <script>
+        // --- APPLICATION STATE & DATA MODEL ---
+        const STAGES = [
+            { id: 1, code: '01', title: 'Meet the Yarn & Hook', subtitle: 'Fundamentals of fiber, tension, and the slip knot.' },
+            { id: 2, code: '02', title: 'Learn the First Stitch', subtitle: 'Mastering the fundamental chain and foundational movement.' },
+            { id: 3, code: '03', title: 'Build a Shape', subtitle: 'Rows, turning, counting, and creating your first fabric.' },
+            { id: 4, code: '04', title: 'First Project: Bucket Hat', subtitle: 'Transitioning small stitches into a real wearable accessory.' },
+            { id: 5, code: '05', title: 'Create a Wearable Design', subtitle: 'Customizing panels, shaping armholes, and structural fit.' },
+            { id: 6, code: '06', title: 'Your Final Creation', subtitle: 'The grand unveiling of your handcrafted masterpiece.' }
+        ];
+
+        const PROJECTS = [
+            { id: 'bucket-hat', name: 'Classic Bucket Hat', difficulty: 'Beginner', time: '3 Hours', category: 'Accessory', desc: 'A chic, sun-shading bucket hat worked in continuous rounds with gentle increases.', icon: 'sun', baseColor: '#c69c6d' },
+            { id: 'summer-top', name: 'Riviera Summer Top', difficulty: 'Beginner+', time: '5 Hours', category: 'Wearable', desc: 'An airy, breathable crop top crafted with simple panels and seamless shoulder joins.', icon: 'shirt', baseColor: '#a3b19b' },
+            { id: 'market-bag', name: 'Artisan Tote Bag', difficulty: 'Beginner', time: '2.5 Hours', category: 'Accessory', desc: 'An expandable net tote bag with sturdy handles for farmers market strolls.', icon: 'shopping-bag', baseColor: '#e0a9a7' },
+            { id: 'cozy-vest', name: 'Boho Granny Vest', difficulty: 'Easy', time: '6 Hours', category: 'Wearable', desc: 'A timeless layering vest featuring effortless geometric motif construction.', icon: 'layers', baseColor: '#b5a3b9' }
+        ];
+
+        class CrochetApp {
+            constructor() {
+                this.currentStage = 1;
+                this.completedStages = JSON.parse(localStorage.getItem('atelier_completed') || '[1]');
+                
+                // Stage 1 Interactive State
+                this.s1Step = 0; // 0: Yarn hold, 1: Loop, 2: Hook insert, 3: Pull, 4: Chain
+                this.s1ChainsCount = 0;
+
+                // Stage 2 Interactive State
+                this.s2Stitches = [];
+                this.s2ActiveStep = 0; // 0: Insert, 1: Yarn Over, 2: Pull Through, 3: Complete
+
+                // Stage 3 Interactive State
+                this.s3Rows = [
+                    { row: 1, count: 8, stitches: ['ch','ch','ch','ch','ch','ch','ch','ch'] },
+                    { row: 2, count: 8, stitches: ['sc','sc','sc','sc','sc','sc','sc','sc'] },
+                    { row: 3, count: 10, stitches: ['sc','inc','sc','sc','sc','sc','sc','sc','inc','sc'] }
+                ];
+                this.s3SelectedRow = 2;
+
+                // Stage 4 Interactive State
+                this.s4DeconstructStep = 0; // 0: Foundation, 1: Base, 2: Crown, 3: Brim, 4: Finishing
+
+                // Stage 5 Interactive State
+                this.s5Color = '#c69c6d';
+                this.s5Size = 'Medium (M)';
+                this.s5Style = 'Classic Ribbed';
+                this.s5CurrentStepIndex = 0;
+
+                // Stage 6 Final Creation State
+                this.activeProject = PROJECTS[0];
+                this.isRevealed = false;
+
+                // Global Guidance mode
+                this.guidanceActive = true;
+                this.toastMessage = null;
+
+                this.init();
+            }
+
+            init() {
+                this.renderNav();
+                this.renderStage();
+                lucide.createIcons();
+            }
+
+            setStage(stageNum) {
+                if (stageNum < 1 || stageNum > 6) return;
+                this.currentStage = stageNum;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                this.renderNav();
+                this.renderStage();
+                lucide.createIcons();
+            }
+
+            markStageComplete(stageNum) {
+                if (!this.completedStages.includes(stageNum)) {
+                    this.completedStages.push(stageNum);
+                    localStorage.setItem('atelier_completed', JSON.stringify(this.completedStages));
+                    this.showToast(`Stage ${stageNum} Mastered! Your skills grow.`);
+                }
+                this.renderNav();
+            }
+
+            nextStage() {
+                this.markStageComplete(this.currentStage);
+                if (this.currentStage < 6) {
+                    this.setStage(this.currentStage + 1);
+                }
+            }
+
+            toggleSoundGuide() {
+                this.guidanceActive = !this.guidanceActive;
+                document.getElementById('guide-mode-text').innerText = `Guidance: ${this.guidanceActive ? 'On' : 'Off'}`;
+                this.showToast(this.guidanceActive ? 'Micro-guidance prompts enabled.' : 'Guidance minimized.');
+            }
+
+            resetJourney() {
+                if (confirm('Are you sure you want to reset your crochet journey?')) {
+                    localStorage.removeItem('atelier_completed');
+                    this.completedStages = [1];
+                    this.currentStage = 1;
+                    this.s1Step = 0;
+                    this.s1ChainsCount = 0;
+                    this.s2Stitches = [];
+                    this.setStage(1);
+                    this.showToast('Journey reset. Welcome back to the basics!');
+                }
+            }
+
+            showToast(msg) {
+                this.toastMessage = msg;
+                const existing = document.getElementById('atelier-toast');
+                if (existing) existing.remove();
+
+                const toast = document.createElement('div');
+                toast.id = 'atelier-toast';
+                toast.className = 'fixed bottom-6 right-6 z-50 glass-panel bg-atelier-900 text-atelier-100 px-5 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 text-sm animate-stitch border border-atelier-700';
+                toast.innerHTML = `<i data-lucide="sparkles" class="w-4 h-4 text-amber-300"></i><span>${msg}</span>`;
+                document.body.appendChild(toast);
+                lucide.createIcons();
+
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.style.opacity = '0';
+                        toast.style.transition = 'opacity 0.5s ease';
+                        setTimeout(() => toast.remove(), 500);
+                    }
+                }, 3500);
+            }
+
+            renderNav() {
+                // Desktop nav
+                const navDesktop = document.getElementById('stage-nav-desktop');
+                if (navDesktop) {
+                    navDesktop.innerHTML = STAGES.map(s => {
+                        const isCurrent = s.id === this.currentStage;
+                        const isCompleted = this.completedStages.includes(s.id);
+                        return `
+                            <button onclick="app.setStage(${s.id})" class="flex items-center space-x-2 px-3.5 py-1.5 rounded-full transition-all text-xs font-medium ${
+                                isCurrent 
+                                    ? 'bg-atelier-900 text-atelier-100 shadow-md' 
+                                    : isCompleted 
+                                        ? 'bg-atelier-200/80 text-atelier-800 hover:bg-atelier-300' 
+                                        : 'text-atelier-600 hover:text-atelier-900 hover:bg-atelier-200/50'
+                            }">
+                                <span class="font-mono text-[10px] opacity-75">${s.code}</span>
+                                <span class="hidden lg:inline">${s.title.split(':')[0]}</span>
+                                ${isCompleted && !isCurrent ? '<i data-lucide="check" class="w-3 h-3 text-emerald-600"></i>' : ''}
+                            </button>
+                        `;
+                    }).join('');
+                }
+
+                // Mobile info
+                const mobileLabel = document.getElementById('mobile-stage-label');
+                const mobileTitle = document.getElementById('mobile-stage-title');
+                const mobileDots = document.getElementById('stage-dots-mobile');
+                
+                if (mobileLabel) mobileLabel.innerText = `Stage ${this.currentStage} of 6`;
+                if (mobileTitle) mobileTitle.innerText = STAGES[this.currentStage - 1].title;
+                if (mobileDots) {
+                    mobileDots.innerHTML = STAGES.map(s => `
+                        <button onclick="app.setStage(${s.id})" class="w-2.5 h-2.5 rounded-full transition-all ${
+                            s.id === this.currentStage ? 'bg-atelier-900 w-6' : this.completedStages.includes(s.id) ? 'bg-atelier-600' : 'bg-atelier-300'
+                        }"></button>
+                    `).join('');
+                }
+            }
+
+            renderStage() {
+                const container = document.getElementById('main-container');
+                if (!container) return;
+
+                switch(this.currentStage) {
+                    case 1: container.innerHTML = this.renderStage1(); break;
+                    case 2: container.innerHTML = this.renderStage2(); break;
+                    case 3: container.innerHTML = this.renderStage3(); break;
+                    case 4: container.innerHTML = this.renderStage4(); break;
+                    case 5: container.innerHTML = this.renderStage5(); break;
+                    case 6: container.innerHTML = this.renderStage6(); break;
+                }
+                lucide.createIcons();
+            }
+
+            // ==========================================
+            // STAGE 1: Meet the Yarn & Hook
+            // ==========================================
+            renderStage1() {
+                const steps = [
+                    { title: "1. Holding the Yarn", desc: "Drape the working yarn over your index finger and secure the tail gently between your pinky and ring finger for smooth tension.", action: "Grip Yarn" },
+                    { title: "2. The Slip Knot", desc: "Form a loop with the yarn tail crossing over the working yarn. Pull a bight through the loop to create an adjustable slip knot.", action: "Form Loop" },
+                    { title: "3. Inserting the Hook", desc: "Slip your crochet hook into the slip knot loop and gently pull the working yarn to snug it comfortably around the shaft.", action: "Insert Hook" },
+                    { title: "4. Yarn Over & Pull", desc: "Wrap the yarn over the hook from back to front ('Yarn Over'). Catch the strand in the hook's groove and pull through the loop.", action: "Pull Through" },
+                    { title: "5. Creating Chain Stitches", desc: "Repeat the yarn over and pull-through movement to build a graceful sequence of chain stitches—the foundation of all crochet.", action: "Create Chain" }
+                ];
+
+                const current = steps[this.s1Step];
+
+                return `
+                    <div class="space-y-8 animate-stitch">
+                        <div class="text-center max-w-2xl mx-auto space-y-3">
+                            <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-atelier-200/70 text-atelier-800 text-xs font-semibold tracking-wider uppercase">
+                                <span>Stage 01</span>
+                                <span>•</span>
+                                <span>Foundations</span>
+                            </div>
+                            <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-atelier-900 tracking-tight">Meet the Yarn & Hook</h2>
+                            <p class="text-atelier-700 text-sm sm:text-base leading-relaxed">
+                                Every haute couture crochet piece begins here. Discover the tactile harmony of fiber, tension, and the fundamental loop.
+                            </p>
+                        </div>
+
+                        <!-- Interactive Studio Workbench -->
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                            <!-- Visual Macro Demonstration Window -->
+                            <div class="lg:col-span-7 glass-panel rounded-3xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden shadow-xl border border-atelier-200 yarn-texture">
+                                <div class="absolute top-4 left-4 flex items-center space-x-2 bg-white/80 backdrop-blur px-3 py-1.5 rounded-full text-xs font-medium text-atelier-800 shadow-sm">
+                                    <i data-lucide="eye" class="w-3.5 h-3.5 text-atelier-600"></i>
+                                    <span>Macro Studio View • Step ${this.s1Step + 1} of 5</span>
+                                </div>
+
+                                <!-- Virtual Hands & Hook Animation Canvas Area -->
+                                <div class="my-12 py-10 flex flex-col items-center justify-center relative min-h-[260px]">
+                                    <!-- Animated Yarn & Hook Representation -->
+                                    <div class="relative w-72 h-44 flex items-center justify-center transition-all duration-500" id="workbench-visual">
+                                        <!-- Yarn strand SVG -->
+                                        <svg class="absolute inset-0 w-full h-full overflow-visible" viewBox="0 0 300 180">
+                                            <path d="M 20 140 Q 90 40 160 90 T 280 60" fill="none" stroke="#c69c6d" stroke-width="8" stroke-linecap="round" class="transition-all duration-700" />
+                                            ${this.s1Step >= 1 ? '<circle cx="160" cy="90" r="22" fill="none" stroke="#e0a9a7" stroke-width="5" stroke-dasharray="6,4" class="animate-pulse" />' : ''}
+                                            ${this.s1Step >= 3 ? '<path d="M 140 70 Q 160 50 180 80" fill="none" stroke="#a3b19b" stroke-width="6" />' : ''}
+                                        </svg>
+
+                                        <!-- Hook Icon / Element -->
+                                        <div class="absolute transition-all duration-500 transform ${
+                                            this.s1Step === 0 ? 'translate-x-[-70px] translate-y-[20px] rotate-[-25deg]' :
+                                            this.s1Step === 1 ? 'translate-x-[-30px] translate-y-[-10px] rotate-[10deg]' :
+                                            this.s1Step === 2 ? 'translate-x-[0px] translate-y-[0px] rotate-[35deg] scale-110' :
+                                            this.s1Step === 3 ? 'translate-x-[20px] translate-y-[-20px] rotate-[45deg]' :
+                                            'translate-x-[40px] translate-y-[10px] rotate-[15deg] scale-105'
+                                        }">
+                                            <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-amber-200 via-amber-100 to-amber-300 shadow-xl flex items-center justify-center border-2 border-amber-400">
+                                                <i data-lucide="git-commit" class="w-8 h-8 text-atelier-800 transform rotate-90"></i>
+                                            </div>
+                                            <span class="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-[10px] uppercase tracking-widest font-mono bg-atelier-900 text-atelier-100 px-2 py-0.5 rounded-full whitespace-nowrap shadow">
+                                                Ergonomic Hook
+                                            </span>
+                                        </div>
+
+                                        <!-- Created Chains Counter Indicator -->
+                                        ${this.s1ChainsCount > 0 ? `
+                                            <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex items-center space-x-1 bg-atelier-900/90 text-atelier-100 px-4 py-1.5 rounded-full text-xs shadow-lg animate-stitch">
+                                                <i data-lucide="link" class="w-3.5 h-3.5 text-amber-300"></i>
+                                                <span class="font-bold">${this.s1ChainsCount}</span> Chain Stitches Formed
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-between pt-4 border-t border-atelier-200/60 text-xs text-atelier-600">
+                                    <span>Interactive Macro Simulation</span>
+                                    <span class="font-medium text-atelier-800">Tap action button below to practice</span>
+                                </div>
+                            </div>
+
+                            <!-- Step Instruction & Practice Panel -->
+                            <div class="lg:col-span-5 glass-panel rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-xl border border-atelier-200">
+                                <div class="space-y-6">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-mono font-bold tracking-widest uppercase text-atelier-500">Step 0${this.s1Step + 1} / 05</span>
+                                        <div class="flex space-x-1">
+                                            ${steps.map((_, i) => `<div class="w-6 h-1.5 rounded-full transition-all ${i <= this.s1Step ? 'bg-atelier-900' : 'bg-atelier-200'}"></div>`).join('')}
+                                        </div>
+                                    </div>
+
+                                    <div class="space-y-3">
+                                        <h3 class="font-serif text-2xl font-bold text-atelier-900">${current.title}</h3>
+                                        <p class="text-atelier-700 text-sm leading-relaxed">${current.desc}</p>
+                                    </div>
+
+                                    <!-- Interactive Try It Yourself Action Box -->
+                                    <div class="bg-atelier-100/80 rounded-2xl p-5 border border-atelier-200 space-y-4">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs font-semibold uppercase tracking-wider text-atelier-800 flex items-center space-x-1.5">
+                                                <i data-lucide="hand" class="w-4 h-4 text-atelier-600"></i>
+                                                <span>Try It Yourself</span>
+                                            </span>
+                                            <span class="text-xs text-atelier-600 font-mono">Practice Mode</span>
+                                        </div>
+                                        <button onclick="app.practiceStep1Action()" class="w-full py-3.5 px-5 bg-atelier-900 hover:bg-atelier-800 text-atelier-100 rounded-xl font-medium text-sm transition-all shadow-lg flex items-center justify-center space-x-2 group">
+                                            <span>${current.action}</span>
+                                            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                                        </button>
+                                        <p class="text-[11px] text-atelier-600 text-center italic">Click to simulate the physical motion and build your first loop.</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-between pt-6 mt-6 border-t border-atelier-200/60">
+                                    <button onclick="app.prevStep1()" ${this.s1Step === 0 ? 'disabled' : ''} class="px-4 py-2 text-xs font-medium text-atelier-700 hover:text-atelier-900 disabled:opacity-40 disabled:cursor-not-allowed">
+                                        ← Previous
+                                    </button>
+                                    <button onclick="app.nextStep1()" class="px-6 py-2.5 bg-atelier-800 hover:bg-atelier-900 text-atelier-100 rounded-xl text-xs font-medium shadow transition-all flex items-center space-x-1.5">
+                                        <span>${this.s1Step === 4 ? 'Complete Stage 1' : 'Next Step'}</span>
+                                        <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            practiceStep1Action() {
+                if (this.s1Step < 4) {
+                    this.s1Step++;
+                    this.showToast(`Great work! You completed: Stage 1 - Step ${this.s1Step}`);
+                } else {
+                    this.s1ChainsCount++;
+                    this.showToast(`Wonderful! Chain stitch #${this.s1ChainsCount} created successfully.`);
+                }
+                this.renderStage();
+            }
+
+            prevStep1() {
+                if (this.s1Step > 0) {
+                    this.s1Step--;
+                    this.renderStage();
+                }
+            }
+
+            nextStep1() {
+                if (this.s1Step < 4) {
+                    this.s1Step = 4;
+                    this.renderStage();
+                } else {
+                    this.nextStage();
+                }
+            }
+
+            // ==========================================
+            // STAGE 2: Learn the First Stitch (Single Crochet)
+            // ==========================================
+            renderStage2() {
+                const stitchSteps = [
+                    { num: "01", title: "Insert the Hook", desc: "Push your hook through the front and back loops of the designated foundation chain V-shape.", icon: "arrow-down-right" },
+                    { num: "02", title: "Yarn Over (YO)", desc: "Wrap the working yarn over the hook from back to front securely in the hook's valley.", icon: "rotate-cw" },
+                    { num: "03", title: "Pull Through", desc: "Draw the newly wrapped yarn back through the chain loop. You now have two loops on your hook.", icon: "chevrons-down" },
+                    { num: "04", title: "Complete Stitch", desc: "Yarn over once more and pull through both loops remaining on the hook. One perfect Single Crochet is complete!", icon: "check-circle-2" }
+                ];
+
+                return `
+                    <div class="space-y-8 animate-stitch">
+                        <div class="text-center max-w-2xl mx-auto space-y-3">
+                            <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-atelier-200/70 text-atelier-800 text-xs font-semibold tracking-wider uppercase">
+                                <span>Stage 02</span>
+                                <span>•</span>
+                                <span>The Foundation Stitch</span>
+                            </div>
+                            <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-atelier-900 tracking-tight">Learn the First Stitch (Single Crochet)</h2>
+                            <p class="text-atelier-700 text-sm sm:text-base leading-relaxed">
+                                The Single Crochet (abbreviated SC) is the sturdy building block of countless garments, hats, and bags. Master the 4-step rhythm below.
+                            </p>
+                        </div>
+
+                        <!-- Macro Visualization & 4-Step Guide Grid -->
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                            <!-- Macro Stitch Demonstration Canvas -->
+                            <div class="lg:col-span-7 glass-panel rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-xl border border-atelier-200 relative overflow-hidden">
+                                <div class="flex items-center justify-between mb-6">
+                                    <span class="text-xs font-mono uppercase tracking-widest text-atelier-600">Macro Stitch Visualizer</span>
+                                    <div class="flex items-center space-x-2">
+                                        <button onclick="app.replayStitchAnimation()" class="px-3 py-1 bg-atelier-200 hover:bg-atelier-300 text-atelier-800 rounded-full text-xs font-medium flex items-center space-x-1 transition-all">
+                                            <i data-lucide="play" class="w-3 h-3"></i>
+                                            <span>Slow Motion Replay</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Visual Close-Up Animation Area -->
+                                <div class="my-8 py-12 flex flex-col items-center justify-center bg-atelier-50/60 rounded-2xl border border-atelier-200/60 relative">
+                                    <div class="flex items-center space-x-4">
+                                        <!-- Foundation Chain Base -->
+                                        <div class="flex space-x-2">
+                                            <div class="w-8 h-8 rounded-full bg-yarn-camel border-2 border-atelier-700 shadow-md flex items-center justify-center text-[10px] text-white font-bold">1</div>
+                                            <div class="w-8 h-8 rounded-full bg-yarn-camel border-2 border-atelier-700 shadow-md flex items-center justify-center text-[10px] text-white font-bold">2</div>
+                                            <div class="w-8 h-8 rounded-full bg-yarn-camel border-2 border-atelier-700 shadow-md flex items-center justify-center text-[10px] text-white font-bold ring-4 ring-atelier-400">3</div>
+                                        </div>
+                                    </div>
+                                    <!-- Hook & Active Loop -->
+                                    <div class="mt-6 flex items-center space-x-2 animate-pulse-gentle">
+                                        <div class="w-10 h-10 rounded-full bg-amber-200 border-2 border-amber-500 shadow flex items-center justify-center">
+                                            <i data-lucide="hook" class="w-5 h-5 text-atelier-900"></i>
+                                        </div>
+                                        <span class="text-xs font-mono text-atelier-700 bg-white/90 px-3 py-1 rounded-full shadow-sm">
+                                            Active Phase: Step 0${this.s2ActiveStep + 1}
+                                        </span>
+                                    </div>
+
+                                    <!-- Feedback Badge -->
+                                    <div class="mt-8 text-center">
+                                        <p class="text-xs font-medium text-atelier-700 italic">"Notice how the hook scoops the working yarn through both loops smoothly."</p>
+                                    </div>
+                                </div>
+
+                                <!-- Interactive Practice Counter -->
+                                <div class="flex items-center justify-between pt-4 border-t border-atelier-200 text-xs">
+                                    <span class="text-atelier-600">Stitches practiced in session: <strong class="text-atelier-900">${this.s2Stitches.length}</strong></span>
+                                    <button onclick="app.practiceSingleCrochet()" class="px-4 py-2 bg-atelier-900 hover:bg-atelier-800 text-atelier-100 rounded-xl font-medium shadow transition-all flex items-center space-x-1.5">
+                                        <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+                                        <span>Practice 1 Stitch (SC)</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 4 Numbered Step Breakdown -->
+                            <div class="lg:col-span-5 flex flex-col space-y-3">
+                                ${stitchSteps.map((st, i) => `
+                                    <div onclick="app.setS2Step(${i})" class="glass-panel p-4 rounded-2xl border transition-all cursor-pointer flex items-start space-x-4 ${
+                                        this.s2ActiveStep === i ? 'border-atelier-900 shadow-md bg-white' : 'border-atelier-200/80 hover:border-atelier-400'
+                                    }">
+                                        <div class="w-8 h-8 rounded-xl ${this.s2ActiveStep === i ? 'bg-atelier-900 text-atelier-100' : 'bg-atelier-200 text-atelier-800'} flex items-center justify-center font-mono text-xs font-bold shrink-0 shadow-sm">
+                                            ${st.num}
+                                        </div>
+                                        <div class="space-y-1 flex-1">
+                                            <h4 class="font-serif font-bold text-atelier-900 text-sm sm:text-base flex items-center justify-between">
+                                                <span>${st.title}</span>
+                                                <i data-lucide="${st.icon}" class="w-4 h-4 text-atelier-600"></i>
+                                            </h4>
+                                            <p class="text-xs text-atelier-700 leading-relaxed">${st.desc}</p>
+                                        </div>
+                                    </div>
+                                `).join('')}
+
+                                <button onclick="app.nextStage()" class="w-full mt-4 py-3.5 bg-atelier-900 hover:bg-atelier-800 text-atelier-100 rounded-2xl text-sm font-semibold shadow-lg transition-all flex items-center justify-center space-x-2">
+                                    <span>Continue to Build a Shape</span>
+                                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            setS2Step(idx) {
+                this.s2ActiveStep = idx;
+                this.renderStage();
+            }
+
+            replayStitchAnimation() {
+                this.showToast('Replaying macro slow-motion single crochet formation...');
+            }
+
+            practiceSingleCrochet() {
+                this.s2Stitches.push('sc');
+                this.showToast(`Stitch #${this.s2Stitches.length} created! Excellent rhythm and tension.`);
+                this.renderStage();
+            }
+
+            // ==========================================
+            // STAGE 3: Build the First Shape
+            // ==========================================
+            renderStage3() {
+                return `
+                    <div class="space-y-8 animate-stitch">
+                        <div class="text-center max-w-2xl mx-auto space-y-3">
+                            <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-atelier-200/70 text-atelier-800 text-xs font-semibold tracking-wider uppercase">
+                                <span>Stage 03</span>
+                                <span>•</span>
+                                <span>Structured Fabric</span>
+                            </div>
+                            <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-atelier-900 tracking-tight">Build the First Shape</h2>
+                            <p class="text-atelier-700 text-sm sm:text-base leading-relaxed">
+                                Stitches alone are threads. When stacked in structured rows, they transform into a tactile fabric. Learn turning chains, counting, and gentle increases.
+                            </p>
+                        </div>
+
+                        <!-- Interactive Fabric Matrix & Controls -->
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                            <!-- Fabric Preview Area -->
+                            <div class="lg:col-span-7 glass-panel rounded-3xl p-6 sm:p-8 shadow-xl border border-atelier-200 flex flex-col justify-between">
+                                <div class="flex items-center justify-between mb-4">
+                                    <span class="text-xs font-mono uppercase tracking-widest text-atelier-600">Live Fabric Matrix Grid</span>
+                                    <div class="flex items-center space-x-2 text-xs font-medium text-atelier-800 bg-atelier-200/60 px-3 py-1 rounded-full">
+                                        <i data-lucide="grid" class="w-3.5 h-3.5"></i>
+                                        <span>3 Rows Structured</span>
+                                    </div>
+                                </div>
+
+                                <!-- Visual Stitch Grid Representation -->
+                                <div class="my-6 p-6 bg-atelier-50 rounded-2xl border border-atelier-200 flex flex-col items-center justify-center space-y-4">
+                                    ${this.s3Rows.map((r, idx) => `
+                                        <div onclick="app.selectRow(${idx})" class="w-full max-w-md p-3 rounded-xl transition-all cursor-pointer flex items-center justify-between ${
+                                            this.s3SelectedRow === idx ? 'bg-white shadow-md border-2 border-atelier-800' : 'bg-atelier-100/60 hover:bg-atelier-100 border border-atelier-200'
+                                        }">
+                                            <div class="flex items-center space-x-3">
+                                                <span class="text-xs font-mono font-bold bg-atelier-900 text-atelier-100 px-2 py-0.5 rounded">Row ${r.row}</span>
+                                                <span class="text-xs text-atelier-700 font-medium">${r.count} Stitches</span>
+                                            </div>
+                                            <div class="flex space-x-1 overflow-x-auto py-1">
+                                                ${r.stitches.map((st, sIdx) => `
+                                                    <div class="w-7 h-7 rounded-lg ${st === 'inc' ? 'bg-amber-300 text-amber-900 font-bold text-[10px]' : 'bg-atelier-200 text-atelier-800'} flex items-center justify-center font-mono text-[10px] shadow-sm" title="${st}">
+                                                        ${st}
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+
+                                <div class="flex items-center justify-between pt-4 border-t border-atelier-200 text-xs text-atelier-600">
+                                    <span>Tip: Click any row to inspect stitch definitions</span>
+                                    <button onclick="app.addRowToFabric()" class="px-4 py-2 bg-atelier-900 hover:bg-atelier-800 text-atelier-100 rounded-xl font-medium shadow transition-all flex items-center space-x-1.5">
+                                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                        <span>Add Row 4 (Increase)</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Concept Breakdown Panel -->
+                            <div class="lg:col-span-5 glass-panel rounded-3xl p-6 sm:p-8 shadow-xl border border-atelier-200 flex flex-col justify-between space-y-6">
+                                <div class="space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-mono uppercase tracking-widest text-atelier-500">Key Concept</span>
+                                        <span class="text-xs font-semibold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">Essential Skill</span>
+                                    </div>
+                                    <h3 class="font-serif text-2xl font-bold text-atelier-900">Turning & Increasing</h3>
+                                    <p class="text-xs sm:text-sm text-atelier-700 leading-relaxed">
+                                        When you reach the end of a row, crochet two chain stitches ("turning chain") and rotate your work 180 degrees to begin the next row. To expand your shape, work two stitches into the exact same base space ("Increase").
+                                    </p>
+
+                                    <div class="bg-atelier-100/80 p-4 rounded-2xl border border-atelier-200 space-y-2">
+                                        <h4 class="text-xs font-bold uppercase tracking-wider text-atelier-900">Active Row Inspector</h4>
+                                        <p class="text-xs text-atelier-700">
+                                            Currently inspecting <strong class="text-atelier-900">Row ${this.s3Rows[this.s3SelectedRow].row}</strong> containing ${this.s3Rows[this.s3SelectedRow].count} stitches. Maintaining even tension here ensures your edges remain crisp and architectural.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <button onclick="app.nextStage()" class="w-full py-3.5 bg-atelier-900 hover:bg-atelier-800 text-atelier-100 rounded-2xl text-sm font-semibold shadow-lg transition-all flex items-center justify-center space-x-2">
+                                    <span>Continue to First Project</span>
+                                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            selectRow(idx) {
+                this.s3SelectedRow = idx;
+                this.renderStage();
+            }
+
+            addRowToFabric() {
+                const nextRowNum = this.s3Rows.length + 1;
+                const newCount = this.s3Rows[this.s3Rows.length - 1].count + 2;
+                this.s3Rows.push({
+                    row: nextRowNum,
+                    count: newCount,
+                    stitches: ['sc', 'inc', 'sc', 'sc', 'sc', 'sc', 'sc', 'sc', 'inc', 'sc']
+                });
+                this.s3SelectedRow = this.s3Rows.length - 1;
+                this.showToast(`Row ${nextRowNum} added with ${newCount} stitches! Shape expansion successful.`);
+                this.renderStage();
+            }
+
+            // ==========================================
+            // STAGE 4: First Project (Bucket Hat Deconstruction)
+            // ==========================================
+            renderStage4() {
+                const deconstructSteps = [
+                    { title: "1. Foundation Ring", desc: "Work 6 single crochets into an adjustable magic ring to create the absolute center crown.", icon: "circle" },
+                    { title: "2. Crown Increases", desc: "Systematically increase stitches in circular rounds until the flat circle matches the top of your head.", icon: "disc" },
+                    { title: "3. Straight Body", desc: "Stop increasing and work even rounds downward to form the cylindrical head band.", icon: "cylinder" },
+                    { title: "4. Brim Expansion", desc: "Introduce rhythmic increases again to flare the fabric outward into a chic sun brim.", icon: "sun" },
+                    { title: "5. Finishing Weave", desc: "Fasten off with a tapestry needle, weaving in any remaining yarn tails for a pristine finish.", icon: "scissors" }
+                ];
+
+                return `
+                    <div class="space-y-8 animate-stitch">
+                        <div class="text-center max-w-2xl mx-auto space-y-3">
+                            <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-atelier-200/70 text-atelier-800 text-xs font-semibold tracking-wider uppercase">
+                                <span>Stage 04</span>
+                                <span>•</span>
+                                <span>First Wearable Design</span>
+                            </div>
+                            <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-atelier-900 tracking-tight">The Classic Crochet Bucket Hat</h2>
+                            <p class="text-atelier-700 text-sm sm:text-base leading-relaxed">
+                                You have mastered stitches and rows. Now, let us deconstruct a real haute couture accessory and see how simple loops become a stunning wearable hat.
+                            </p>
+                        </div>
+
+                        <!-- Fashion Atelier Presentation & Deconstruction Grid -->
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                            <!-- 3D / Fashion Presentation Card -->
+                            <div class="lg:col-span-6 glass-panel rounded-3xl p-6 sm:p-8 shadow-xl border border-atelier-200 flex flex-col justify-between relative overflow-hidden">
+                                <div class="absolute top-4 right-4 bg-atelier-900 text-atelier-100 text-xs font-mono px-3 py-1 rounded-full shadow">
+                                    Project #01 • Beginner Wearable
+                                </div>
+
+                                <div class="space-y-4 my-4">
+                                    <div class="w-full h-56 rounded-2xl bg-gradient-to-br from-atelier-200 via-atelier-300 to-atelier-400 flex items-center justify-center relative shadow-inner">
+                                        <!-- Bucket hat graphic icon / SVG -->
+                                        <div class="text-center space-y-2">
+                                            <div class="w-24 h-24 mx-auto rounded-full bg-atelier-900/10 flex items-center justify-center border-2 border-atelier-800 shadow-lg">
+                                                <i data-lucide="sun" class="w-12 h-12 text-atelier-900 animate-spin" style="animation-duration: 20s;"></i>
+                                            </div>
+                                            <span class="font-serif italic text-atelier-900 text-lg">Finished Bucket Hat</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-3 gap-3 text-center">
+                                        <div class="bg-white/80 p-3 rounded-xl border border-atelier-200">
+                                            <span class="block text-[10px] uppercase font-mono text-atelier-500">Yarn Needed</span>
+                                            <strong class="text-xs text-atelier-900">150g Worsted</strong>
+                                        </div>
+                                        <div class="bg-white/80 p-3 rounded-xl border border-atelier-200">
+                                            <span class="block text-[10px] uppercase font-mono text-atelier-500">Hook Size</span>
+                                            <strong class="text-xs text-atelier-900">5.0mm (H)</strong>
+                                        </div>
+                                        <div class="bg-white/80 p-3 rounded-xl border border-atelier-200">
+                                            <span class="block text-[10px] uppercase font-mono text-atelier-500">Est. Time</span>
+                                            <strong class="text-xs text-atelier-900">3 Hours</strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="pt-4 border-t border-atelier-200/60 flex items-center justify-between text-xs text-atelier-600">
+                                    <span>Difficulty: Beginner Friendly</span>
+                                    <span class="font-bold text-atelier-900">100% Success Rate</span>
+                                </div>
+                            </div>
+
+                            <!-- Interactive Deconstruction Steps -->
+                            <div class="lg:col-span-6 glass-panel rounded-3xl p-6 sm:p-8 shadow-xl border border-atelier-200 flex flex-col justify-between space-y-6">
+                                <div class="space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-mono uppercase tracking-widest text-atelier-500">Anatomical Deconstruction</span>
+                                        <span class="text-xs font-semibold text-atelier-800 bg-atelier-200 px-3 py-1 rounded-full">Step ${this.s4DeconstructStep + 1} of 5</span>
+                                    </div>
+                                    <h3 class="font-serif text-2xl font-bold text-atelier-900">How the Hat is Assembled</h3>
+
+                                    <div class="space-y-3">
+                                        ${deconstructSteps.map((ds, idx) => `
+                                            <div onclick="app.setS4Step(${idx})" class="p-3.5 rounded-2xl border transition-all cursor-pointer flex items-start space-x-3 ${
+                                                this.s4DeconstructStep === idx ? 'bg-atelier-900 text-atelier-100 shadow-md border-atelier-900' : 'bg-white/70 hover:bg-white border-atelier-200 text-atelier-900'
+                                            }">
+                                                <div class="w-7 h-7 rounded-lg ${this.s4DeconstructStep === idx ? 'bg-atelier-800 text-white' : 'bg-atelier-200 text-atelier-800'} flex items-center justify-center font-mono text-xs font-bold shrink-0">
+                                                    0${idx + 1}
+                                                </div>
+                                                <div class="space-y-0.5 flex-1">
+                                                    <h4 class="font-serif font-bold text-sm flex items-center justify-between">
+                                                        <span>${ds.title}</span>
+                                                        <i data-lucide="${ds.icon}" class="w-3.5 h-3.5 opacity-75"></i>
+                                                    </h4>
+                                                    <p class="text-xs opacity-90 leading-relaxed">${ds.desc}</p>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+
+                                <button onclick="app.nextStage()" class="w-full py-3.5 bg-atelier-900 hover:bg-atelier-800 text-atelier-100 rounded-2xl text-sm font-semibold shadow-lg transition-all flex items-center justify-center space-x-2">
+                                    <span>Continue to Wearable Design Studio</span>
+                                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            setS4Step(idx) {
+                this.s4DeconstructStep = idx;
+                this.renderStage();
+            }
+
+            // ==========================================
+            // STAGE 5: Create a Wearable Piece (Studio Customizer)
+            // ==========================================
+            renderStage5() {
+                const colors = [
+                    { name: 'Warm Camel', hex: '#c69c6d' },
+                    { name: 'Sage Green', hex: '#a3b19b' },
+                    { name: 'Soft Rose', hex: '#e0a9a7' },
+                    { name: 'Cream Ivory', hex: '#f4f1de' },
+                    { name: 'Charcoal Noir', hex: '#3d3a37' }
+                ];
+
+                const sizes = ['Small (S)', 'Medium (M)', 'Large (L)', 'Oversized (XL)'];
+
+                return `
+                    <div class="space-y-8 animate-stitch">
+                        <div class="text-center max-w-2xl mx-auto space-y-3">
+                            <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-atelier-200/70 text-atelier-800 text-xs font-semibold tracking-wider uppercase">
+                                <span>Stage 05</span>
+                                <span>•</span>
+                                <span>Haute Couture Studio</span>
+                            </div>
+                            <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-atelier-900 tracking-tight">Create a Wearable Summer Top</h2>
+                            <p class="text-atelier-700 text-sm sm:text-base leading-relaxed">
+                                Customize your own bespoke crochet summer top. Select your luxury yarn shade and preferred size, then review the modular panel construction.
+                            </p>
+                        </div>
+
+                        <!-- Customizer Workbench -->
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                            <!-- Live Interactive Model Preview -->
+                            <div class="lg:col-span-6 glass-panel rounded-3xl p-6 sm:p-8 shadow-xl border border-atelier-200 flex flex-col justify-between relative overflow-hidden">
+                                <div class="absolute top-4 left-4 bg-white/90 px-3 py-1 rounded-full text-xs font-mono font-bold text-atelier-800 shadow-sm">
+                                    Model: Riviera Top • ${this.s5Size}
+                                </div>
+
+                                <div class="my-10 p-8 rounded-3xl flex flex-col items-center justify-center relative transition-all duration-700 shadow-inner" style="background-color: ${this.s5Color}25; border: 2px solid ${this.s5Color};">
+                                    <div class="w-36 h-44 rounded-2xl flex flex-col items-center justify-center shadow-lg transition-all duration-500 relative" style="background-color: ${this.s5Color};">
+                                        <i data-lucide="shirt" class="w-16 h-16 text-white opacity-90"></i>
+                                        <span class="absolute bottom-3 font-serif italic text-white text-xs tracking-wider">Bespoke Fit</span>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-3 pt-4 border-t border-atelier-200/60">
+                                    <div class="flex items-center justify-between text-xs">
+                                        <span class="text-atelier-600">Selected Shade:</span>
+                                        <strong class="text-atelier-900 font-mono">${this.s5Color}</strong>
+                                    </div>
+                                    <div class="flex items-center justify-between text-xs">
+                                        <span class="text-atelier-600">Modular Panels:</span>
+                                        <strong class="text-atelier-900">Front + Back + Straps + Ribbing</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Customization Controls & Component Breakdown -->
+                            <div class="lg:col-span-6 glass-panel rounded-3xl p-6 sm:p-8 shadow-xl border border-atelier-200 flex flex-col justify-between space-y-6">
+                                <div class="space-y-6">
+                                    <!-- Color Selector -->
+                                    <div class="space-y-3">
+                                        <label class="text-xs font-mono font-bold uppercase tracking-wider text-atelier-700">1. Select Luxury Yarn Color</label>
+                                        <div class="flex items-center space-x-3">
+                                            ${colors.map(c => `
+                                                <button onclick="app.setS5Color('${c.hex}')" class="w-9 h-9 rounded-full transition-all shadow-md relative flex items-center justify-center ${this.s5Color === c.hex ? 'ring-4 ring-atelier-900 scale-110' : 'hover:scale-105'}" style="background-color: ${c.hex};" title="${c.name}">
+                                                    ${this.s5Color === c.hex ? '<i data-lucide="check" class="w-4 h-4 text-white drop-shadow"></i>' : ''}
+                                                </button>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+
+                                    <!-- Size Selector -->
+                                    <div class="space-y-3">
+                                        <label class="text-xs font-mono font-bold uppercase tracking-wider text-atelier-700">2. Select Garment Size</label>
+                                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                            ${sizes.map(sz => `
+                                                <button onclick="app.setS5Size('${sz}')" class="py-2 px-3 rounded-xl text-xs font-medium transition-all border ${
+                                                    this.s5Size === sz ? 'bg-atelier-900 text-atelier-100 border-atelier-900 shadow' : 'bg-white/70 text-atelier-800 border-atelier-200 hover:border-atelier-400'
+                                                }">
+                                                    ${sz}
+                                                </button>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+
+                                    <!-- Construction Flow Info -->
+                                    <div class="bg-atelier-100/80 p-4 rounded-2xl border border-atelier-200 space-y-2">
+                                        <h4 class="text-xs font-bold uppercase tracking-wider text-atelier-900">Modular Assembly Plan</h4>
+                                        <p class="text-xs text-atelier-700 leading-relaxed">
+                                            Back Panel (Row 1-40) → Front Panel (Shaped Neckline) → Shoulder Seams → Armhole Ribbing Edging.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <button onclick="app.nextStage()" class="w-full py-3.5 bg-atelier-900 hover:bg-atelier-800 text-atelier-100 rounded-2xl text-sm font-semibold shadow-lg transition-all flex items-center justify-center space-x-2">
+                                    <span>Proceed to Final Grand Creation</span>
+                                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            setS5Color(hex) {
+                this.s5Color = hex;
+                this.renderStage();
+            }
+
+            setS5Size(sz) {
+                this.s5Size = sz;
+                this.renderStage();
+            }
+
+            // ==========================================
+            // STAGE 6: Your Final Creation (Reward & Reveal)
+            // ==========================================
+            renderStage6() {
+                return `
+                    <div class="space-y-8 animate-stitch">
+                        <div class="text-center max-w-3xl mx-auto space-y-3">
+                            <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-amber-200 text-amber-900 text-xs font-semibold tracking-wider uppercase shadow-sm">
+                                <i data-lucide="award" class="w-3.5 h-3.5"></i>
+                                <span>Stage 06 • Grand Finale</span>
+                            </div>
+                            <h2 class="font-serif text-3xl sm:text-5xl font-bold text-atelier-900 tracking-tight">YOU STARTED WITH ONE STITCH. NOW YOU CAN CREATE.</h2>
+                            <p class="text-atelier-700 text-sm sm:text-base leading-relaxed">
+                                Look at how far your hands have traveled. From a single loop on a hook to a complete haute couture masterpiece.
+                            </p>
+                        </div>
+
+                        <!-- Grand Reveal Card -->
+                        <div class="glass-panel rounded-3xl p-6 sm:p-10 shadow-2xl border border-atelier-300 max-w-4xl mx-auto relative overflow-hidden yarn-texture">
+                            <div class="absolute top-6 right-6 flex items-center space-x-2 bg-atelier-900 text-atelier-100 text-xs font-mono px-4 py-1.5 rounded-full shadow-lg">
+                                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-300"></i>
+                                <span>Masterpiece Certified</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+                                <!-- Final Product Visual -->
+                                <div class="md:col-span-5 flex flex-col items-center justify-center p-8 rounded-3xl shadow-inner bg-gradient-to-tr from-atelier-200 to-atelier-300 border border-atelier-300 relative">
+                                    <div class="w-32 h-32 rounded-full bg-atelier-900 text-atelier-100 flex items-center justify-center shadow-2xl mb-4 transform hover:scale-105 transition-transform">
+                                        <i data-lucide="${this.activeProject.icon}" class="w-16 h-16 text-amber-200"></i>
+                                    </div>
+                                    <h3 class="font-serif text-2xl font-bold text-atelier-900 text-center">${this.activeProject.name}</h3>
+                                    <span class="text-xs font-mono text-atelier-700 uppercase tracking-widest mt-1">${this.activeProject.category}</span>
+                                </div>
+
+                                <!-- Product Specifications & Summary -->
+                                <div class="md:col-span-7 space-y-6">
+                                    <div class="space-y-2">
+                                        <h4 class="font-serif text-xl font-bold text-atelier-900">Bespoke Specifications</h4>
+                                        <p class="text-xs sm:text-sm text-atelier-700 leading-relaxed">${this.activeProject.desc}</p>
+                                    </div>
+
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="bg-white/80 p-3.5 rounded-2xl border border-atelier-200">
+                                            <span class="text-[10px] uppercase font-mono text-atelier-500 block">Difficulty Level</span>
+                                            <strong class="text-xs text-atelier-900 font-bold">${this.activeProject.difficulty}</strong>
+                                        </div>
+                                        <div class="bg-white/80 p-3.5 rounded-2xl border border-atelier-200">
+                                            <span class="text-[10px] uppercase font-mono text-atelier-500 block">Estimated Time</span>
+                                            <strong class="text-xs text-atelier-900 font-bold">${this.activeProject.time}</strong>
+                                        </div>
+                                        <div class="bg-white/80 p-3.5 rounded-2xl border border-atelier-200">
+                                            <span class="text-[10px] uppercase font-mono text-atelier-500 block">Stitch Types</span>
+                                            <strong class="text-xs text-atelier-900 font-bold">Chain, Single Crochet, Increase</strong>
+                                        </div>
+                                        <div class="bg-white/80 p-3.5 rounded-2xl border border-atelier-200">
+                                            <span class="text-[10px] uppercase font-mono text-atelier-500 block">Finishing Technique</span>
+                                            <strong class="text-xs text-atelier-900 font-bold">Seamless Join & Weave</strong>
+                                        </div>
+                                    </div>
+
+                                    <!-- Make Another Project Selector -->
+                                    <div class="pt-4 border-t border-atelier-200/80 space-y-3">
+                                        <label class="text-xs font-mono font-bold uppercase tracking-wider text-atelier-800 block">Ready for Your Next Masterpiece?</label>
+                                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                            ${PROJECTS.map(p => `
+                                                <button onclick="app.switchProject('${p.id}')" class="py-2.5 px-3 rounded-xl text-xs font-medium transition-all border ${
+                                                    this.activeProject.id === p.id ? 'bg-atelier-900 text-atelier-100 border-atelier-900 shadow' : 'bg-white/80 text-atelier-800 border-atelier-200 hover:border-atelier-400'
+                                                }">
+                                                    ${p.name.split(' ')[1] || p.name}
+                                                </button>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reset / Restart Journey Button -->
+                        <div class="text-center pt-4">
+                            <button onclick="app.setStage(1)" class="px-8 py-4 bg-atelier-900 hover:bg-atelier-800 text-atelier-100 rounded-2xl font-semibold text-sm shadow-xl transition-all inline-flex items-center space-x-2">
+                                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                               <span>Revisit Academy Basics</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            switchProject(projId) {
+                const found = PROJECTS.find(p => p.id === projId);
+                if (found) {
+                    this.activeProject = found;
+                    this.showToast(`Selected project: ${found.name}. Ready to craft!`);
+                    this.renderStage();
+                }
+            }
+        }
+
+        // Initialize Application on Window Load
+        let app;
+        window.onload = function () {
+            app = new CrochetApp();
+        };
+    </script>
+</body>
+</html>

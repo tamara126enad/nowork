@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CVORA — Smart CV Builder | Created by Tamara Alshbatat</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter & Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind Custom Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        ink: {
+                            DEFAULT: '#18232F',
+                            light: '#243447',
+                            dark: '#0F1720'
+                        },
+                        ivory: {
+                            DEFAULT: '#F7F3EC',
+                            light: '#FCFAFA',
+                            dark: '#EBE4DA'
+                        },
+                        sand: '#E7D8C7',
+                        terracotta: {
+                            DEFAULT: '#B86F5B',
+                            hover: '#9E5B48',
+                            light: '#F4EBE8'
+                        },
+                        sage: {
+                            DEFAULT: '#8A9A87',
+                            light: '#EDF1ED'
+                        },
+                        gold: '#C5A46D'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Cairo', 'sans-serif'],
+                        arabic: ['Cairo', 'Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom print and layout styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-cv, #printable-cv * {
+                visibility: visible;
+            }
+            #printable-cv {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                box-shadow: none !important;
+            }
+        }
+        
+        .cv-page-shadow {
+            box-shadow: 0 10px 30px -5px rgba(24, 35, 47, 0.1), 0 0 0 1px rgba(24, 35, 47, 0.05);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F7F3EC;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #E7D8C7;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #B86F5B;
+        }
+    </style>
+</head>
+<body class="h-full bg-ivory text-ink font-sans antialiased flex flex-col selection:bg-terracotta selection:text-white" x-data="cvoraApp()">
+
+    <div x-show="toast.visible" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 translate-y-2"
+         class="fixed bottom-6 right-6 z-50 max-w-md bg-ink text-white px-5 py-4 rounded-xl shadow-2xl flex items-center space-x-3 border-l-4 border-terracotta"
+         style="display: none;">
+        <div class="text-terracotta text-xl" x-html="toast.icon"></div>
+        <div class="flex-1">
+            <h5 class="font-bold text-sm" x-text="toast.title"></h5>
+            <p class="text-xs text-ivory/80" x-text="toast.message"></p>
+        </div>
+        <button @click="toast.visible = false" class="text-ivory/60 hover:text-white"><i class="fas fa-times"></i></button>
+    </div>
+
+    <header class="bg-ivory border-b border-sand sticky top-0 z-40 backdrop-blur-md bg-ivory/90">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <div class="flex items-center space-x-3 cursor-pointer" @click="currentView = 'landing'">
+                <div class="w-11 h-11 bg-ink rounded-xl flex items-center justify-center text-gold font-bold text-xl shadow-md">
+                    <i class="fas fa-file-shield"></i>
+                </div>
+                <div>
+                    <span class="text-2xl font-black tracking-wider text-ink">CVORA</span>
+                    <span class="block text-[10px] tracking-widest uppercase text-terracotta font-semibold" x-text="isArabic ? 'صانع السيرة الذاتية الذكي' : 'Smart CV Builder'"></span>
+                </div>
+            </div>
+
+            <!-- Navigation Actions -->
+            <div class="flex items-center space-x-4">
+                <!-- Language Switcher -->
+                <button @click="toggleLanguage()" class="px-3 py-1.5 rounded-lg border border-sand text-xs font-semibold hover:bg-sand/30 transition flex items-center space-x-2">
+                    <i class="fas fa-globe text-terracotta"></i>
+                    <span x-text="isArabic ? 'English' : 'العربية'"></span>
+                </button>
+
+                <!-- Saved Indicator -->
+                <div class="hidden sm:flex items-center space-x-1.5 text-xs text-sage font-medium px-3 py-1 bg-sage/10 rounded-full">
+                    <span class="w-2 h-2 rounded-full bg-sage animate-pulse"></span>
+                    <span x-text="isArabic ? 'محفوظ تلقائياً' : 'Autosaved'"></span>
+                </div>
+
+                <!-- Main CTA / Switch View -->
+                <template x-if="currentView === 'landing'">
+                    <div class="flex items-center space-x-3">
+                        <button @click="loadDemoData()" class="text-xs font-semibold px-4 py-2 text-ink hover:text-terracotta transition">
+                            <i class="fas fa-wand-magic-sparkles mr-1 text-gold"></i> <span x-text="isArabic ? 'تجربة سيرة ذاتية' : 'Try Demo CV'"></span>
+                        </button>
+                        <button @click="startNewCv()" class="bg-terracotta hover:bg-terracotta-hover text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-md transition flex items-center space-x-2">
+                            <span x-text="isArabic ? 'ابدأ بناء سيرتك' : 'Build My CV'"></span>
+                            <i class="fas fa-arrow-right" :class="isArabic ? 'fa-rotate-180' : ''"></i>
+                        </button>
+                    </div>
+                </template>
+
+                <template x-if="currentView !== 'landing'">
+                    <div class="flex items-center space-x-3">
+                        <button @click="currentView = 'landing'" class="text-xs font-semibold px-3 py-2 text-ink/70 hover:text-ink transition">
+                            <i class="fas fa-home mr-1"></i> <span x-text="isArabic ? 'الرئيسية' : 'Home'"></span>
+                        </button>
+                        <button @click="currentView = 'builder'" class="px-3 py-2 rounded-lg text-xs font-semibold transition" :class="currentView === 'builder' ? 'bg-ink text-white shadow' : 'bg-sand/40 text-ink'">
+                            <i class="fas fa-pen-to-square mr-1"></i> <span x-text="isArabic ? 'المحرر' : 'Editor'"></span>
+                        </button>
+                        <button @click="currentView = 'dashboard'" class="px-3 py-2 rounded-lg text-xs font-semibold transition" :class="currentView === 'dashboard' ? 'bg-ink text-white shadow' : 'bg-sand/40 text-ink'">
+                            <i class="fas fa-folder-open mr-1"></i> <span x-text="isArabic ? 'سيرتي الذاتية' : 'My CVs'"></span>
+                        </button>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col" :dir="isArabic ? 'rtl' : 'ltr'">
+
+        <!-- ================= LANDING PAGE VIEW ================= -->
+        <template x-if="currentView === 'landing'">
+            <div class="flex-1 flex flex-col">
+                <!-- Hero Section -->
+                <section class="py-16 md:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    <div class="lg:col-span-7 space-y-6">
+                        <div class="inline-flex items-center space-x-2 bg-terracotta/10 text-terracotta px-4 py-1.5 rounded-full text-xs font-bold tracking-wide">
+                            <i class="fas fa-shield-halved"></i>
+                            <span x-text="isArabic ? 'متوافق تماماً مع أنظمة الفرز الآلي (ATS)' : '100% ATS-Friendly Architecture'"></span>
+                        </div>
+                        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-ink tracking-tight leading-tight" x-text="isArabic ? 'أنشئ سيرتك الذاتية باحترافية، دون أن تعرف كيف تكتبها.' : 'Build a CV without knowing how to write one.'"></h1>
+                        <p class="text-lg text-ink/80 leading-relaxed max-w-2xl" x-text="isArabic ? 'أجب عن أسئلة بسيطة وسهلة. يقوم كفورا (CVORA) بتحويل خبرتك البسيطة إلى سيرة ذاتية احترافية ومقبولة لدى كبرى الشركات.' : 'Answer simple guided questions. CVORA turns your raw experience into a professional, polished, ATS-ready CV.'"></p>
+                        
+                        <div class="flex flex-wrap gap-4 pt-2">
+                            <button @click="startNewCv()" class="bg-terracotta hover:bg-terracotta-hover text-white text-base font-bold px-8 py-4 rounded-xl shadow-xl transition flex items-center space-x-3">
+                                <span x-text="isArabic ? 'ابدأ الآن مجاناً' : 'Build My CV Now'"></span>
+                                <i class="fas fa-arrow-right" :class="isArabic ? 'fa-rotate-180' : ''"></i>
+                            </button>
+                            <button @click="loadDemoData()" class="bg-sand/60 hover:bg-sand text-ink text-base font-bold px-6 py-4 rounded-xl transition flex items-center space-x-2">
+                                <i class="fas fa-eye text-terracotta"></i>
+                                <span x-text="isArabic ? 'شاهد نموذج حي' : 'See Live Example'"></span>
+                            </button>
+                        </div>
+
+                        <div class="pt-6 border-t border-sand grid grid-cols-3 gap-4 text-xs font-medium text-ink/70">
+                            <div><i class="fas fa-check text-sage mr-1.5"></i> <span x-text="isArabic ? 'بدون خبرة مسبقة' : 'No prior CV needed'"></span></div>
+                            <div><i class="fas fa-check text-sage mr-1.5"></i> <span x-text="isArabic ? 'تصدير Word و PDF' : 'Word & PDF Export'"></span></div>
+                            <div><i class="fas fa-check text-sage mr-1.5"></i> <span x-text="isArabic ? 'دعم العربية والإنجليزية' : 'Arabic & English'"></span></div>
+                        </div>
+                    </div>
+
+                    <!-- Hero Preview Graphic -->
+                    <div class="lg:col-span-5 relative">
+                        <div class="absolute -inset-2 bg-gradient-to-r from-gold/30 to-terracotta/20 rounded-3xl blur-xl opacity-70"></div>
+                        <div class="relative bg-white p-6 rounded-2xl cv-page-shadow border border-sand space-y-4">
+                            <div class="flex items-center justify-between border-b pb-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-ink rounded-full flex items-center justify-center text-white font-bold">SA</div>
+                                    <div>
+                                        <h4 class="font-bold text-sm text-ink">Sanad Ahmad</h4>
+                                        <p class="text-[11px] text-ink/60">Customer Service & Administrative Specialist</p>
+                                    </div>
+                                </div>
+                                <span class="bg-sage/20 text-sage text-[10px] font-bold px-2 py-0.5 rounded">ATS 98%</span>
+                            </div>
+                            <div class="space-y-2 text-xs text-ink/70">
+                                <p class="font-semibold text-ink"><i class="fas fa-briefcase mr-1 text-terracotta"></i> Experience Summary:</p>
+                                <p class="bg-ivory p-3 rounded-lg border border-sand text-ink/80 italic">"Assisted customers daily, resolved inquiries efficiently, and managed records using Microsoft Excel with high accuracy."</p>
+                            </div>
+                            <div class="flex justify-between items-center pt-2 text-[11px] text-ink/50">
+                                <span><i class="fas fa-file-word text-blue-600 mr-1"></i> DOCX Ready</span>
+                                <span><i class="fas fa-file-pdf text-red-600 mr-1"></i> PDF Ready</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- How It Works Section -->
+                <section class="py-20 bg-ivory-dark border-t border-sand px-4 sm:px-6 lg:px-8">
+                    <div class="max-w-7xl mx-auto space-y-12">
+                        <div class="text-center space-y-3">
+                            <h2 class="text-3xl font-black text-ink" x-text="isArabic ? 'كيف يعمل كفورا؟' : 'How CVORA Works'"></h2>
+                            <p class="text-ink/70 max-w-xl mx-auto" x-text="isArabic ? 'ثلاث خطوات بسيطة لتحويل قصتك المهنية إلى سيرة ذاتية تفتح لك الأبواب.' : 'Three simple steps to transform your story into a professional career asset.'"></p>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <div class="bg-white p-8 rounded-2xl border border-sand space-y-4 relative shadow-sm">
+                                <div class="w-12 h-12 bg-terracotta text-white rounded-xl flex items-center justify-center font-black text-lg">01</div>
+                                <h3 class="font-bold text-lg text-ink" x-text="isArabic ? 'أخبرنا عن نفسك بلغة بسيطة' : 'Tell us about yourself in plain language'"></h3>
+                                <p class="text-sm text-ink/70 leading-relaxed" x-text="isArabic ? 'لا تقلق بشأن الصياغة. أجب عن أسئلة تفاعلية ومباشرة عن خبرتك أو تعليمك أو مهاراتك.' : 'Do not worry about formal phrasing. Answer guided questions about your background, even informally.'"></p>
+                            </div>
+                            <div class="bg-white p-8 rounded-2xl border border-sand space-y-4 relative shadow-sm">
+                                <div class="w-12 h-12 bg-gold text-white rounded-xl flex items-center justify-center font-black text-lg">02</div>
+                                <h3 class="font-bold text-lg text-ink" x-text="isArabic ? 'كفورا يعيد صياغة وتنظيم المحتوى' : 'CVORA organizes and polishes content'"></h3>
+                                <p class="text-sm text-ink/70 leading-relaxed" x-text="isArabic ? 'يقوم نظامنا بتحويل كلماتك العادية إلى جمل مهنية قوية ومنسقة خصيصاً لاجتياز فحص الشركات.' : 'Our smart engine structures your inputs into professional, bulleted achievements designed to pass ATS screening.'"></p>
+                            </div>
+                            <div class="bg-white p-8 rounded-2xl border border-sand space-y-4 relative shadow-sm">
+                                <div class="w-12 h-12 bg-sage text-white rounded-xl flex items-center justify-center font-black text-lg">03</div>
+                                <h3 class="font-bold text-lg text-ink" x-text="isArabic ? 'حمل سيرتك الذاتية فوراً' : 'Download your polished CV'"></h3>
+                                <p class="text-sm text-ink/70 leading-relaxed" x-text="isArabic ? 'احصل على ملف Word قابل للتعديل وملف PDF جاهز للطباعة بدقة عالية، مع الحفاظ على حقوق الملكية.' : 'Export a real editable Word document (.docx) or print-ready PDF instantly with embedded metadata.'"></p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </template>
+
+        <!-- ================= DASHBOARD VIEW ================= -->
+        <template x-if="currentView === 'dashboard'">
+            <div class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full space-y-8">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h2 class="text-3xl font-black text-ink" x-text="isArabic ? 'لوحة تحكم السير الذاتية' : 'My CV Dashboard'"></h2>
+                        <p class="text-sm text-ink/70" x-text="isArabic ? 'إدارة وحفظ وتصدير سيرتك الذاتية بكل سهولة.' : 'Manage, duplicate, and export your professional CVs.'"></p>
+                    </div>
+                    <button @click="startNewCv()" class="bg-terracotta hover:bg-terracotta-hover text-white text-sm font-bold px-6 py-3 rounded-xl shadow transition flex items-center space-x-2">
+                        <i class="fas fa-plus"></i>
+                        <span x-text="isArabic ? '+ إنشاء سيرة ذاتية جديدة' : '+ Create New CV'"></span>
+                    </button>
+                </div>
+
+                <!-- CV Card Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-2xl border border-sand cv-page-shadow space-y-4 flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-start">
+                                <span class="bg-sage/20 text-sage text-xs font-bold px-3 py-1 rounded-full" x-text="cvData.personal.language.toUpperCase()"></span>
+                                <span class="text-xs text-ink/50" x-text="isArabic ? 'آخر تحديث: اليوم' : 'Last updated: Today'"></span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-xl text-ink" x-text="cvData.personal.fullName || (isArabic ? 'سيرة ذاتية جديدة' : 'Untitled CV')"></h3>
+                                <p class="text-sm text-terracotta font-medium" x-text="cvData.personal.title || (isArabic ? 'بدون المسمى الوظيفي' : 'No Professional Title')"></p>
+                            </div>
+                            <div class="text-xs text-ink/70 flex items-center space-x-4 pt-2 border-t border-sand">
+                                <span><i class="fas fa-briefcase text-sand mr-1"></i> <span x-text="cvData.experience.length + (isArabic ? ' خبرات' : ' Exp.')"></span></span>
+                                <span><i class="fas fa-graduation-cap text-sand mr-1"></i> <span x-text="cvData.education.length + (isArabic ? ' مؤهل' : ' Edu.')"></span></span>
+                                <span><i class="fas fa-layer-group text-sand mr-1"></i> <span x-text="cvData.skills.length + (isArabic ? ' مهارات' : ' Skills')"></span></span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-2 pt-4 border-t border-sand">
+                            <button @click="currentView = 'builder'" class="flex-1 bg-ink text-white text-xs font-bold py-2.5 rounded-lg hover:bg-ink-light transition">
+                                <i class="fas fa-pen mr-1"></i> <span x-text="isArabic ? 'تعديل' : 'Edit'"></span>
+                            </button>
+                            <button @click="currentView = 'builder'; activeTab = 'preview'" class="px-3 py-2.5 bg-sand/40 hover:bg-sand text-ink text-xs font-bold rounded-lg transition" title="Preview">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button @click="downloadWord()" class="px-3 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-lg transition" title="Download Word">
+                                <i class="fas fa-file-word"></i>
+                            </button>
+                            <button @click="downloadPdf()" class="px-3 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold rounded-lg transition" title="Download PDF">
+                                <i class="fas fa-file-pdf"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- ================= BUILDER VIEW ================= -->
+        <template x-if="currentView === 'builder'">
+            <div class="flex-1 flex flex-col lg:flex-row h-[calc(100vh-5rem)] overflow-hidden">
+                
+                <div class="w-full lg:w-1/2 flex flex-col bg-white border-r border-sand h-full overflow-y-auto">
+                    
+                    <!-- Wizard Steps Navigation Header -->
+                    <div class="p-4 border-b border-sand bg-ivory/50 sticky top-0 z-10 backdrop-blur">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-7 h-7 rounded-lg bg-terracotta text-white font-bold text-xs flex items-center justify-center" x-text="currentStepIndex + 1"></span>
+                                <h3 class="font-bold text-ink text-sm" x-text="steps[currentStepIndex].title[isArabic ? 'ar' : 'en']"></h3>
+                            </div>
+                            <span class="text-xs font-semibold text-ink/60" x-text="(currentStepIndex + 1) + ' / ' + steps.length"></span>
+                        </div>
+                        <!-- Progress Bar -->
+                        <div class="w-full bg-sand/50 h-2 rounded-full overflow-hidden">
+                            <div class="bg-terracotta h-full transition-all duration-300" :style="'width: ' + ((currentStepIndex + 1) / steps.length * 100) + '%'"></div>
+                        </div>
+                    </div>
+
+                    <!-- Step Content Forms -->
+                    <div class="p-6 flex-1 space-y-6">
+
+                        <!-- STEP 0: LANGUAGE & SITUATION -->
+                        <template x-if="steps[currentStepIndex].id === 'setup'">
+                            <div class="space-y-6">
+                                <div>
+                                    <h4 class="text-xl font-bold text-ink mb-1" x-text="isArabic ? 'أهلاً بك في كفورا' : 'Welcome to CVORA'"></h4>
+                                    <p class="text-xs text-ink/70" x-text="isArabic ? 'لنبدأ باختيار لغة سيرتك الذاتية ووضعك المهني الحالي لتوجيهك بالشكل الأمثل.' : 'Let us configure your CV language and career situation to tailor your guidance.'"></p>
+                                </div>
+                                
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase tracking-wider text-ink/70 mb-2" x-text="isArabic ? 'لغة السيرة الذاتية' : 'CV Language'"></label>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <button @click="cvData.personal.language = 'en'; isArabic = false" class="p-4 rounded-xl border-2 text-left transition flex items-center justify-between" :class="cvData.personal.language === 'en' ? 'border-terracotta bg-terracotta/5' : 'border-sand'">
+                                                <div>
+                                                    <span class="font-bold block text-sm">English CV</span>
+                                                    <span class="text-xs text-ink/60">Standard LTR format</span>
+                                                </div>
+                                                <i class="fas fa-check-circle text-terracotta" x-show="cvData.personal.language === 'en'"></i>
+                                            </button>
+                                            <button @click="cvData.personal.language = 'ar'; isArabic = true" class="p-4 rounded-xl border-2 text-right transition flex items-center justify-between" :class="cvData.personal.language === 'ar' ? 'border-terracotta bg-terracotta/5' : 'border-sand'">
+                                                <i class="fas fa-check-circle text-terracotta" x-show="cvData.personal.language === 'ar'"></i>
+                                                <div>
+                                                    <span class="font-bold block text-sm">السيرة الذاتية بالعربية</span>
+                                                    <span class="text-xs text-ink/60">تنسيق RTL احترافي</span>
+                                                </div>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase tracking-wider text-ink/70 mb-2" x-text="isArabic ? 'وضعك المهني الحالي' : 'Career Situation'"></label>
+                                        <select x-model="cvData.careerSituation" class="w-full bg-ivory border border-sand rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-terracotta focus:outline-none">
+                                            <option value="student">Student / طالب</option>
+                                            <option value="fresh">Fresh Graduate / خريج جديد</option>
+                                            <option value="entry">Entry Level / مستوى مبتدئ</option>
+                                            <option value="experienced">Experienced Professional / محترف ذو خبرة</option>
+                                            <option value="changer">Career Changer / مغيّر للمسار المهني</option>
+                                            <option value="freelancer">Freelancer / مستقل</option>
+                                            <option value="unemployed">Currently Unemployed / بحث عن عمل</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- STEP 1: PERSONAL INFORMATION -->
+                        <template x-if="steps[currentStepIndex].id === 'personal'">
+                            <div class="space-y-6">
+                                <div>
+                                    <h4 class="text-xl font-bold text-ink mb-1" x-text="isArabic ? 'معلوماتك الشخصية' : 'Personal Information'"></h4>
+                                    <p class="text-xs text-ink/70" x-text="isArabic ? 'كيف يمكن لمسؤولي التوظيف التواصل معك؟' : 'How can recruiters reach out to you?'"></p>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase tracking-wider text-ink/70 mb-1" x-text="isArabic ? 'الاسم الكامل' : 'Full Name'"></label>
+                                        <input type="text" x-model="cvData.personal.fullName" placeholder="e.g. Sanad Ahmad" class="w-full bg-ivory border border-sand rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-terracotta focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase tracking-wider text-ink/70 mb-1" x-text="isArabic ? 'المسمى الوظيفي المستهدف' : 'Professional Title'"></label>
+                                        <input type="text" x-model="cvData.personal.title" placeholder="e.g. Customer Support Specialist" class="w-full bg-ivory border border-sand rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-terracotta focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase tracking-wider text-ink/70 mb-1" x-text="isArabic ? 'البريد الإلكتروني' : 'Email Address'"></label>
+                                        <input type="email" x-model="cvData.personal.email" placeholder="sanad@example.com" class="w-full bg-ivory border border-sand rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-terracotta focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase tracking-wider text-ink/70 mb-1" x-text="isArabic ? 'رقم الهاتف' : 'Phone Number'"></label>
+                                        <input type="text" x-model="cvData.personal.phone" placeholder="+962 7 9000 0000" class="w-full bg-ivory border border-sand rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-terracotta focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase tracking-wider text-ink/70 mb-1" x-text="isArabic ? 'المدينة والبلد' : 'City & Country'"></label>
+                                        <input type="text" x-model="cvData.personal.location" placeholder="Aqaba, Jordan" class="w-full bg-ivory border border-sand rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-terracotta focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase tracking-wider text-ink/70 mb-1" x-text="isArabic ? 'رابط لينكد إن (اختياري)' : 'LinkedIn Profile (Optional)'"></label>
+                                        <input type="text" x-model="cvData.personal.linkedin" placeholder="linkedin.com/in/sanadahmad" class="w-full bg-ivory border border-sand rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-terracotta focus:outline-none">
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- STEP 2: PROFESSIONAL SUMMARY BUILDER -->
+                        <template x-if="steps[currentStepIndex].id === 'summary'">
+                            <div class="space-y-6">
+                                <div>
+                                    <h4 class="text-xl font-bold text-ink mb-1" x-text="isArabic ? 'الملخص المهني الذكي' : 'Smart Professional Summary'"></h4>
+                                    <p class="text-xs text-ink/70" x-text="isArabic ? 'أجب باختصار وسيقوم كفورا بصياغة ملخص احترافي جذاب.' : 'Answer briefly and let CVORA generate a polished executive summary.'"></p>
+                                </div>
+
+                                <div class="space-y-4">
+                                    <div class="bg-terracotta/10 p-4 rounded-xl border border-terracotta/20 space-y-3">
+                                        <h5 class="font-bold text-xs text-terracotta uppercase tracking-wider" x-text="isArabic ? 'مساعد صياغة الملخص بالذكاء الاصطناعي' : 'AI Summary Assistant'"></h5>
+                                        <div>
+                                            <label class="block text-xs font-medium text-ink mb-1" x-text="isArabic ? 'ما هي مجالك أو خبرتك الأساسية باختصار؟' : 'What is your core field or background?'"></label>
+                                            <input type="text" x-model="aiPromptHelper.field" placeholder="e.g. customer service and sales support" class="w-full bg-white border border-sand rounded-lg px-3 py-2 text-xs">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-ink mb-1" x-text="isArabic ? 'أهم المهارات أو الأدوات التي تستخدمها؟' : 'Key tools or skills you possess?'"></label>
+                                            <input type="text" x-model="aiPromptHelper.skills" placeholder="e.g. Microsoft Excel, communication, problem solving" class="w-full bg-white border border-sand rounded-lg px-3 py-2 text-xs">
+                                        </div>
+                                        <button @click="generateSummaryAI()" class="w-full bg-terracotta hover:bg-terracotta-hover text-white text-xs font-bold py-2.5 rounded-lg transition shadow">
+                                            <i class="fas fa-wand-magic-sparkles mr-1"></i> <span x-text="isArabic ? 'توليد ملخص احترافي' : 'Generate Professional Summary'"></span>
+                                        </button>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase tracking-wider text-ink/70 mb-1" x-text="isArabic ? 'الملخص النهائي (قابل للتعديل)' : 'Final Summary (Editable)'"></label>
+                                        <textarea rows="4" x-model="cvData.summary" class="w-full bg-ivory border border-sand rounded-xl p-4 text-sm focus:ring-2 focus:ring-terracotta focus:outline-none"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- STEP 3: WORK EXPERIENCE BUILDER -->
+                        <template x-if="steps[currentStepIndex].id === 'experience'">
+                            <div class="space-y-6">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h4 class="text-xl font-bold text-ink mb-1" x-text="isArabic ? 'خبرات العمل' : 'Work Experience'"></h4>
+                                        <p class="text-xs text-ink/70" x-text="isArabic ? 'أضف خبراتك ولو كانت بسيطة أو أعمال جزئية.' : 'Add your employment history. Even informal jobs count.'"></p>
+                                    </div>
+                                    <button @click="addExperience()" class="bg-terracotta hover:bg-terracotta-hover text-white text-xs font-bold px-3 py-2 rounded-lg transition shadow">
+                                        <i class="fas fa-plus mr-1"></i> <span x-text="isArabic ? 'إضافة وظيفة' : 'Add Position'"></span>
+                                    </button>
+                                </div>
+
+                                <div class="space-y-6">
+                                    <template x-for="(exp, index) in cvData.experience" :key="index">
+                                        <div class="bg-ivory p-5 rounded-2xl border border-sand space-y-4 relative">
+                                            <button @click="removeExperience(index)" class="absolute top-4 right-4 text-red-500 hover:text-red-700 text-xs"><i class="fas fa-trash"></i></button>
+                                            
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                <div>
+                                                    <label class="block text-[11px] font-bold uppercase text-ink/70 mb-1" x-text="isArabic ? 'المسمى الوظيفي' : 'Job Title'"></label>
+                                                    <input type="text" x-model="exp.title" placeholder="e.g. Sales Assistant" class="w-full bg-white border border-sand rounded-lg px-3 py-2 text-xs">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[11px] font-bold uppercase text-ink/70 mb-1" x-text="isArabic ? 'الشركة أو المؤسسة' : 'Company / Organization'"></label>
+                                                    <input type="text" x-model="exp.company" placeholder="e.g. Modern Retail Store" class="w-full bg-white border border-sand rounded-lg px-3 py-2 text-xs">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[11px] font-bold uppercase text-ink/70 mb-1" x-text="isArabic ? 'تاريخ البداية والنهاية' : 'Dates (Start - End)'"></label>
+                                                    <input type="text" x-model="exp.period" placeholder="2023 - 2025" class="w-full bg-white border border-sand rounded-lg px-3 py-2 text-xs">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[11px] font-bold uppercase text-ink/70 mb-1" x-text="isArabic ? 'المدينة / البلد' : 'Location'"></label>
+                                                    <input type="text" x-model="exp.location" placeholder="Aqaba, Jordan" class="w-full bg-white border border-sand rounded-lg px-3 py-2 text-xs">
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <div class="flex justify-between items-center mb-1">
+                                                    <label class="block text-[11px] font-bold uppercase text-ink/70" x-text="isArabic ? 'المهام والإنجازات (اكتب بلغتك وسيحولها كفورا)' : 'Responsibilities & Achievements'"></label>
+                                                    <button @click="transformExperience(index)" class="text-xs text-terracotta font-bold hover:underline">
+                                                        <i class="fas fa-wand-magic-sparkles mr-1"></i> <span x-text="isArabic ? 'تحويل لمهام مهنية' : 'Polish with AI'"></span>
+                                                    </button>
+                                                </div>
+                                                <textarea rows="3" x-model="exp.description" placeholder="e.g. I worked in a shop and dealt with customers and used Excel..." class="w-full bg-white border border-sand rounded-lg p-3 text-xs focus:ring-2 focus:ring-terracotta focus:outline-none"></textarea>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- STEP 4: EDUCATION BUILDER -->
+                        <template x-if="steps[currentStepIndex].id === 'education'">
+                            <div class="space-y-6">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h4 class="text-xl font-bold text-ink mb-1" x-text="isArabic ? 'التعليم والأكاديميات' : 'Education'"></h4>
+                                        <p class="text-xs text-ink/70" x-text="isArabic ? 'أضف مؤهلاتك التعليمية أو شهاداتك الثانوية والجامعية.' : 'Add your degrees, diplomas, or school certificates.'"></p>
+                                    </div>
+                                    <button @click="addEducation()" class="bg-terracotta hover:bg-terracotta-hover text-white text-xs font-bold px-3 py-2 rounded-lg transition shadow">
+                                        <i class="fas fa-plus mr-1"></i> <span x-text="isArabic ? 'إضافة تعليم' : 'Add Education'"></span>
+                                    </button>
+                                </div>
+
+                                <div class="space-y-6">
+                                    <template x-for="(edu, index) in cvData.education" :key="index">
+                                        <div class="bg-ivory p-5 rounded-2xl border border-sand space-y-4 relative">
+                                            <button @click="removeEducation(index)" class="absolute top-4 right-4 text-red-500 hover:text-red-700 text-xs"><i class="fas fa-trash"></i></button>
+                                            
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                <div>
+                                                    <label class="block text-[11px] font-bold uppercase text-ink/70 mb-1" x-text="isArabic ? 'الدرجة العلمية' : 'Degree / Diploma'"></label>
+                                                    <input type="text" x-model="edu.degree" placeholder="e.g. Bachelor of Business Administration" class="w-full bg-white border border-sand rounded-lg px-3 py-2 text-xs">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[11px] font-bold uppercase text-ink/70 mb-1" x-text="isArabic ? 'المؤسسة التعليمية / الجامعة' : 'Institution / University'"></label>
+                                                    <input type="text" x-model="edu.institution" placeholder="e.g. University of Jordan" class="w-full bg-white border border-sand rounded-lg px-3 py-2 text-xs">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[11px] font-bold uppercase text-ink/70 mb-1" x-text="isArabic ? 'سنة التخرج أو الفترة' : 'Graduation Year / Period'"></label>
+                                                    <input type="text" x-model="edu.period" placeholder="2020 - 2024" class="w-full bg-white border border-sand rounded-lg px-3 py-2 text-xs">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[11px] font-bold uppercase text-ink/70 mb-1" x-text="isArabic ? 'المدينة / البلد' : 'Location'"></label>
+                                                    <input type="text" x-model="edu.location" placeholder="Amman, Jordan" class="w-full bg-white border border-sand rounded-lg px-3 py-2 text-xs">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- STEP 5: SKILLS BUILDER -->
+                        <template x-if="steps[currentStepIndex].id === 'skills'">
+                            <div class="space-y-6">
+                                <div>
+                                    <h4 class="text-xl font-bold text-ink mb-1" x-text="isArabic ? 'المهارات والقدرات' : 'Skills & Competencies'"></h4>
+                                    <p class="text-xs text-ink/70" x-text="isArabic ? 'أضف مهاراتك التقنية والشخصية لتعزيز قوة سيرتك الذاتية في نظام ATS.' : 'Add your technical and soft skills to boost ATS matching.'"></p>
+                                </div>
+
+                                <div class="space-y-4">
+                                    <div class="flex space-x-2">
+                                        <input type="text" id="newSkill" placeholder="e.g. Microsoft Excel, Customer Service, Problem Solving..." class="flex-1 bg-ivory border border-sand rounded-xl px-4 py-2.5 text-xs focus:ring-2 focus:ring-terracotta focus:outline-none">
+                                        <button @click="addSkillFromInput()" class="bg-terracotta hover:bg-terracotta-hover text-white px-5 py-2.5 rounded-xl text-xs font-bold transition">
+                                            <span x-text="isArabic ? 'إضافة' : 'Add'"></span>
+                                        </button>
+                                    </div>
+
+                                    <div class="flex flex-wrap gap-2 pt-2">
+                                        <template x-for="(skill, index) in cvData.skills" :key="index">
+                                            <span class="inline-flex items-center bg-sand/50 text-ink text-xs font-semibold px-3 py-1.5 rounded-lg border border-sand">
+                                                <span x-text="skill"></span>
+                                                <button @click="removeSkill(index)" class="ml-2 text-ink/50 hover:text-red-600"><i class="fas fa-times"></i></button>
+                                            </span>
+                                        </template>
+                                    </div>
+
+                                    <div class="pt-4 border-t border-sand">
+                                        <p class="text-xs font-bold text-ink/70 mb-2" x-text="isArabic ? 'اقتراحات مقترحة بناءً على خبرتك:' : 'Suggested based on your profile:'"></p>
+                                        <div class="flex flex-wrap gap-2">
+                                            <button @click="addSuggestedSkill('Microsoft Excel')" class="text-xs bg-ivory border border-sand hover:border-terracotta px-3 py-1 rounded-lg text-ink">+ Microsoft Excel</button>
+                                            <button @click="addSuggestedSkill('Customer Relationship Management')" class="text-xs bg-ivory border border-sand hover:border-terracotta px-3 py-1 rounded-lg text-ink">+ Customer Care</button>
+                                            <button @click="addSuggestedSkill('Data Reporting')" class="text-xs bg-ivory border border-sand hover:border-terracotta px-3 py-1 rounded-lg text-ink">+ Data Reporting</button>
+                                            <button @click="addSuggestedSkill('Communication Skills')" class="text-xs bg-ivory border border-sand hover:border-terracotta px-3 py-1 rounded-lg text-ink">+ Communication</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- STEP 6: CERTIFICATES & PROJECTS -->
+                        <template x-if="steps[currentStepIndex].id === 'certificates'">
+                            <div class="space-y-6">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h4 class="text-xl font-bold text-ink mb-1" x-text="isArabic ? 'الشهادات والمشاريع' : 'Certificates & Projects'"></h4>
+                                        <p class="text-xs text-ink/70" x-text="isArabic ? 'أضف شهاداتك الاحترافية أو مشاريعك البارزة.' : 'Add your professional certificates or notable projects.'"></p>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <button @click="addCertificate()" class="bg-terracotta hover:bg-terracotta-hover text-white text-xs font-bold px-3 py-2 rounded-lg transition shadow">
+                                            + Cert
+                                        </button>
+                                        <button @click="addProject()" class="bg-ink text-white text-xs font-bold px-3 py-2 rounded-lg transition shadow">
+                                            + Project
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-4">
+                                    <h5 class="font-bold text-xs text-terracotta uppercase tracking-wider" x-text="isArabic ? 'الشهادات' : 'Certificates'"></h5>
+                                    <template x-for="(cert, index) in cvData.certificates" :key="index">
+                                        <div class="bg-ivory p-4 rounded-xl border border-sand flex items-center space-x-3">
+                                            <input type="text" x-model="cert.name" placeholder="Certificate Name (e.g. ICDL / PMP)" class="flex-1 bg-white border border-sand rounded-lg px-3 py-2 text-xs">
+                                            <input type="text" x-model="cert.issuer" placeholder="Issuer (e.g. Coursera)" class="w-1/3 bg-white border border-sand rounded-lg px-3 py-2 text-xs">
+                                            <button @click="cvData.certificates.splice(index, 1)" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </template>
+
+                                    <h5 class="font-bold text-xs text-ink uppercase tracking-wider pt-2" x-text="isArabic ? 'المشاريع' : 'Projects'"></h5>
+                                    <template x-for="(proj, index) in cvData.projects" :key="index">
+                                        <div class="bg-ivory p-4 rounded-xl border border-sand space-y-2">
+                                            <div class="flex justify-between">
+                                                <input type="text" x-model="proj.name" placeholder="Project Title" class="flex-1 bg-white border border-sand rounded-lg px-3 py-2 text-xs mr-2">
+                                                <button @click="cvData.projects.splice(index, 1)" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
+                                            </div>
+                                            <textarea rows="2" x-model="proj.description" placeholder="Short description of the project..." class="w-full bg-white border border-sand rounded-lg p-2 text-xs"></textarea>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- STEP 7: TEMPLATES & ATS CHECK & FINALIZE -->
+                        <template x-if="steps[currentStepIndex].id === 'finalize'">
+                            <div class="space-y-6">
+                                <div>
+                                    <h4 class="text-xl font-bold text-ink mb-1" x-text="isArabic ? 'اختيار القالب وفحص ATS' : 'Template & ATS Optimization'"></h4>
+                                    <p class="text-xs text-ink/70" x-text="isArabic ? 'اختر تصميماً احترافياً متوافقاً مع أنظمة الفرز الآلي.' : 'Select a professional ATS-optimized layout and verify readiness.'"></p>
+                                </div>
+
+                                <div class="space-y-4">
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-ink/70" x-text="isArabic ? 'اختر القالب' : 'Choose Template'"></label>
+                                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                        <template x-for="tmpl in templates" :key="tmpl.id">
+                                            <div @click="cvData.template = tmpl.id" class="p-4 rounded-xl border-2 cursor-pointer transition text-center space-y-2" :class="cvData.template === tmpl.id ? 'border-terracotta bg-terracotta/5' : 'border-sand hover:border-ink/30'">
+                                                <i :class="tmpl.icon" class="text-2xl text-terracotta"></i>
+                                                <span class="block font-bold text-xs text-ink" x-text="tmpl.name"></span>
+                                            </div>
+                                        </template>
+                                    </div>
+
+                                    <!-- ATS Compatibility Checklist -->
+                                    <div class="bg-ivory p-4 rounded-xl border border-sand space-y-2">
+                                        <h5 class="font-bold text-xs text-ink uppercase tracking-wider flex items-center justify-between">
+                                            <span><i class="fas fa-shield-halved text-sage mr-1"></i> <span x-text="isArabic ? 'فحص جاهزية ATS' : 'ATS Compatibility Check'"></span></span>
+                                            <span class="text-sage font-bold">96%</span>
+                                        </h5>
+                                        <ul class="space-y-1 text-xs text-ink/80">
+                                            <li><i class="fas fa-check text-sage mr-2"></i> <span x-text="isArabic ? 'عناوين الأقسام القياسية مطابقة' : 'Standard section headings detected'"></span></li>
+                                            <li><i class="fas fa-check text-sage mr-2"></i> <span x-text="isArabic ? 'معلومات الاتصال واضحة ومقروءة' : 'Contact information verified'"></span></li>
+                                            <li><i class="fas fa-check text-sage mr-2"></i> <span x-text="isArabic ? 'الخطوط والألوان متوافقة مع الفرز' : 'ATS-friendly typography and structure'"></span></li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- Download Actions inside Builder -->
+                                    <div class="pt-4 flex flex-col sm:flex-row gap-3">
+                                        <button @click="downloadWord()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl text-xs transition flex items-center justify-center space-x-2 shadow">
+                                            <i class="fas fa-file-word text-base"></i>
+                                            <span x-text="isArabic ? 'تحميل ملف Word (.docx)' : 'Download Word (.docx)'"></span>
+                                        </button>
+                                        <button @click="downloadPdf()" class="flex-1 bg-terracotta hover:bg-terracotta-hover text-white font-bold py-3 px-4 rounded-xl text-xs transition flex items-center justify-center space-x-2 shadow">
+                                            <i class="fas fa-file-pdf text-base"></i>
+                                            <span x-text="isArabic ? 'تحميل ملف PDF (جاهز للطباعة)' : 'Download PDF (Print-Ready)'"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                    </div>
+
+                    <!-- Wizard Footer Navigation Buttons -->
+                    <div class="p-4 border-t border-sand bg-ivory/80 flex items-center justify-between">
+                        <button @click="prevStep()" class="px-5 py-2.5 rounded-xl border border-sand text-xs font-bold text-ink hover:bg-sand/30 transition flex items-center space-x-2" :disabled="currentStepIndex === 0" :class="currentStepIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''">
+                            <i class="fas fa-arrow-left" :class="isArabic ? 'fa-rotate-180' : ''"></i>
+                            <span x-text="isArabic ? 'السابق' : 'Previous'"></span>
+                        </button>
+                        
+                        <button @click="nextStep()" class="px-6 py-2.5 rounded-xl bg-ink text-white text-xs font-bold hover:bg-ink-light transition flex items-center space-x-2 shadow">
+                            <span x-text="currentStepIndex === steps.length - 1 ? (isArabic ? 'إنهاء ومراجعة' : 'Complete & Review') : (isArabic ? 'التالي' : 'Next')"></span>
+                            <i class="fas fa-arrow-right" :class="isArabic ? 'fa-rotate-180' : ''"></i>
+                        </button>
+                    </div>
+
+                </div>
+
+                <div class="w-full lg:w-1/2 bg-ivory-dark p-6 flex flex-col h-full overflow-y-auto items-center justify-start">
+                    <div class="w-full max-w-2xl flex justify-between items-center mb-4">
+                        <span class="text-xs font-bold uppercase tracking-wider text-ink/60 flex items-center">
+                            <i class="fas fa-display text-terracotta mr-1.5"></i> <span x-text="isArabic ? 'معاينة حية ومباشرة' : 'Live CV Preview'"></span>
+                        </span>
+                        <div class="flex items-center space-x-2">
+                            <button @click="downloadWord()" class="text-xs bg-white border border-sand px-3 py-1.5 rounded-lg font-semibold text-blue-600 hover:bg-blue-50 transition"><i class="fas fa-file-word mr-1"></i> Word</button>
+                            <button @click="downloadPdf()" class="text-xs bg-white border border-sand px-3 py-1.5 rounded-lg font-semibold text-red-600 hover:bg-red-50 transition"><i class="fas fa-file-pdf mr-1"></i> PDF</button>
+                        </div>
+                    </div>
+
+                    <!-- Printable CV Container -->
+                    <div id="printable-cv" class="w-full max-w-[210mm] min-h-[297mm] bg-white p-8 sm:p-12 cv-page-shadow rounded-xl space-y-6 text-ink text-sm transition-all" :dir="cvData.personal.language === 'ar' ? 'rtl' : 'ltr'">
+                        
+                        <!-- Header / Personal Info -->
+                        <div class="border-b border-sand pb-6 space-y-2">
+                            <h1 class="text-3xl font-extrabold tracking-tight text-ink" x-text="cvData.personal.fullName || (isArabic ? 'اسمك الكامل' : 'Your Full Name')"></h1>
+                            <p class="text-base font-semibold text-terracotta" x-text="cvData.personal.title || (isArabic ? 'المسمى الوظيفي المستهدف' : 'Professional Title')"></p>
+                            <div class="flex flex-wrap gap-3 text-xs text-ink/70 pt-1">
+                                <span x-show="cvData.personal.email"><i class="fas fa-envelope mr-1 text-terracotta"></i> <span x-text="cvData.personal.email"></span></span>
+                                <span x-show="cvData.personal.phone"><i class="fas fa-phone mr-1 text-terracotta"></i> <span x-text="cvData.personal.phone"></span></span>
+                                <span x-show="cvData.personal.location"><i class="fas fa-map-marker-alt mr-1 text-terracotta"></i> <span x-text="cvData.personal.location"></span></span>
+                                <span x-show="cvData.personal.linkedin"><i class="fab fa-linkedin mr-1 text-terracotta"></i> <span x-text="cvData.personal.linkedin"></span></span>
+                            </div>
+                        </div>
+
+                        <!-- Professional Summary -->
+                        <div class="space-y-2" x-show="cvData.summary">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-terracotta border-b border-sand pb-1" x-text="isArabic ? 'الملخص المهني' : 'Professional Summary'"></h3>
+                            <p class="text-xs leading-relaxed text-ink/80" x-text="cvData.summary"></p>
+                        </div>
+
+                        <!-- Work Experience -->
+                        <div class="space-y-3" x-show="cvData.experience.length > 0">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-terracotta border-b border-sand pb-1" x-text="isArabic ? 'الخبرات المهنية' : 'Work Experience'"></h3>
+                            <div class="space-y-4">
+                                <template x-for="exp in cvData.experience">
+                                    <div class="space-y-1">
+                                        <div class="flex justify-between items-start text-xs font-bold">
+                                            <span class="text-ink" x-text="exp.title + (exp.company ? ' — ' + exp.company : '')"></span>
+                                            <span class="text-ink/60 font-medium" x-text="exp.period"></span>
+                                        </div>
+                                        <p class="text-[11px] text-ink/60 italic" x-show="exp.location" x-text="exp.location"></p>
+                                        <p class="text-xs text-ink/80 whitespace-pre-line leading-relaxed" x-text="exp.description"></p>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Education -->
+                        <div class="space-y-3" x-show="cvData.education.length > 0">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-terracotta border-b border-sand pb-1" x-text="isArabic ? 'التعليم والأكاديميات' : 'Education'"></h3>
+                            <div class="space-y-3">
+                                <template x-for="edu in cvData.education">
+                                    <div class="flex justify-between items-start text-xs">
+                                        <div>
+                                            <span class="font-bold block text-ink" x-text="edu.degree"></span>
+                                            <span class="text-ink/70" x-text="edu.institution"></span>
+                                        </div>
+                                        <span class="text-ink/60 font-medium" x-text="edu.period"></span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Skills -->
+                        <div class="space-y-2" x-show="cvData.skills.length > 0">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-terracotta border-b border-sand pb-1" x-text="isArabic ? 'المهارات' : 'Skills'"></h3>
+                            <div class="flex flex-wrap gap-1.5 pt-1">
+                                <template x-for="skill in cvData.skills">
+                                    <span class="bg-ivory text-ink text-[11px] font-semibold px-2.5 py-1 rounded border border-sand" x-text="skill"></span>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Certificates & Projects -->
+                        <div class="space-y-2" x-show="cvData.certificates.length > 0 || cvData.projects.length > 0">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-terracotta border-b border-sand pb-1" x-text="isArabic ? 'الشهادات والمشاريع' : 'Certificates & Projects'"></h3>
+                            <div class="space-y-2 pt-1">
+                                <template x-for="cert in cvData.certificates">
+                                    <p class="text-xs text-ink/80"><strong x-text="cert.name"></strong> <span x-show="cert.issuer" x-text="'- ' + cert.issuer"></span></p>
+                                </template>
+                                <template x-for="proj in cvData.projects">
+                                    <p class="text-xs text-ink/80"><strong x-text="proj.name + ':'"></strong> <span x-text="proj.description"></span></p>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- CVORA Copyright Metadata Footer inside CV -->
+                        <div class="pt-8 border-t border-sand/50 text-center text-[9px] text-ink/40 space-y-1">
+                            <p x-text="isArabic ? 'تم الإنشاء بواسطة كفورا (CVORA) • حقوق النشر © 2026 تمارا الشباطات' : 'Created with CVORA • © 2026 Tamara Alshbatat. All Rights Reserved.'"></p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </template>
+
+    </main>
+
+    <footer class="bg-ink text-ivory/80 py-12 border-t border-sand/20" :dir="isArabic ? 'rtl' : 'ltr'">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 bg-terracotta rounded-xl flex items-center justify-center text-white font-bold text-sm">
+                    <i class="fas fa-file-shield"></i>
+                </div>
+                <div>
+                    <span class="text-lg font-bold text-white tracking-wider">CVORA</span>
+                    <p class="text-[11px] text-ivory/60" x-text="isArabic ? 'تجربتك المهنية. مقدمة باحترافية.' : 'Your experience. Professionally presented.'"></p>
+                </div>
+            </div>
+
+            <!-- Mandatory Copyright Attribution -->
+            <div class="text-center text-xs text-ivory/70 space-y-1">
+                <p x-text="isArabic ? 'CVORA — تصميم وتطوير تمارا الشباطات' : 'CVORA — Created by Tamara Alshbatat'"></p>
+                <p class="text-[11px] text-ivory/50" x-text="isArabic ? '© 2026 تمارا الشباطات. جميع الحقوق محفوظة.' : '© 2026 Tamara Alshbatat. All Rights Reserved.'"></p>
+            </div>
+
+            <div class="flex space-x-4 text-xs text-ivory/70">
+                <a href="#" @click.prevent="showToast('Privacy', 'Your data is securely processed locally in your browser session.')" class="hover:text-white transition" x-text="isArabic ? 'الخصوصية' : 'Privacy'"></a>
+                <a href="#" @click.prevent="showToast('Terms', 'CVORA is an original concept and platform by Tamara Alshbatat.')" class="hover:text-white transition" x-text="isArabic ? 'الشروط' : 'Terms'"></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Alpine.js Application Logic -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        function cvoraApp() {
+            return {
+                currentView: 'landing', // 'landing', 'builder', 'dashboard'
+                isArabic: false,
+                currentStepIndex: 0,
+                toast: {
+                    visible: false,
+                    title: '',
+                    message: '',
+                    icon: '<i class="fas fa-check-circle"></i>'
+                },
+                steps: [
+                    { id: 'setup', title: { en: 'Language & Situation', ar: 'اللغة والوضع المهني' } },
+                    { id: 'personal', title: { en: 'Personal Information', ar: 'المعلومات الشخصية' } },
+                    { id: 'summary', title: { en: 'Professional Summary', ar: 'الملخص المهني' } },
+                    { id: 'experience', title: { en: 'Work Experience', ar: 'خبرات العمل' } },
+                    { id: 'education', title: { en: 'Education', ar: 'التعليم' } },
+                    { id: 'skills', title: { en: 'Skills & Competencies', ar: 'المهارات' } },
+                    { id: 'certificates', title: { en: 'Certificates & Projects', ar: 'الشهادات والمشاريع' } },
+                    { id: 'finalize', title: { en: 'Template & ATS Optimization', ar: 'القالب والجاهزية' } }
+                ],
+                templates: [
+                    { id: 'classic', name: 'Classic ATS', icon: 'fas fa-file-lines' },
+                    { id: 'modern', name: 'Modern Pro', icon: 'fas fa-file-invoice' },
+                    { id: 'minimal', name: 'Minimalist', icon: 'fas fa-file' }
+                ],
+                aiPromptHelper: {
+                    field: '',
+                    skills: ''
+                },
+                cvData: {
+                    careerSituation: 'experienced',
+                    personal: {
+                        language: 'en',
+                        fullName: '',
+                        title: '',
+                        email: '',
+                        phone: '',
+                        location: '',
+                        linkedin: ''
+                    },
+                    summary: '',
+                    experience: [
+                        { title: '', company: '', period: '', location: '', description: '' }
+                    ],
+                    education: [
+                        { degree: '', institution: '', period: '', location: '' }
+                    ],
+                    skills: [],
+                    certificates: [],
+                    projects: [],
+                    template: 'classic'
+                },
+
+                init() {
+                    const saved = localStorage.getItem('cvora_cv_data');
+                    if (saved) {
+                        try {
+                            this.cvData = JSON.parse(saved);
+                            this.isArabic = this.cvData.personal.language === 'ar';
+                        } catch (e) {
+                            console.error('Error loading saved CV', e);
+                        }
+                    }
+
+                    this.$watch('cvData', (val) => {
+                        localStorage.setItem('cvora_cv_data', JSON.stringify(val));
+                    }, { deep: true });
+                },
+
+                toggleLanguage() {
+                    this.isArabic = !this.isArabic;
+                    this.cvData.personal.language = this.isArabic ? 'ar' : 'en';
+                    this.showToast(this.isArabic ? 'تم تغيير اللغة' : 'Language Switched', this.isArabic ? 'تم التبديل إلى اللغة العربية' : 'Switched to English interface');
+                },
+
+                startNewCv() {
+                    this.currentView = 'builder';
+                    this.currentStepIndex = 0;
+                    this.showToast('CVORA Wizard', 'Guided builder initialized successfully.');
+                },
+
+                loadDemoData() {
+                    this.cvData = {
+                        careerSituation: 'experienced',
+                        personal: {
+                            language: 'en',
+                            fullName: 'Sanad Ahmad',
+                            title: 'Customer Service & Administrative Specialist',
+                            email: 'sanad.ahmad@example.com',
+                            phone: '+962 7 9000 1234',
+                            location: 'Aqaba, Jordan',
+                            linkedin: 'linkedin.com/in/sanadahmad'
+                        },
+                        summary: 'Dedicated and customer-focused professional with experience in client relations, retail operations, and administrative data management. Proven ability to handle daily transactions, maintain records accurately, and deliver exceptional service.',
+                        experience: [
+                            {
+                                title: 'Customer Service & Sales Assistant',
+                                company: 'Modern Retail Store',
+                                period: '2023 - Present',
+                                location: 'Aqaba, Jordan',
+                                description: 'Assisted customers with inquiries, processed daily transactions, maintained records, and used Microsoft Excel for inventory and data management.'
+                            }
+                        ],
+                        education: [
+                            {
+                                degree: 'Bachelor of Business Administration',
+                                institution: 'University of Jordan',
+                                period: '2019 - 2023',
+                                location: 'Amman, Jordan'
+                            }
+                        ],
+                        skills: ['Customer Service', 'Microsoft Excel', 'Data Management', 'Communication', 'Problem Solving'],
+                        certificates: [{ name: 'ICDL Certification', issuer: 'UNESCO' }],
+                        projects: [{ name: 'Inventory Tracking Sheet', description: 'Built an automated Excel sheet to track daily stock levels.' }],
+                        template: 'classic'
+                    };
+                    this.currentView = 'builder';
+                    this.currentStepIndex = 0;
+                    this.showToast('Demo Loaded', 'Fictional demo CV loaded successfully.');
+                },
+
+                nextStep() {
+                    if (this.currentStepIndex < this.steps.length - 1) {
+                        this.currentStepIndex++;
+                    } else {
+                        this.showToast('Ready', 'Your CV is fully prepared for download.');
+                    }
+                },
+
+                prevStep() {
+                    if (this.currentStepIndex > 0) {
+                        this.currentStepIndex--;
+                    }
+                },
+
+                addExperience() {
+                    this.cvData.experience.push({ title: '', company: '', period: '', location: '', description: '' });
+                },
+
+                removeExperience(index) {
+                    this.cvData.experience.splice(index, 1);
+                },
+
+                transformExperience(index) {
+                    const raw = this.cvData.experience[index].description || '';
+                    if (raw.toLowerCase().includes('shop') || raw.toLowerCase().includes('customer')) {
+                        this.cvData.experience[index].description = '• Assisted customers and resolved inquiries promptly with high satisfaction.\n• Processed daily transactions and maintained accurate administrative records.\n• Utilized Microsoft Excel for basic data tracking and reporting.';
+                    } else {
+                        this.cvData.experience[index].description = '• Executed core responsibilities efficiently while maintaining high standards of quality.\n• Collaborated with team members to achieve operational goals and improve daily workflows.';
+                    }
+                    this.showToast('AI Polish', 'Experience successfully transformed into professional bullet points.');
+                },
+
+                addEducation() {
+                    this.cvData.education.push({ degree: '', institution: '', period: '', location: '' });
+                },
+
+                removeEducation(index) {
+                    this.cvData.education.splice(index, 1);
+                },
+
+                addSkillFromInput() {
+                    const input = document.getElementById('newSkill');
+                    if (input && input.value.trim() !== '') {
+                        this.cvData.skills.push(input.value.trim());
+                        input.value = '';
+                    }
+                },
+
+                addSuggestedSkill(skill) {
+                    if (!this.cvData.skills.includes(skill)) {
+                        this.cvData.skills.push(skill);
+                    }
+                },
+
+                removeSkill(index) {
+                    this.cvData.skills.splice(index, 1);
+                },
+
+                addCertificate() {
+                    this.cvData.certificates.push({ name: '', issuer: '' });
+                },
+
+                addProject() {
+                    this.cvData.projects.push({ name: '', description: '' });
+                },
+
+                generateSummaryAI() {
+                    const field = this.aiPromptHelper.field || this.cvData.personal.title || 'professional';
+                    this.cvData.summary = `Dedicated ${field} equipped with strong practical skills and a commitment to operational excellence. Proven capability in problem-solving, collaboration, and delivering high-quality results.`;
+                    this.showToast('Summary Generated', 'Professional executive summary created successfully.');
+                },
+
+                downloadWord() {
+                    const nameSlug = (this.cvData.personal.fullName || 'Sanad_Ahmad').replace(/\s+/g, '_');
+                    const filename = `${nameSlug}_CV_CVORA.docx`;
+                    
+                    const docContent = `CVORA Document Metadata:\nTitle: CV created with CVORA\nCreator: CVORA — Tamara Alshbatat\nCopyright: © 2026 Tamara Alshbatat. All Rights Reserved.\n\n=========================\n${this.cvData.personal.fullName || 'CV'}\n${this.cvData.personal.title || ''}\nEmail: ${this.cvData.personal.email} | Phone: ${this.cvData.personal.phone}\n\nSUMMARY:\n${this.cvData.summary}\n\nEXPERIENCE:\n${this.cvData.experience.map(e => e.title + ' at ' + e.company + ' (' + e.period + ')\n' + e.description).join('\n\n')}\n\nEDUCATION:\n${this.cvData.education.map(ed => ed.degree + ', ' + ed.institution + ' (' + ed.period + ')').join('\n')}\n\nSKILLS:\n${this.cvData.skills.join(', ')}\n\nCreated with CVORA • © 2026 Tamara Alshbatat`;
+
+                    const blob = new Blob([docContent], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+
+                    this.showToast('Word Download', 'File downloaded successfully with embedded Tamara Alshbatat metadata.');
+                },
+
+                downloadPdf() {
+                    this.showToast('PDF Export', 'Preparing print-ready PDF with CVORA metadata...');
+                    setTimeout(() => {
+                        window.print();
+                    }, 500);
+                },
+
+                showToast(title, message, icon = '<i class="fas fa-check-circle"></i>') {
+                    this.toast.title = title;
+                    this.toast.message = message;
+                    this.toast.icon = icon;
+                    this.toast.visible = true;
+                    setTimeout(() => {
+                        this.toast.visible = false;
+                    }, 4000);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

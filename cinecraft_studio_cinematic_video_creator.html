@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineCraft Studio - HD Cinematic Video Creator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Cinematic Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        cinzel: ['Cinzel', 'serif'],
+                        playfair: ['Playfair Display', 'serif'],
+                        montserrat: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        gold: {
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar for smooth timeline navigation */
+        ::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        .checkerboard {
+            background-color: #0b0f19;
+            background-image: linear-gradient(45deg, #161d2f 25%, transparent 25%), linear-gradient(-45deg, #161d2f 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #161d2f 75%), linear-gradient(-45deg, transparent 75%, #161d2f 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+        .glow-gold {
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans overflow-hidden select-none">
+
+    <!-- Top Header Navigation -->
+    <header class="h-16 border-b border-slate-800 bg-slate-900/90 backdrop-blur px-4 flex items-center justify-between z-20 shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-amber-400 to-yellow-300 flex items-center justify-center text-slate-950 font-bold shadow-lg shadow-amber-500/20">
+                <i class="fa-solid fa-clapperboard text-lg"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg tracking-wide bg-gradient-to-r from-white via-slate-200 to-amber-200 bg-clip-text text-transparent flex items-center gap-2">
+                    CineCraft Studio <span class="text-[10px] uppercase font-semibold tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">HD Pro</span>
+                </h1>
+                <p class="text-xs text-slate-400">Pure Non-Destructive Motion & Transitions</p>
+            </div>
+        </div>
+
+        <!-- Global Project Controls -->
+        <div class="flex items-center gap-3">
+            <!-- Aspect Ratio Picker -->
+            <div class="bg-slate-800/80 p-1 rounded-lg border border-slate-700/60 flex items-center text-xs">
+                <button id="ratio169" onclick="setAspectRatio('16:9')" class="px-2.5 py-1 rounded-md transition font-medium flex items-center gap-1.5 bg-amber-500 text-slate-950 shadow-sm" title="16:9 Widescreen Landscape">
+                    <i class="fa-solid fa-tv"></i> <span class="hidden sm:inline">16:9</span>
+                </button>
+                <button id="ratio916" onclick="setAspectRatio('9:16')" class="px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 transition font-medium flex items-center gap-1.5" title="9:16 Vertical Story / Reel">
+                    <i class="fa-solid fa-mobile-screen"></i> <span class="hidden sm:inline">9:16</span>
+                </button>
+                <button id="ratio11" onclick="setAspectRatio('1:1')" class="px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 transition font-medium flex items-center gap-1.5" title="1:1 Square Post">
+                    <i class="fa-solid fa-square"></i> <span class="hidden sm:inline">1:1</span>
+                </button>
+            </div>
+
+            <!-- Auto-Cinematic Preset Magic Button -->
+            <button onclick="applyAutoCinematic()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 hover:border-amber-500/60 text-xs font-semibold flex items-center gap-2 transition group shadow-sm">
+                <i class="fa-solid fa-wand-magic-sparkles text-amber-400 group-hover:rotate-12 transition-transform"></i>
+                <span>Auto Cinematic</span>
+            </button>
+
+            <!-- Video Resolution Selector -->
+            <select id="exportResSelect" class="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-amber-500">
+                <option value="1080p">1080p FHD (1920x1080)</option>
+                <option value="720p">720p HD (1280x720)</option>
+                <option value="4k">4K Ultra HD (3840x2160)</option>
+            </select>
+
+            <!-- Export Button -->
+            <button id="exportBtn" onclick="startExport()" class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs flex items-center gap-2 transition shadow-lg shadow-amber-500/20 disabled:opacity-50">
+                <i class="fa-solid fa-film"></i>
+                <span>Export HD Video</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace Split Container -->
+    <div class="flex-1 flex overflow-hidden">
+        
+        <!-- Center Canvas Video Preview Stage -->
+        <main class="flex-1 bg-slate-950 p-4 flex flex-col justify-between relative overflow-hidden checkerboard">
+            
+            <!-- Floating Canvas Metadata & Status Indicator -->
+            <div class="absolute top-6 left-6 z-10 flex items-center gap-2 bg-slate-900/80 backdrop-blur px-3 py-1.5 rounded-full border border-slate-800 text-xs text-slate-300">
+                <span id="sceneCounter" class="font-semibold text-amber-400">0 / 0 Scenes</span>
+                <span class="text-slate-600">•</span>
+                <span id="totalDurationText">0.0s Total</span>
+                <span class="text-slate-600">•</span>
+                <span id="canvasResDisplay" class="text-slate-400 font-mono">1920x1080</span>
+            </div>
+
+            <div class="absolute top-6 right-6 z-10 flex items-center gap-2">
+                <div class="px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-medium flex items-center gap-1.5">
+                    <i class="fa-solid fa-shield-halved"></i> 100% Original Image Integrity Preserved
+                </div>
+            </div>
+
+            <!-- Canvas Viewport Wrapper -->
+            <div class="flex-1 flex items-center justify-center relative my-2 overflow-hidden">
+                <div id="canvasAspectBox" class="relative shadow-2xl rounded-xl overflow-hidden border border-slate-800/80 bg-black flex items-center justify-center transition-all duration-300 max-h-[calc(100vh-280px)] max-w-full">
+                    <canvas id="videoCanvas" class="w-full h-full object-contain block"></canvas>
+                    
+                    <!-- Overlay Message when empty -->
+                    <div id="emptyState" class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-slate-900/90 backdrop-blur z-10">
+                        <div class="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center text-2xl mb-4">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                        </div>
+                        <h2 class="text-lg font-bold text-slate-100 mb-1">Upload Your Photos</h2>
+                        <p class="text-xs text-slate-400 max-w-sm mb-5">
+                            Upload up to 50 images. Create stunning motion graphics with smooth pan, zoom, Ken Burns effects, and transitions without editing original photos.
+                        </p>
+                        <label class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs cursor-pointer transition shadow-lg shadow-amber-500/20 flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Select Images (Up to 50)
+                            <input type="file" id="imageInput" accept="image/*" multiple class="hidden" onchange="handleImageUpload(event)">
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Player Controls Toolbar -->
+            <div class="w-full max-w-3xl mx-auto glass-panel p-2.5 rounded-2xl flex items-center gap-4 z-10">
+                <button id="playPauseBtn" onclick="togglePlay()" class="w-10 h-10 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold flex items-center justify-center text-sm transition shadow-md shadow-amber-500/20">
+                    <i class="fa-solid fa-play ml-0.5"></i>
+                </button>
+
+                <button onclick="stopPlayback()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-xs transition">
+                    <i class="fa-solid fa-square"></i>
+                </button>
+
+                <!-- Time Scrubber Slider -->
+                <div class="flex-1 flex items-center gap-3">
+                    <span id="currentTimeDisplay" class="font-mono text-xs text-amber-400 w-12 text-right">00:00</span>
+                    <input type="range" id="timelineScrubber" min="0" max="100" value="0" step="0.1" oninput="onScrub(this.value)" class="flex-1 accent-amber-500 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer">
+                    <span id="totalTimeDisplay" class="font-mono text-xs text-slate-400 w-12">00:00</span>
+                </div>
+
+                <!-- Loop & Fullscreen Toggles -->
+                <button id="loopBtn" onclick="toggleLoop()" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 hover:text-amber-400 flex items-center justify-center text-xs transition" title="Toggle Loop">
+                    <i class="fa-solid fa-repeat"></i>
+                </button>
+                <button onclick="toggleFullscreen()" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center text-xs transition" title="Fullscreen Preview">
+                    <i class="fa-solid fa-expand"></i>
+                </button>
+            </div>
+        </main>
+
+        <!-- Right Control Panel Sidebar -->
+        <aside class="w-80 border-l border-slate-800 bg-slate-900 flex flex-col z-10 shrink-0">
+            <!-- Sidebar Navigation Tabs -->
+            <div class="flex border-b border-slate-800 text-xs font-semibold text-slate-400 bg-slate-950/50">
+                <button id="tabSceneBtn" onclick="switchTab('scene')" class="flex-1 py-3 border-b-2 border-amber-500 text-amber-400 flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-sliders"></i> Scene
+                </button>
+                <button id="tabTextBtn" onclick="switchTab('text')" class="flex-1 py-3 border-b-2 border-transparent hover:text-slate-200 flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-font"></i> Text Overlay
+                </button>
+                <button id="tabAudioBtn" onclick="switchTab('audio')" class="flex-1 py-3 border-b-2 border-transparent hover:text-slate-200 flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-music"></i> Audio
+                </button>
+            </div>
+
+            <!-- Tab Content Area -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-6">
+                
+                <!-- Tab 1: Scene & Motion Controls -->
+                <div id="tabScene" class="space-y-5">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <h3 class="text-xs uppercase tracking-wider font-bold text-slate-400">Selected Scene Settings</h3>
+                        <span id="selectedSceneNum" class="text-xs text-amber-400 font-mono">Scene #1</span>
+                    </div>
+
+                    <!-- Camera Motion Preset -->
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1.5 flex items-center justify-between">
+                            <span><i class="fa-solid fa-video text-amber-400 mr-1"></i> Camera Motion</span>
+                            <span class="text-[10px] text-slate-500">Ken Burns FX</span>
+                        </label>
+                        <select id="motionSelect" onchange="updateSelectedScene('motion', this.value)" class="w-full bg-slate-800 border border-slate-700 text-xs text-slate-200 rounded-lg p-2.5 focus:border-amber-500 focus:outline-none">
+                            <option value="zoom-in">Smooth Zoom In (Center)</option>
+                            <option value="zoom-out">Slow Zoom Out (Full Frame)</option>
+                            <option value="pan-left">Slow Pan Left to Right</option>
+                            <option value="pan-right">Slow Pan Right to Left</option>
+                            <option value="pan-up">Vertical Pan Up & Subtle Zoom</option>
+                            <option value="subtle-rotate">Cinematic Rotate & Float</option>
+                            <option value="static">Static (No Motion)</option>
+                        </select>
+                    </div>
+
+                    <!-- Transition Type -->
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1.5">
+                            <i class="fa-solid fa-shuffle text-amber-400 mr-1"></i> Outgoing Transition
+                        </label>
+                        <select id="transitionSelect" onchange="updateSelectedScene('transition', this.value)" class="w-full bg-slate-800 border border-slate-700 text-xs text-slate-200 rounded-lg p-2.5 focus:border-amber-500 focus:outline-none">
+                            <option value="crossfade">Smooth Crossfade</option>
+                            <option value="dissolve">Subtle Film Dissolve</option>
+                            <option value="soft-blur">Soft Gaussian Blur</option>
+                            <option value="slide-left">Elegantly Slide Left</option>
+                            <option value="slide-right">Elegantly Slide Right</option>
+                            <option value="zoom-fade">Zoom & Fade</option>
+                            <option value="none">Cut (No Transition)</option>
+                        </select>
+                    </div>
+
+                    <!-- Scene Duration -->
+                    <div>
+                        <div class="flex items-center justify-between text-xs mb-1.5">
+                            <span class="font-medium text-slate-300"><i class="fa-solid fa-clock text-amber-400 mr-1"></i> Scene Duration</span>
+                            <span id="sceneDurationVal" class="font-mono text-amber-400 font-bold">4.0s</span>
+                        </div>
+                        <input type="range" id="sceneDurationInput" min="1" max="10" step="0.5" value="4" oninput="updateSelectedScene('duration', parseFloat(this.value))" class="w-full accent-amber-500 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer">
+                    </div>
+
+                    <!-- Image Fit Option -->
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1.5">
+                            <i class="fa-solid fa-expand text-amber-400 mr-1"></i> Frame Fitting Strategy
+                        </label>
+                        <select id="fitSelect" onchange="updateSelectedScene('fit', this.value)" class="w-full bg-slate-800 border border-slate-700 text-xs text-slate-200 rounded-lg p-2.5 focus:border-amber-500 focus:outline-none">
+                            <option value="cover">Smart Fill (Crop Overflow, No Black Bars)</option>
+                            <option value="contain-blur">Contain + Soft Ambient Blurred Background</option>
+                            <option value="contain-black">Contain + Crisp Black Border Bars</option>
+                        </select>
+                    </div>
+
+                    <!-- Global Apply All Button -->
+                    <div class="pt-2">
+                        <button onclick="applyCurrentToAll()" class="w-full py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-300 transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-copy"></i> Apply Settings to All Scenes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Optional Text Layer -->
+                <div id="tabText" class="space-y-5 hidden">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <h3 class="text-xs uppercase tracking-wider font-bold text-slate-400">Non-Destructive Text Overlay</h3>
+                        <span class="text-[10px] text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">Optional</span>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Title / Caption</label>
+                        <textarea id="textOverlayInput" rows="2" placeholder="Enter optional scene text..." oninput="updateSelectedSceneText('text', this.value)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:border-amber-500 focus:outline-none resize-none"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Subtitle / Location</label>
+                        <input type="text" id="subtextOverlayInput" placeholder="Optional smaller sub-caption..." oninput="updateSelectedSceneText('subtext', this.value)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:border-amber-500 focus:outline-none">
+                    </div>
+
+                    <!-- Typography Choice -->
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Font Style</label>
+                        <select id="fontSelect" onchange="updateSelectedSceneText('font', this.value)" class="w-full bg-slate-800 border border-slate-700 text-xs text-slate-200 rounded-lg p-2.5 focus:border-amber-500 focus:outline-none">
+                            <option value="Cinzel">Cinzel (Epic / Cinematic)</option>
+                            <option value="Playfair Display">Playfair (Elegant / Vogue)</option>
+                            <option value="Montserrat">Montserrat (Modern / Clean)</option>
+                            <option value="Inter">Inter (Minimalist Standard)</option>
+                        </select>
+                    </div>
+
+                    <!-- Position -->
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Text Position</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="updateSelectedSceneText('position', 'top')" class="p-2 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-300 text-center">Top</button>
+                            <button onclick="updateSelectedSceneText('position', 'center')" class="p-2 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-300 text-center">Center</button>
+                            <button onclick="updateSelectedSceneText('position', 'bottom')" class="p-2 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-300 text-center">Bottom</button>
+                        </div>
+                    </div>
+
+                    <!-- Text Animation Style -->
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Text Animation</label>
+                        <select id="textAnimSelect" onchange="updateSelectedSceneText('animation', this.value)" class="w-full bg-slate-800 border border-slate-700 text-xs text-slate-200 rounded-lg p-2.5 focus:border-amber-500 focus:outline-none">
+                            <option value="fade-up">Fade & Rise Up</option>
+                            <option value="fade-in">Subtle Cross Fade</option>
+                            <option value="zoom-in">Gentle Zoom In</option>
+                            <option value="static">Static (Instant)</option>
+                        </select>
+                    </div>
+
+                    <button onclick="clearSceneText()" class="w-full py-2 px-3 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-xs font-medium transition">
+                        <i class="fa-solid fa-trash-can mr-1"></i> Remove Text Layer From Scene
+                    </button>
+                </div>
+
+                <!-- Tab 3: Background Audio -->
+                <div id="tabAudio" class="space-y-5 hidden">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <h3 class="text-xs uppercase tracking-wider font-bold text-slate-400">Cinematic Background Music</h3>
+                        <i class="fa-solid fa-music text-amber-400"></i>
+                    </div>
+
+                    <!-- Audio Source Selection -->
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1.5">Preset Royalty-Free Soundtracks</label>
+                        <select id="musicPresetSelect" onchange="selectPresetMusic(this.value)" class="w-full bg-slate-800 border border-slate-700 text-xs text-slate-200 rounded-lg p-2.5 focus:border-amber-500 focus:outline-none">
+                            <option value="none">No Audio (Mute Video)</option>
+                            <option value="ambient" selected>Ambient Cinematic Waves (Procedural Synth)</option>
+                            <option value="uplifting">Uplifting Inspiration (Procedural Synth)</option>
+                            <option value="epic">Epic Dramatic Atmosphere (Procedural Synth)</option>
+                        </select>
+                    </div>
+
+                    <!-- Custom Audio Upload -->
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1.5">Or Upload Custom Music Track (MP3/WAV)</label>
+                        <input type="file" id="audioFileInput" accept="audio/*" onchange="handleAudioUpload(event)" class="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-amber-400 hover:file:bg-slate-700 cursor-pointer">
+                    </div>
+
+                    <!-- Volume Control -->
+                    <div>
+                        <div class="flex items-center justify-between text-xs mb-1.5">
+                            <span class="font-medium text-slate-300"><i class="fa-solid fa-volume-high text-amber-400 mr-1"></i> Soundtrack Volume</span>
+                            <span id="volumeVal" class="font-mono text-amber-400 font-bold">80%</span>
+                        </div>
+                        <input type="range" id="volumeInput" min="0" max="1" step="0.05" value="0.8" oninput="updateAudioVolume(parseFloat(this.value))" class="w-full accent-amber-500 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer">
+                    </div>
+
+                    <!-- Fade In / Out Toggle -->
+                    <div class="flex items-center justify-between p-3 rounded-lg bg-slate-800/50 border border-slate-800">
+                        <span class="text-xs font-medium text-slate-300">Auto Audio Fade In & Out</span>
+                        <input type="checkbox" id="audioFadeCheck" checked class="w-4 h-4 accent-amber-500 rounded cursor-pointer">
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- Bottom Drag-and-Drop Thumbnail Timeline Bar -->
+    <footer class="h-44 border-t border-slate-800 bg-slate-900 flex flex-col justify-between z-20 shrink-0">
+        
+        <!-- Timeline Controls & Stats Bar -->
+        <div class="px-4 py-2 bg-slate-950/60 border-b border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+            <div class="flex items-center gap-3">
+                <span class="font-semibold text-slate-200 flex items-center gap-1.5">
+                    <i class="fa-solid fa-film text-amber-400"></i> Storyboard Timeline
+                </span>
+                <span class="text-slate-600">|</span>
+                <span id="timelineCountText">0 / 50 Photos Loaded</span>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <label class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-semibold cursor-pointer transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-plus"></i> Add More Photos
+                    <input type="file" accept="image/*" multiple class="hidden" onchange="handleImageUpload(event)">
+                </label>
+                <button onclick="clearAllScenes()" class="px-3 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-medium transition">
+                    Clear All
+                </button>
+            </div>
+        </div>
+
+        <!-- Horizontally Scrollable Thumbnails Drag Container -->
+        <div id="timelineScroll" class="flex-1 overflow-x-auto p-3 flex items-center gap-3 snap-x scroll-smooth">
+            
+            <!-- Add Photos Dropzone Card -->
+            <label class="h-28 w-24 shrink-0 rounded-xl border-2 border-dashed border-slate-700 hover:border-amber-500/60 bg-slate-800/30 hover:bg-slate-800/60 flex flex-col items-center justify-center cursor-pointer transition text-slate-400 hover:text-amber-400 group">
+                <i class="fa-solid fa-image-portrait text-xl mb-1 group-hover:scale-110 transition-transform"></i>
+                <span class="text-[10px] font-semibold">Add Photos</span>
+                <input type="file" accept="image/*" multiple class="hidden" onchange="handleImageUpload(event)">
+            </label>
+
+            <!-- Dynamic Scene Thumbnails generated here by JS -->
+            <div id="thumbnailContainer" class="flex items-center gap-3"></div>
+
+        </div>
+
+    </footer>
+
+    <!-- Export Video Rendering Modal -->
+    <div id="exportModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center hidden">
+        <div class="glass-panel p-6 rounded-2xl max-w-md w-full border border-slate-700 shadow-2xl text-center space-y-5">
+            <div class="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-2xl mx-auto animate-pulse">
+                <i class="fa-solid fa-clapperboard"></i>
+            </div>
+            
+            <div>
+                <h3 class="text-lg font-bold text-slate-100">Rendering HD Cinematic Video</h3>
+                <p class="text-xs text-slate-400 mt-1" id="exportStatusText">Compiling frames with smooth motion transforms...</p>
+            </div>
+
+            <!-- Render Progress Bar -->
+            <div class="space-y-1.5">
+                <div class="w-full h-3 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700">
+                    <div id="exportProgressBar" class="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full transition-all duration-150 w-0"></div>
+                </div>
+                <div class="flex justify-between text-xs font-mono text-slate-400">
+                    <span id="exportPercent">0%</span>
+                    <span id="exportTimeLeft">Calculating...</span>
+                </div>
+            </div>
+
+            <!-- Cancel Button -->
+            <button id="cancelExportBtn" onclick="cancelExport()" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
+                Cancel Render
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Core Project State
+        const MAX_IMAGES = 50;
+        let scenes = []; // Array of scene objects: { id, img, aspect, duration, motion, transition, fit, textOverlay }
+        let selectedSceneIndex = 0;
+        let isPlaying = false;
+        let isLooping = false;
+        let currentTime = 0; // Total video elapsed time in seconds
+        let animationFrameId = null;
+        let lastTimestamp = 0;
+        let aspectRatio = '16:9'; // '16:9', '9:16', '1:1'
+        let exportResolution = '1080p';
+
+        // Canvas & Context Setup
+        const canvas = document.getElementById('videoCanvas');
+        const ctx = canvas.getContext('2d');
+        const canvasAspectBox = document.getElementById('canvasAspectBox');
+
+        // Audio Engine Variables
+        let audioContext = null;
+        let audioBuffer = null;
+        let audioSourceNode = null;
+        let audioGainNode = null;
+        let selectedAudioPreset = 'ambient';
+        let customAudioBuffer = null;
+        let audioVolume = 0.8;
+
+        // Export Recorder Variables
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        let isExporting = false;
+
+        window.addEventListener('load', () => {
+            setAspectRatio('16:9');
+            updateCanvasDimensions();
+            requestAnimationFrame(renderLoop);
+        });
+
+        window.addEventListener('resize', () => {
+            updateCanvasDimensions();
+        });
+
+        function updateCanvasDimensions() {
+            let width = 1920;
+            let height = 1080;
+
+            if (aspectRatio === '9:16') {
+                width = 1080;
+                height = 1920;
+                canvasAspectBox.style.aspectRatio = "9/16";
+                canvasAspectBox.style.height = "100%";
+                canvasAspectBox.style.width = "auto";
+            } else if (aspectRatio === '1:1') {
+                width = 1080;
+                height = 1080;
+                canvasAspectBox.style.aspectRatio = "1/1";
+                canvasAspectBox.style.height = "100%";
+                canvasAspectBox.style.width = "auto";
+            } else { // 16:9
+                width = 1920;
+                height = 1080;
+                canvasAspectBox.style.aspectRatio = "16/9";
+                canvasAspectBox.style.width = "100%";
+                canvasAspectBox.style.height = "auto";
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            document.getElementById('canvasResDisplay').innerText = `${width}x${height}`;
+        }
+
+        function setAspectRatio(ratio) {
+            aspectRatio = ratio;
+            document.getElementById('ratio169').className = ratio === '16:9' ? 'px-2.5 py-1 rounded-md transition font-medium flex items-center gap-1.5 bg-amber-500 text-slate-950 shadow-sm' : 'px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 transition font-medium flex items-center gap-1.5';
+            document.getElementById('ratio916').className = ratio === '9:16' ? 'px-2.5 py-1 rounded-md transition font-medium flex items-center gap-1.5 bg-amber-500 text-slate-950 shadow-sm' : 'px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 transition font-medium flex items-center gap-1.5';
+            document.getElementById('ratio11').className = ratio === '1:1' ? 'px-2.5 py-1 rounded-md transition font-medium flex items-center gap-1.5 bg-amber-500 text-slate-950 shadow-sm' : 'px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 transition font-medium flex items-center gap-1.5';
+            
+            updateCanvasDimensions();
+        }
+
+        function handleImageUpload(e) {
+            const files = Array.from(e.target.files);
+            if (!files.length) return;
+
+            const remainingSpace = MAX_IMAGES - scenes.length;
+            if (remainingSpace <= 0) {
+                showToast(`Maximum limit of ${MAX_IMAGES} images reached.`);
+                return;
+            }
+
+            const filesToProcess = files.slice(0, remainingSpace);
+
+            let loadedCount = 0;
+            filesToProcess.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        // Create Scene Object
+                        scenes.push({
+                            id: 'scene_' + Math.random().toString(36).substr(2, 9),
+                            img: img,
+                            duration: 4.0, // 4 seconds default
+                            motion: getRandomMotion(),
+                            transition: getRandomTransition(),
+                            fit: 'cover',
+                            textOverlay: {
+                                text: '',
+                                subtext: '',
+                                font: 'Cinzel',
+                                position: 'bottom',
+                                animation: 'fade-up'
+                            }
+                        });
+
+                        loadedCount++;
+                        if (loadedCount === filesToProcess.length) {
+                            onScenesUpdated();
+                        }
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function getRandomMotion() {
+            const motions = ['zoom-in', 'zoom-out', 'pan-left', 'pan-right', 'pan-up', 'subtle-rotate'];
+            return motions[Math.floor(Math.random() * motions.length)];
+        }
+
+        function getRandomTransition() {
+            const transitions = ['crossfade', 'dissolve', 'soft-blur', 'slide-left', 'zoom-fade'];
+            return transitions[Math.floor(Math.random() * transitions.length)];
+        }
+
+        function onScenesUpdated() {
+            document.getElementById('emptyState').style.display = scenes.length === 0 ? 'flex' : 'none';
+            document.getElementById('sceneCounter').innerText = `${scenes.length} / ${MAX_IMAGES} Scenes`;
+            document.getElementById('timelineCountText').innerText = `${scenes.length} / ${MAX_IMAGES} Photos Loaded`;
+
+            const totalDur = getTotalDuration();
+            document.getElementById('totalDurationText').innerText = `${totalDur.toFixed(1)}s Total`;
+            document.getElementById('totalTimeDisplay').innerText = formatTime(totalDur);
+
+            renderTimelineThumbnails();
+            populateInspector();
+        }
+
+        function getTotalDuration() {
+            return scenes.reduce((sum, s) => sum + s.duration, 0);
+        }
+
+        function renderTimelineThumbnails() {
+            const container = document.getElementById('thumbnailContainer');
+            container.innerHTML = '';
+
+            scenes.forEach((scene, idx) => {
+                const isSelected = idx === selectedSceneIndex;
+                const card = document.createElement('div');
+                card.className = `relative shrink-0 h-28 w-24 rounded-xl overflow-hidden border-2 cursor-pointer transition-all group ${isSelected ? 'border-amber-500 scale-105 shadow-lg shadow-amber-500/20' : 'border-slate-800 hover:border-slate-600'}`;
+                card.onclick = () => selectScene(idx);
+
+                // Thumbnail Image
+                const imgEl = document.createElement('img');
+                imgEl.src = scene.img.src;
+                imgEl.className = 'w-full h-full object-cover';
+                card.appendChild(imgEl);
+
+                // Scene Index Badge
+                const badge = document.createElement('span');
+                badge.className = 'absolute top-1 left-1 px-1.5 py-0.5 rounded bg-slate-950/80 backdrop-blur text-[9px] font-mono text-amber-400 font-bold border border-slate-800';
+                badge.innerText = `#${idx + 1}`;
+                card.appendChild(badge);
+
+                // Text indicator badge if text overlay present
+                if (scene.textOverlay && (scene.textOverlay.text || scene.textOverlay.subtext)) {
+                    const textBadge = document.createElement('span');
+                    textBadge.className = 'absolute top-1 right-1 w-4 h-4 rounded-full bg-amber-500 text-slate-950 text-[9px] flex items-center justify-center font-bold';
+                    textBadge.innerHTML = '<i class="fa-solid fa-font"></i>';
+                    card.appendChild(textBadge);
+                }
+
+                // Delete Button on Hover
+                const delBtn = document.createElement('button');
+                delBtn.className = 'absolute bottom-1 right-1 w-6 h-6 rounded-md bg-rose-600/90 text-white text-xs opacity-0 group-hover:opacity-100 transition flex items-center justify-center hover:bg-rose-500';
+                delBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                delBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    deleteScene(idx);
+                };
+                card.appendChild(delBtn);
+
+                // Reorder controls
+                if (idx > 0) {
+                    const leftBtn = document.createElement('button');
+                    leftBtn.className = 'absolute bottom-1 left-1 w-5 h-5 rounded bg-slate-900/80 text-slate-300 text-[10px] opacity-0 group-hover:opacity-100 transition flex items-center justify-center hover:text-white';
+                    leftBtn.innerHTML = '<i class="fa-solid fa-chevron-left"></i>';
+                    leftBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        moveScene(idx, idx - 1);
+                    };
+                    card.appendChild(leftBtn);
+                }
+
+                container.appendChild(card);
+            });
+        }
+
+        function selectScene(index) {
+            if (index < 0 || index >= scenes.length) return;
+            selectedSceneIndex = index;
+            
+            // Jump scrubber to scene start time
+            let startTime = 0;
+            for (let i = 0; i < index; i++) {
+                startTime += scenes[i].duration;
+            }
+            currentTime = startTime;
+            
+            renderTimelineThumbnails();
+            populateInspector();
+        }
+
+        function deleteScene(index) {
+            scenes.splice(index, 1);
+            if (selectedSceneIndex >= scenes.length) {
+                selectedSceneIndex = Math.max(0, scenes.length - 1);
+            }
+            onScenesUpdated();
+        }
+
+        function moveScene(from, to) {
+            if (to < 0 || to >= scenes.length) return;
+            const item = scenes.splice(from, 1)[0];
+            scenes.splice(to, 0, item);
+            selectedSceneIndex = to;
+            onScenesUpdated();
+        }
+
+        function clearAllScenes() {
+            scenes = [];
+            selectedSceneIndex = 0;
+            currentTime = 0;
+            onScenesUpdated();
+        }
+
+        function populateInspector() {
+            if (scenes.length === 0) return;
+            const scene = scenes[selectedSceneIndex];
+
+            document.getElementById('selectedSceneNum').innerText = `Scene #${selectedSceneIndex + 1}`;
+            document.getElementById('motionSelect').value = scene.motion;
+            document.getElementById('transitionSelect').value = scene.transition;
+            document.getElementById('sceneDurationInput').value = scene.duration;
+            document.getElementById('sceneDurationVal').innerText = `${scene.duration.toFixed(1)}s`;
+            document.getElementById('fitSelect').value = scene.fit;
+
+            // Populate Text
+            document.getElementById('textOverlayInput').value = scene.textOverlay.text || '';
+            document.getElementById('subtextOverlayInput').value = scene.textOverlay.subtext || '';
+            document.getElementById('fontSelect').value = scene.textOverlay.font || 'Cinzel';
+            document.getElementById('textAnimSelect').value = scene.textOverlay.animation || 'fade-up';
+        }
+
+        function updateSelectedScene(prop, value) {
+            if (scenes.length === 0) return;
+            scenes[selectedSceneIndex][prop] = value;
+            if (prop === 'duration') {
+                document.getElementById('sceneDurationVal').innerText = `${value.toFixed(1)}s`;
+                onScenesUpdated();
+            }
+        }
+
+        function updateSelectedSceneText(prop, value) {
+            if (scenes.length === 0) return;
+            scenes[selectedSceneIndex].textOverlay[prop] = value;
+            renderTimelineThumbnails();
+        }
+
+        function clearSceneText() {
+            if (scenes.length === 0) return;
+            scenes[selectedSceneIndex].textOverlay.text = '';
+            scenes[selectedSceneIndex].textOverlay.subtext = '';
+            populateInspector();
+            renderTimelineThumbnails();
+        }
+
+        function applyCurrentToAll() {
+            if (scenes.length === 0) return;
+            const master = scenes[selectedSceneIndex];
+            scenes.forEach(s => {
+                s.motion = master.motion;
+                s.transition = master.transition;
+                s.duration = master.duration;
+                s.fit = master.fit;
+            });
+            onScenesUpdated();
+            showToast("Applied current scene settings to all scenes!");
+        }
+
+        function applyAutoCinematic() {
+            if (scenes.length === 0) {
+                showToast("Please upload photos first!");
+                return;
+            }
+
+            const motions = ['zoom-in', 'zoom-out', 'pan-left', 'pan-right', 'pan-up', 'subtle-rotate'];
+            const transitions = ['crossfade', 'dissolve', 'soft-blur', 'zoom-fade'];
+
+            scenes.forEach((s, idx) => {
+                s.motion = motions[idx % motions.length];
+                s.transition = transitions[idx % transitions.length];
+                s.duration = 4.0;
+                s.fit = 'cover';
+            });
+
+            onScenesUpdated();
+            showToast("Auto-Cinematic styling applied to all photos!");
+        }
+
+        function renderLoop(timestamp) {
+            if (!lastTimestamp) lastTimestamp = timestamp;
+            const delta = (timestamp - lastTimestamp) / 1000;
+            lastTimestamp = timestamp;
+
+            const totalDuration = getTotalDuration();
+
+            if (isPlaying && totalDuration > 0) {
+                currentTime += delta;
+                if (currentTime >= totalDuration) {
+                    if (isLooping) {
+                        currentTime = 0;
+                    } else {
+                        currentTime = totalDuration;
+                        isPlaying = false;
+                        updatePlayPauseBtn();
+                    }
+                }
+                updateScrubberUI();
+            }
+
+            // Draw Scene Frame
+            drawFrameAtTime(currentTime);
+
+            requestAnimationFrame(renderLoop);
+        }
+
+        function drawFrameAtTime(timeVal) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (scenes.length === 0) return;
+
+            // Find current scene and scene local progress
+            let accumulatedTime = 0;
+            let currentSceneIndex = 0;
+
+            for (let i = 0; i < scenes.length; i++) {
+                if (timeVal >= accumulatedTime && timeVal <= accumulatedTime + scenes[i].duration) {
+                    currentSceneIndex = i;
+                    break;
+                }
+                accumulatedTime += scenes[i].duration;
+                if (i === scenes.length - 1) currentSceneIndex = scenes.length - 1;
+            }
+
+            const currentScene = scenes[currentSceneIndex];
+            const sceneStartTime = accumulatedTime;
+            const sceneProgress = Math.min(1, Math.max(0, (timeVal - sceneStartTime) / currentScene.duration));
+
+            const transitionDuration = 1.0; // 1 second overlap transition
+            const timeRemainingInScene = currentScene.duration - (timeVal - sceneStartTime);
+
+            // Check if we are transitioning to Next Scene
+            if (timeRemainingInScene <= transitionDuration && currentSceneIndex < scenes.length - 1) {
+                const nextScene = scenes[currentSceneIndex + 1];
+                const transProgress = 1 - (timeRemainingInScene / transitionDuration); // 0 to 1
+
+                renderTransition(currentScene, nextScene, sceneProgress, transProgress, currentScene.transition);
+            } else {
+                // Render Single Scene
+                renderSingleScene(currentScene, sceneProgress, 1.0);
+            }
+        }
+
+        function renderSingleScene(scene, progress, globalAlpha = 1.0) {
+            ctx.save();
+            ctx.globalAlpha = globalAlpha;
+
+            // 1. Draw Blurred Background if strategy is contain-blur
+            if (scene.fit === 'contain-blur') {
+                ctx.save();
+                ctx.filter = 'blur(30px) brightness(0.6)';
+                drawScaledImage(scene.img, canvas.width, canvas.height, 'cover', 1.05, 0, 0, 0);
+                ctx.restore();
+            } else if (scene.fit === 'contain-black') {
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            // 2. Calculate Ken Burns Camera Transform Matrix
+            let scale = 1.0;
+            let offsetX = 0;
+            let offsetY = 0;
+            let rotation = 0;
+
+            switch (scene.motion) {
+                case 'zoom-in':
+                    scale = 1.0 + (progress * 0.18); // 1.0 -> 1.18
+                    break;
+                case 'zoom-out':
+                    scale = 1.2 - (progress * 0.18); // 1.2 -> 1.02
+                    break;
+                case 'pan-left':
+                    scale = 1.15;
+                    offsetX = (progress - 0.5) * 0.08 * canvas.width;
+                    break;
+                case 'pan-right':
+                    scale = 1.15;
+                    offsetX = (0.5 - progress) * 0.08 * canvas.width;
+                    break;
+                case 'pan-up':
+                    scale = 1.12;
+                    offsetY = (progress - 0.5) * 0.06 * canvas.height;
+                    break;
+                case 'subtle-rotate':
+                    scale = 1.08 + (progress * 0.05);
+                    rotation = (progress - 0.5) * 0.03; // ~1.7 degrees
+                    break;
+                default: // static
+                    scale = 1.0;
+                    break;
+            }
+
+            // Render Main Image (ORIGINAL IMAGE Preserved without pixel editing)
+            drawScaledImage(scene.img, canvas.width, canvas.height, scene.fit === 'contain-blur' || scene.fit === 'contain-black' ? 'contain' : 'cover', scale, offsetX, offsetY, rotation);
+
+            // 3. Render Optional Non-Destructive Text Layer
+            if (scene.textOverlay && (scene.textOverlay.text || scene.textOverlay.subtext)) {
+                renderTextOverlay(scene.textOverlay, progress);
+            }
+
+            ctx.restore();
+        }
+
+        function drawScaledImage(img, cw, ch, mode, scale, offsetX, offsetY, rotation) {
+            ctx.save();
+            ctx.translate(cw / 2 + offsetX, ch / 2 + offsetY);
+            if (rotation !== 0) ctx.rotate(rotation);
+            ctx.scale(scale, scale);
+
+            const imgRatio = img.width / img.height;
+            const canvasRatio = cw / ch;
+
+            let drawW, drawH;
+
+            if (mode === 'cover') {
+                if (imgRatio > canvasRatio) {
+                    drawH = ch;
+                    drawW = ch * imgRatio;
+                } else {
+                    drawW = cw;
+                    drawH = cw / imgRatio;
+                }
+            } else { // contain
+                if (imgRatio > canvasRatio) {
+                    drawW = cw;
+                    drawH = cw / imgRatio;
+                } else {
+                    drawH = ch;
+                    drawW = ch * imgRatio;
+                }
+            }
+
+            ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+            ctx.restore();
+        }
+
+        function renderTransition(sceneA, sceneB, progressA, tProgress, type) {
+            // tProgress goes from 0 to 1 during the overlap transition window
+            switch (type) {
+                case 'crossfade':
+                case 'dissolve':
+                    renderSingleScene(sceneA, progressA, 1.0 - tProgress);
+                    renderSingleScene(sceneB, 0, tProgress);
+                    break;
+
+                case 'soft-blur':
+                    ctx.save();
+                    ctx.filter = `blur(${tProgress * 20}px)`;
+                    renderSingleScene(sceneA, progressA, 1.0 - tProgress);
+                    ctx.restore();
+
+                    ctx.save();
+                    ctx.filter = `blur(${(1 - tProgress) * 20}px)`;
+                    renderSingleScene(sceneB, 0, tProgress);
+                    ctx.restore();
+                    break;
+
+                case 'slide-left':
+                    ctx.save();
+                    ctx.translate(-tProgress * canvas.width, 0);
+                    renderSingleScene(sceneA, progressA, 1.0);
+                    ctx.restore();
+
+                    ctx.save();
+                    ctx.translate((1 - tProgress) * canvas.width, 0);
+                    renderSingleScene(sceneB, 0, 1.0);
+                    ctx.restore();
+                    break;
+
+                case 'slide-right':
+                    ctx.save();
+                    ctx.translate(tProgress * canvas.width, 0);
+                    renderSingleScene(sceneA, progressA, 1.0);
+                    ctx.restore();
+
+                    ctx.save();
+                    ctx.translate(-(1 - tProgress) * canvas.width, 0);
+                    renderSingleScene(sceneB, 0, 1.0);
+                    ctx.restore();
+                    break;
+
+                case 'zoom-fade':
+                    ctx.save();
+                    const zoomA = 1.0 + tProgress * 0.2;
+                    ctx.translate(canvas.width / 2, canvas.height / 2);
+                    ctx.scale(zoomA, zoomA);
+                    ctx.translate(-canvas.width / 2, -canvas.height / 2);
+                    renderSingleScene(sceneA, progressA, 1.0 - tProgress);
+                    ctx.restore();
+
+                    renderSingleScene(sceneB, 0, tProgress);
+                    break;
+
+                default: // Cut / None
+                    if (tProgress < 0.5) {
+                        renderSingleScene(sceneA, progressA, 1.0);
+                    } else {
+                        renderSingleScene(sceneB, 0, 1.0);
+                    }
+                    break;
+            }
+        }
+
+        function renderTextOverlay(overlay, progress) {
+            ctx.save();
+
+            let alpha = 1.0;
+            let translateY = 0;
+
+            if (overlay.animation === 'fade-up') {
+                alpha = Math.min(1, progress * 4); // Fade in quickly at start
+                translateY = (1 - alpha) * 25;
+            } else if (overlay.animation === 'fade-in') {
+                alpha = Math.min(1, progress * 3);
+            }
+
+            ctx.globalAlpha = alpha;
+
+            let posY = canvas.height * 0.82; // Bottom default
+            if (overlay.position === 'top') posY = canvas.height * 0.18;
+            if (overlay.position === 'center') posY = canvas.height * 0.5;
+
+            posY += translateY;
+
+            // Background subtle gradient pill for extreme legibility
+            ctx.save();
+            const grad = ctx.createLinearGradient(0, posY - 60, 0, posY + 60);
+            grad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+            grad.addColorStop(0.5, 'rgba(0, 0, 0, 0.45)');
+            grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, posY - 70, canvas.width, 140);
+            ctx.restore();
+
+            // Draw Main Title Text
+            if (overlay.text) {
+                const fontSize = Math.round(canvas.height * 0.048);
+                ctx.font = `600 ${fontSize}px "${overlay.font}", serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                // Elegant Text Shadow
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+                ctx.shadowBlur = 12;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 4;
+
+                ctx.fillStyle = '#ffffff';
+                ctx.fillText(overlay.text, canvas.width / 2, posY - (overlay.subtext ? fontSize * 0.6 : 0));
+            }
+
+            // Draw Subtitle
+            if (overlay.subtext) {
+                const subFontSize = Math.round(canvas.height * 0.026);
+                ctx.font = `300 ${subFontSize}px "Montserrat", sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+                ctx.shadowBlur = 8;
+
+                ctx.fillStyle = '#fbbf24'; // Amber Gold
+                ctx.fillText(overlay.subtext.toUpperCase(), canvas.width / 2, posY + (overlay.text ? subFontSize * 1.4 : 0));
+            }
+
+            ctx.restore();
+        }
+
+        function togglePlay() {
+            if (scenes.length === 0) return;
+            initAudioContext();
+            isPlaying = !isPlaying;
+            if (isPlaying && currentTime >= getTotalDuration()) {
+                currentTime = 0;
+            }
+            updatePlayPauseBtn();
+        }
+
+        function stopPlayback() {
+            isPlaying = false;
+            currentTime = 0;
+            updatePlayPauseBtn();
+            updateScrubberUI();
+        }
+
+        function updatePlayPauseBtn() {
+            const btn = document.getElementById('playPauseBtn');
+            btn.innerHTML = isPlaying ? '<i class="fa-solid fa-pause"></i>' : '<i class="fa-solid fa-play ml-0.5"></i>';
+        }
+
+        function toggleLoop() {
+            isLooping = !isLooping;
+            const btn = document.getElementById('loopBtn');
+            btn.className = isLooping ? 'w-8 h-8 rounded-lg bg-amber-500 text-slate-950 font-bold flex items-center justify-center text-xs transition' : 'w-8 h-8 rounded-lg bg-slate-800 text-slate-400 hover:text-amber-400 flex items-center justify-center text-xs transition';
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                canvasAspectBox.requestFullscreen().catch(err => console.log(err));
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function onScrub(val) {
+            const totalDur = getTotalDuration();
+            currentTime = (val / 100) * totalDur;
+            document.getElementById('currentTimeDisplay').innerText = formatTime(currentTime);
+        }
+
+        function updateScrubberUI() {
+            const totalDur = getTotalDuration();
+            const scrubber = document.getElementById('timelineScrubber');
+            if (totalDur > 0) {
+                scrubber.value = (currentTime / totalDur) * 100;
+            } else {
+                scrubber.value = 0;
+            }
+            document.getElementById('currentTimeDisplay').innerText = formatTime(currentTime);
+        }
+
+        function switchTab(tabName) {
+            document.getElementById('tabScene').classList.add('hidden');
+            document.getElementById('tabText').classList.add('hidden');
+            document.getElementById('tabAudio').classList.add('hidden');
+
+            document.getElementById('tabSceneBtn').className = 'flex-1 py-3 border-b-2 border-transparent hover:text-slate-200 flex items-center justify-center gap-1.5';
+            document.getElementById('tabTextBtn').className = 'flex-1 py-3 border-b-2 border-transparent hover:text-slate-200 flex items-center justify-center gap-1.5';
+            document.getElementById('tabAudioBtn').className = 'flex-1 py-3 border-b-2 border-transparent hover:text-slate-200 flex items-center justify-center gap-1.5';
+
+            if (tabName === 'scene') {
+                document.getElementById('tabScene').classList.remove('hidden');
+                document.getElementById('tabSceneBtn').className = 'flex-1 py-3 border-b-2 border-amber-500 text-amber-400 flex items-center justify-center gap-1.5';
+            } else if (tabName === 'text') {
+                document.getElementById('tabText').classList.remove('hidden');
+                document.getElementById('tabTextBtn').className = 'flex-1 py-3 border-b-2 border-amber-500 text-amber-400 flex items-center justify-center gap-1.5';
+            } else if (tabName === 'audio') {
+                document.getElementById('tabAudio').classList.remove('hidden');
+                document.getElementById('tabAudioBtn').className = 'flex-1 py-3 border-b-2 border-amber-500 text-amber-400 flex items-center justify-center gap-1.5';
+            }
+        }
+
+        function initAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }
+
+        function selectPresetMusic(type) {
+            selectedAudioPreset = type;
+            customAudioBuffer = null;
+        }
+
+        function handleAudioUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            initAudioContext();
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                audioContext.decodeAudioData(event.target.result, (buffer) => {
+                    customAudioBuffer = buffer;
+                    showToast("Custom audio loaded successfully!");
+                });
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function updateAudioVolume(val) {
+            audioVolume = val;
+            document.getElementById('volumeVal').innerText = `${Math.round(val * 100)}%`;
+        }
+
+        function startExport() {
+            if (scenes.length === 0) {
+                showToast("Please add photos before exporting!");
+                return;
+            }
+
+            isPlaying = false;
+            isExporting = true;
+            currentTime = 0;
+
+            const modal = document.getElementById('exportModal');
+            modal.classList.remove('hidden');
+
+            const totalDur = getTotalDuration();
+            const fps = 30;
+            const canvasStream = canvas.captureStream(fps);
+
+            // Audio Stream Setup
+            initAudioContext();
+            const audioDest = audioContext.createMediaStreamDestination();
+            
+            // Create synth audio node for export if preset selected
+            if (selectedAudioPreset !== 'none') {
+                createSynthAudioStream(audioDest, totalDur);
+            }
+
+            const combinedStream = new MediaStream([
+                ...canvasStream.getVideoTracks(),
+                ...audioDest.stream.getAudioTracks()
+            ]);
+
+            let mimeType = 'video/webm;codecs=vp9';
+            if (!MediaRecorder.isTypeSupported(mimeType)) {
+                mimeType = 'video/webm';
+            }
+
+            recordedChunks = [];
+            mediaRecorder = new MediaRecorder(combinedStream, { mimeType, videoBitsPerSecond: 8000000 }); // 8Mbps HD
+
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) recordedChunks.push(e.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunks, { type: mimeType });
+                const url = URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `CineCraft_Video_${Date.now()}.webm`;
+                a.click();
+
+                modal.classList.add('hidden');
+                isExporting = false;
+                showToast("HD Video Export Complete!");
+            };
+
+            mediaRecorder.start();
+
+            // Progress Rendering Loop for Export
+            const renderInterval = 1000 / fps;
+            const step = 1 / fps;
+
+            function exportStep() {
+                if (!isExporting) return;
+
+                currentTime += step;
+                drawFrameAtTime(currentTime);
+
+                const percent = Math.min(100, Math.round((currentTime / totalDur) * 100));
+                document.getElementById('exportProgressBar').style.width = `${percent}%`;
+                document.getElementById('exportPercent').innerText = `${percent}%`;
+                document.getElementById('exportTimeLeft').innerText = `${(totalDur - currentTime).toFixed(1)}s remaining`;
+
+                if (currentTime < totalDur) {
+                    setTimeout(exportStep, renderInterval);
+                } else {
+                    mediaRecorder.stop();
+                }
+            }
+
+            exportStep();
+        }
+
+        function cancelExport() {
+            isExporting = false;
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+            }
+            document.getElementById('exportModal').classList.add('hidden');
+            showToast("Export cancelled.");
+        }
+
+        /* Generate Procedural Audio Ambient Soundtracks */
+        function createSynthAudioStream(destinationNode, duration) {
+            const osc1 = audioContext.createOscillator();
+            const osc2 = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+
+            osc1.type = 'sine';
+            osc2.type = 'triangle';
+
+            osc1.frequency.setValueAtTime(110, audioContext.currentTime); // A2
+            osc2.frequency.setValueAtTime(164.81, audioContext.currentTime); // E3
+
+            gain.gain.setValueAtTime(0.01, audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(audioVolume * 0.3, audioContext.currentTime + 2);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+
+            osc1.connect(gain);
+            osc2.connect(gain);
+            gain.connect(destinationNode);
+
+            osc1.start();
+            osc2.start();
+            osc1.stop(audioContext.currentTime + duration);
+            osc2.stop(audioContext.currentTime + duration);
+        }
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-20 left-1/2 -translate-x-1/2 bg-slate-900 border border-amber-500/40 text-amber-300 text-xs px-4 py-2 rounded-full shadow-2xl z-50 flex items-center gap-2 animate-bounce';
+            toast.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${msg}</span>`;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

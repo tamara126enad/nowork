@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اكتشف الأردن — كل محافظة حكاية | تمارا الشباطات</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        jordan: {
+                            sand: '#F4EAD5',
+                            beige: '#E5D4BC',
+                            earth: '#8C6D4F',
+                            darkearth: '#2B231D',
+                            gold: '#D4AF37',
+                            neon: '#F7E7CE',
+                            darkbg: '#0F0E0D',
+                            cardbg: '#1A1816'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Tahoma', 'Arial', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for cinematic icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #0F0E0D;
+            color: #F4EAD5;
+            overflow-x: hidden;
+        }
+
+        /* Neon Beige Glowing Border Effect for Jordan */
+        .neon-jordan-border {
+            filter: drop-shadow(0 0 12px rgba(247, 231, 206, 0.4)) drop-shadow(0 0 25px rgba(212, 175, 55, 0.2));
+        }
+
+        /* Governorate interactive styles */
+        .gov-path {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            stroke: #2B231D;
+            stroke-width: 1.5;
+        }
+
+        .gov-path:hover {
+            fill: #D4AF37 !important;
+            filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.8));
+            transform: scale(1.002);
+            z-index: 50;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1A1816;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #8C6D4F;
+            border-radius: 3px;
+        }
+
+        /* Cinematic Background Glows */
+        .bg-glow-1 {
+            position: absolute;
+            top: 10%;
+            left: 20%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(212,175,55,0.08) 0%, rgba(15,14,13,0) 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-glow-2 {
+            position: absolute;
+            bottom: 10%;
+            right: 15%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(140,109,79,0.1) 0%, rgba(15,14,13,0) 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(26, 24, 22, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        /* Modal animations */
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-animate {
+            animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body class="bg-jordan-darkbg text-jordan-sand min-h-screen flex flex-col justify-between selection:bg-jordan-gold selection:text-black">
+
+    <!-- Header -->
+    <header class="w-full border-b border-jordan-earth/30 bg-jordan-darkbg/90 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-jordan-gold to-jordan-earth flex items-center justify-center text-black font-bold shadow-lg shadow-jordan-gold/20">
+                    <i class="fa-solid fa-earth-americas text-lg"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-black tracking-wider bg-gradient-to-r from-jordan-sand via-jordan-gold to-jordan-beige bg-clip-text text-transparent">اكتشف الأردن</span>
+                    <span class="block text-xs text-jordan-earth tracking-widest font-semibold">بواسطة تمارا الشباطات</span>
+                </div>
+            </div>
+
+            <nav class="hidden md:flex items-center space-x-8 space-x-reverse text-sm font-medium">
+                <a href="#home" class="text-jordan-gold transition hover:text-white flex items-center gap-1.5"><i class="fa-solid fa-house"></i> الرئيسية</a>
+                <a href="#map-section" class="text-jordan-sand/80 hover:text-jordan-gold transition flex items-center gap-1.5"><i class="fa-solid fa-map-location-dot"></i> خريطة الأردن</a>
+                <a href="#cards-section" class="text-jordan-sand/80 hover:text-jordan-gold transition flex items-center gap-1.5"><i class="fa-solid fa-landmark"></i> المحافظات</a>
+                <a href="#about-section" class="text-jordan-sand/80 hover:text-jordan-gold transition flex items-center gap-1.5"><i class="fa-solid fa-circle-info"></i> عن المشروع</a>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <a href="#map-section" class="px-4 py-2 bg-gradient-to-r from-jordan-gold to-jordan-earth text-black font-bold text-sm rounded-xl shadow-lg hover:brightness-110 transition active:scale-95 flex items-center gap-2">
+                    <i class="fa-solid fa-compass"></i> ابدأ الاستكشاف
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow relative">
+        <!-- Ambient Glows -->
+        <div class="bg-glow-1"></div>
+        <div class="bg-glow-2"></div>
+
+        <!-- Hero Section -->
+        <section id="home" class="pt-12 pb-8 text-center px-4 relative z-10">
+            <div class="max-w-4xl mx-auto">
+                <span class="inline-block px-4 py-1.5 mb-4 text-xs font-bold tracking-widest uppercase bg-jordan-earth/20 text-jordan-gold border border-jordan-gold/30 rounded-full">
+                    منصة سياحية رقمية تفاعلية
+                </span>
+                <h1 class="text-4xl sm:text-6xl font-black tracking-tight mb-6 leading-tight">
+                    الأردن... <span class="bg-gradient-to-r from-jordan-sand via-jordan-gold to-jordan-beige bg-clip-text text-transparent">كل محافظة حكاية</span>
+                </h1>
+                <p class="text-base sm:text-lg text-jordan-sand/80 max-w-2xl mx-auto mb-8 font-light">
+                    انطلق في رحلة بصرية وصوتية عبر خريطة الأردن التفاعلية. استكشف المعالم التاريخية، التراث العريق، والجمال الطبيعي لكل محافظة بلمسة واحدة.
+                </p>
+            </div>
+        </section>
+
+       
+        <!-- Cards Section -->
+        <section id="cards-section" class="py-12 px-4 relative z-10">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-12">
+                    <span class="text-jordan-gold text-xs font-bold tracking-widest uppercase mb-2 block">استكشف المملكة</span>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold mb-4">الأردن... 12 محافظة، حكايات لا تنتهي</h2>
+                    <p class="text-jordan-sand/70 max-w-xl mx-auto text-sm">من قمم عجلون الخضراء إلى رمال وادي رم الساحرة، ومن معالم عمّان العريقة إلى شواطئ العقبة الدافئة.</p>
+                </div>
+
+                <div id="governorates-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 sm:gap-8 gap-6">
+                    <!-- Populated dynamically via JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about-section" class="py-12 px-4 relative z-10 border-t border-jordan-earth/20 bg-jordan-cardbg/50">
+            <div class="max-w-4xl mx-auto text-center">
+                <h3 class="text-2xl font-bold text-jordan-gold mb-4">عن المشروع السياحي الرقمي</h3>
+                <p class="text-jordan-sand/80 text-sm leading-relaxed mb-6">
+                    تم تصميم وتطوير منصة "اكتشف الأردن" لتكون مرجعًا سياحيًا بصريًا وتفاعليًا فريداً يعكس عراقة المملكة وتاريخها وحضارتها الحديثة. يدمج المشروع أحدث تقنيات الويب مع جمال التصميم التراثي والنيون البيج.
+                </p>
+                <div class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-jordan-earth/20 border border-jordan-gold/30 text-jordan-gold font-bold text-sm">
+                    <i class="fa-solid fa-feather"></i>
+                    <span>إعداد وتصميم: تمارا الشباطات</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Governorate Details Modal -->
+    <div id="gov-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-md p-4 overflow-y-auto">
+        <div class="glass-panel w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl modal-animate border border-jordan-gold/40 relative my-8">
+            <!-- Modal Header with Close Button -->
+            <div class="relative h-64 sm:h-80 w-full overflow-hidden bg-jordan-darkearth">
+                <img id="modal-img" src="" alt="المحافظة" class="w-full h-full object-cover transition duration-700 hover:scale-105" onerror="this.src='https://placehold.co/800x400/2B231D/F4EAD5?text=Jordan+Tourism'">
+                <div class="absolute inset-0 bg-gradient-to-t from-jordan-cardbg via-jordan-cardbg/40 to-transparent"></div>
+                
+                <!-- Close Button -->
+                <button onclick="closeGovModal()" class="absolute top-4 left-4 w-10 h-10 rounded-full bg-black/60 hover:bg-jordan-gold hover:text-black text-jordan-sand flex items-center justify-center backdrop-blur-md transition shadow-lg z-20">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+
+                <!-- Title & Tag -->
+                <div class="absolute bottom-6 right-6 left-6">
+                    <span id="modal-tag" class="px-3 py-1 rounded-full text-xs font-bold bg-jordan-gold text-black mb-2 inline-block">محافظة أردنية</span>
+                    <h2 id="modal-title" class="text-3xl sm:text-5xl font-black text-jordan-sand tracking-wide">اسم المحافظة</h2>
+                </div>
+            </div>
+
+            <!-- Modal Body Content -->
+            <div class="p-6 sm:p-8 space-y-8 max-h-[60vh] overflow-y-auto">
+                
+                <!-- Audio Player Bar -->
+                <div class="p-4 rounded-2xl bg-jordan-darkearth/80 border border-jordan-gold/20 flex items-center justify-between flex-wrap gap-4">
+                    <div class="flex items-center gap-3">
+                        <button id="play-audio-btn" onclick="toggleAudio()" class="w-12 h-12 rounded-full bg-jordan-gold text-black flex items-center justify-center font-bold hover:scale-105 transition shadow-lg">
+                            <i id="audio-icon" class="fa-solid fa-play"></i>
+                        </button>
+                        <div>
+                            <h4 class="text-sm font-bold text-jordan-gold">النبذة الصوتية التعريفية</h4>
+                            <p id="audio-status-text" class="text-xs text-jordan-sand/70">استمع إلى قصة وحكاية المحافظة</p>
+                        </div>
+                    </div>
+                    <!-- Simulated Audio Waveform Visual -->
+                    <div class="flex items-center gap-1.5 h-6">
+                        <span class="w-1 bg-jordan-gold animate-pulse h-full rounded-full"></span>
+                        <span class="w-1 bg-jordan-gold animate-pulse h-3/4 rounded-full" style="animation-delay: 0.2s"></span>
+                        <span class="w-1 bg-jordan-gold animate-pulse h-1/2 rounded-full" style="animation-delay: 0.4s"></span>
+                        <span class="w-1 bg-jordan-gold animate-pulse h-5/6 rounded-full" style="animation-delay: 0.1s"></span>
+                        <span class="w-1 bg-jordan-gold animate-pulse h-2/3 rounded-full" style="animation-delay: 0.3s"></span>
+                    </div>
+                    <!-- Hidden Audio Element -->
+                    <audio id="gov-audio" src="" preload="none"></audio>
+                </div>
+
+                <!-- Brief & History -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="p-5 rounded-2xl bg-jordan-darkearth/40 border border-jordan-earth/30">
+                        <h3 class="text-lg font-bold text-jordan-gold mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-book-open"></i> نبذة قصيرة
+                        </h3>
+                        <p id="modal-brief" class="text-sm text-jordan-sand/80 leading-relaxed">...</p>
+                    </div>
+                    <div class="p-5 rounded-2xl bg-jordan-darkearth/40 border border-jordan-earth/30">
+                        <h3 class="text-lg font-bold text-jordan-gold mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-landmark-dome"></i> التاريخ العريق
+                        </h3>
+                        <p id="modal-history" class="text-sm text-jordan-sand/80 leading-relaxed">...</p>
+                    </div>
+                </div>
+
+                <!-- Why Visit? -->
+                <div class="p-6 rounded-2xl bg-gradient-to-r from-jordan-earth/20 to-jordan-cardbg border border-jordan-gold/30">
+                    <h3 class="text-lg font-bold text-jordan-gold mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-star"></i> لماذا تستحق الزيارة؟
+                    </h3>
+                    <p id="modal-why" class="text-sm text-jordan-sand/90 leading-relaxed font-medium">...</p>
+                </div>
+
+                <!-- Must-Visit Places -->
+                <div>
+                    <h3 class="text-xl font-bold text-jordan-gold mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-location-dot"></i> أماكن لا تفوّت زيارتها
+                    </h3>
+                    <div id="modal-spots" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Heritage, Food & Crafts -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="p-5 rounded-2xl bg-jordan-darkearth/40 border border-jordan-earth/30">
+                        <h3 class="text-lg font-bold text-jordan-gold mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-masks-theater"></i> التراث والحرف التقليدية
+                        </h3>
+                        <p id="modal-heritage" class="text-sm text-jordan-sand/80 leading-relaxed">...</p>
+                    </div>
+                    <div class="p-5 rounded-2xl bg-jordan-darkearth/40 border border-jordan-earth/30">
+                        <h3 class="text-lg font-bold text-jordan-gold mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-utensils"></i> الأكلات والمنتجات المحلية
+                        </h3>
+                        <p id="modal-food" class="text-sm text-jordan-sand/80 leading-relaxed">...</p>
+                    </div>
+                </div>
+
+                <!-- Image Gallery -->
+                <div>
+                    <h3 class="text-xl font-bold text-jordan-gold mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-images"></i> معرض الصور التوثيقي
+                    </h3>
+                    <div id="modal-gallery" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 bg-jordan-darkearth border-t border-jordan-earth/30 flex justify-between items-center">
+                <span class="text-xs text-jordan-earth font-bold">منصة اكتشف الأردن — تمارا الشباطات</span>
+                <button onclick="closeGovModal()" class="px-5 py-2 rounded-xl bg-jordan-gold text-black font-bold text-sm hover:brightness-110 transition">
+                    إغلاق النافذة
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="w-full border-t border-jordan-earth/30 bg-jordan-darkbg py-4 px-6 text-center text-xs text-jordan-sand/60">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div>
+                © Tamara Alshbatat — All Rights Reserved | تمارا الشباطات — جميع الحقوق محفوظة
+            </div>
+            <div id="live-datetime" class="font-mono text-jordan-gold font-bold">
+                <!-- Updated live via JS -->
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Comprehensive Dataset for all 12 Jordanian Governorates + Petra special tag
+        const jordanData = {
+            amman: {
+                id: "amman",
+                name: "عصبة المملكة: عمّان",
+                tag: "العاصمة التاريخية والحديثة",
+                image: "https://images.unsplash.com/photo-1578895101408-1a364853a72f?auto=format&fit=crop&w=1200&q=80",
+                brief: "عاصمة المملكة الأردنية الهاشمية، مدينة تمزج ببراعة بين أصالة الماضي وعراقة التاريخ وحداثة الحاضر العمراني والثقافي.",
+                history: "شهدت عمّان (عمان القديمة / ربوة عمون / فيلادلفيا) تعاقب حضارات عظيمة كالعمونيين واليونان والرومان والبيزنطيين، وتزخر بالمعالم الأثرية الخالدة.",
+                why: "لأنها نقطة الانطلاق الكبرى التي تجمع بين صخب الأسواق الشرقية التقليدية العريقة، والمقاهي الحديثة، والمتاحف والمعالم الأثرية الساحرة كجبل القلعة والمدرج الروماني.",
+                spots: [
+                    { name: "جبل القلعة", desc: "معلم تاريخي يطل على وسط المدينة ويحوي معبد هرقل والقصر الأموي." },
+                    { name: "المدرج الروماني", desc: "تحفة معمارية أثرية ضخمة تعود للقرن الثاني الميلادي." },
+                    { name: "شارع أبوبكر الصديق / جبل اللويبدة", desc: "ملتقى الفن والثقافة والمقاهي التراثية العريقة." }
+                ],
+                heritage: "تزخر عمّان بالفنون المعاصرة، الحرف اليدوية الشرقية، والأسواق التقليدية التراثية مثل سوق البخارية وسوق الصاغة.",
+                food: "المنسف الأردني الأصيل، الفلافل والمسخن، والكنافة النبلية الشهيرة في وسط البلد.",
+                gallery: [
+                    "https://images.unsplash.com/photo-1578895101408-1a364853a72f?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1580910051074-3eb694886505?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=80"
+                ]
+            },
+            irbid: {
+                id: "irbid",
+                name: "عروس الشمال: إربد",
+                tag: "أرض التاريخ والثقافة والعلم",
+                image: "https://images.unsplash.com/photo-1590073844006-33379778ae09?auto=format&fit=crop&w=1200&q=80",
+                brief: "تلقب بعروس الشمال الأردني، وتتميز بسهولها الخضراء الخصبة، وتاريخها العريق الذي يعود لمدن الديكابولس التاريخية.",
+                history: "تضم مدينة أم قيس الأثرية (جدارا) التي تطل على بحر جليلة والجولان، وكانت مركزاً ثقافياً وتجارياً هاماً عبر العصور الرومانية والبيزنطية والإسلامية.",
+                why: "لأنها تقدم تجربة سياحية متكاملة تجمع بين الطبيعة الغناء في السهول الممتدة، والآثار الرومانية العظيمة في أم قيس وتبنة، والمذاق الريفي الأصيل.",
+                spots: [
+                    { name: "أم قيس (جدارا)", desc: "مدينة أثرية رومانية تطل على بحيرة طبريا ونهر اليرموك." },
+                    { name: "تل إربد الأثري", desc: "موقع تاريخي عريق يروي تعاقب الحضارات على المدينة." },
+                    { name: "محمية أرز الشوبك / غابات عجلون المحيطة", desc: "طبيعة خلابة ومسارات مشي مذهلة." }
+                ],
+                heritage: "الصناعات اليدوية القروية، التطريز التقليدي، والأهازيج الفلكلورية الشمالية الأصيلة.",
+                food: "الكبسة الشمالية، الصاجية الريفية، والزيتون والزيت البلدي الأجود في المنطقة.",
+                gallery: [
+                    "https://images.unsplash.com/photo-1590073844006-33379778ae09?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80"
+                ]
+            },
+            aqaba: {
+                id: "aqaba",
+                name: "بوابة البحر: العقبة",
+                tag: "درة البحر الأحمر والشواطئ الساحرة",
+                image: "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80",
+                brief: "المدينة البحرية الوحيدة في الأردن، تتميز بمياهها الدافئة وشعابها المرجانية الفريدة وجبالها الصحراوية الخلابة.",
+                history: "مرفأ تجاري استراتيجي عبر التاريخ القديم والحديث، محطة رئيسية للحجاج والتجارة منذ آلاف السنين، وتشهد قلعة العقبة الأيوبية على عراقتها.",
+                why: "لأنها الوجهة المثالية لعشاق الغوص، الرياضات البحرية، الاسترخاء تحت أشعة الشمس، والاستمتاع بقربها من سحر صحراء وادي رم.",
+                spots: [
+                    { name: "ممشى العقبة البحري", desc: "إطلالات ساحرة على مياه البحر الأحمر والحدود المجاورة." },
+                    { name: "موقع أيلة الإسلامية", desc: "بقايا المدينة الإسلامية القديمة التي تعود للقرن السابع الميلادي." },
+                    { name: "محمية العقبة البحرية", desc: "شعاب مرجانية نادرة ومواقع غوص عالمية مذهلة." }
+                ],
+                heritage: "الصيد البحري، الحرف اليدوية المستوحاة من الصدف والبحر، والفلكلور الساحلي المميز (السمسمية).",
+                food: "السمك الصيادية الأيقوني الأردني، والمأكولات البحرية الطازجة.",
+                gallery: [
+                    "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80"
+                ]
+            },
+            maan: {
+                id: "maan",
+                name: "أيقونة الصحراء: معان (البترة)",
+                tag: "وطن الأنباط ومدينة الورد الخالدة",
+                image: "https://images.unsplash.com/photo-1579606032856-e6d4554b915a?auto=format&fit=crop&w=1200&q=80",
+                brief: "تضم إحدى عجائب الدنيا السبع الجديدة (البترة) ورمال وادي رم الساحرة، محافظة تجمع بين عظمة التاريخ وقوة الطبيعة الصحراوية.",
+                history: "عاصمة الأنباط التاريخية التي حفرت بالصخر الوردي قبل أكثر من ألفي عام، ومرور رحلات التجارة والبخور العريقة.",
+                why: "لأن زيارة معان والبترة ووادي رم تعتبر رحلة استثنائية خارج الزمن، تذهل الحواس بروعة العمارة النبطية وسحر الكداس الصحراوية.",
+                spots: [
+                    { name: "السيق والخزنة في البترة", desc: "الممر الضخم المنحوت في الصخر المؤدي إلى تحفة الخزنة الشهيرة." },
+                    { name: "وادي رم (وادي القممر)", desc: "صحراء ساحرة تشبه كوكب المريخ وشهيرة بتصوير الأفلام العالمية." },
+                    { name: "قلعة معان العثمانية", desc: "معلم تاريخي على طريق الحج الشامي." }
+                ],
+                heritage: "حياكة البيوت البدوية التقليدية، صناعة الفخار، وتقاليد الكرم البدوي الأصيل.",
+                food: "المظبي الصحراوي، القهوة العربية المعطرة بالهيل، والخبز البدوي المخبوز على الجمر.",
+                gallery: [
+                    "https://images.unsplash.com/photo-1579606032856-e6d4554b915a?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=600&q=80"
+                ]
+            },
+            petra: {
+                id: "petra",
+                name: "مدينة الأنباط: البترة",
+                tag: "عجيبة الدنيا السبع الوردية",
+                image: "https://images.unsplash.com/photo-1579606032856-e6d4554b915a?auto=format&fit=crop&w=1200&q=80",
+                brief: "الدرة الأثرية الكبرى في محافظة معان، المدينة المنحوتة في الصخر الوردي بالكامل والتي أبهرت العالم بأسره.",
+                history: "أنشأها الأنباط العرب قبل الميلاد واتخذوها عاصمة لهم، وكانت مركزاً محوريًا للتجارة العالمية بين الشرق والغرب.",
+                why: "لتعيش تجربة لا تُنسى في السير عبر السيق الضيق حتى تلمح الخزنة بألوانها الوردية الساحرة تحت ضوء الشمس.",
+                spots: [
+                    { name: "الخزنة", desc: "الواجهة الأثرية الأكثر شهرة وروعة في العالم." },
+                    { name: "الدير", desc: "معلم ضخم منحوت في أعالي الجبال." },
+                    { name: "السيق الكبير", desc: "شق طبيعي ساحر يبلغ طوله أكثر من كيلومتر." }
+                ],
+                heritage: "النحت في الصخر، الفخار النبطي التقليدي، والفنون التراثية الجنوبية.",
+                food: "المجدرة الجنوبية، الأكلات البدوية التقليدية.",
+                gallery: [
+                    "https://images.unsplash.com/photo-1579606032856-e6d4554b915a?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=600&q=80"
+                ]
+            },
+            jerash: {
+                id: "jerash",
+                name: "مدينة الأعمدة: جرش",
+                tag: "جوهرة العمارة الرومانية في الشرق",
+                image: "https://images.unsplash.com/photo-1585250000693-13c5bc3f2e4e?auto=format&fit=crop&w=1200&q=80",
+                brief: "إحدى أفضل المدن الأثرية الرومانية المحافظ عليها في العالم، تشتهر بشوارعها المرصوفة بالحصى وأعمدتها الشامخة ومسارحها العريقة.",
+                history: "عُرفت بمدينة (جراسا) التاريخية، وبلغت ذروة مجدها في العصر الروماني كإحدى مدن الديكابولس المزدهرة.",
+                why: "لتشعر وكأنك عبرت آلة الزمن إلى العصور القديمة، ولتستمتع بساحة الندوة الفريدة ومهرجان جرش للثقافة والفنون السنوي.",
+                spots: [
+                    { name: "شارع الأعمدة", desc: "شارع رئيسي طويل مرصوف بالأحجار وتحفّه الأعمدة الضخمة." },
+                    { name: "الساحة البيضاوية (الندوة)", desc: "ساحة فريدة ومحاطة بأعمدة أيونية سامقة." },
+                    { name: "المسرح الجنوبي", desc: "مسرح روماني ضخم ما زال يُستخدم للفعاليات الفنية الكبرى." }
+                ],
+                heritage: "الصناعات الخشبية التقليدية، التطريز الفلكلوري، وصناعة الفخار.",
+                food: "المكمورة الجرشية التقليدية العريقة، والمسخن بالزيت البلدي.",
+                gallery: [
+                    "https://images.unsplash.com/photo-1585250000693-13c5bc3f2e4e?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1590073844006-33379778ae09?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=80"
+                ]
+            },
+            ajloun: {
+                id: "ajloun",
+                name: "تاج الغابات: عجلون",
+                tag: "غابات طبيعية وقلاع شامخة على الجبال",
+                image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80",
+                brief: "محافظة الطبيعة الخلابة وغابات السنديان والبلوط الكثيفة، وتتوسطها قلعة عجلون الإسلامية الشامخة.",
+                history: "بنى القائد عز الدين بن أسامة (ابن أخي صلاح الدين الأيوبي) قلعة عجلون في القرن الثاني عشر لتكون حصناً منيعاً لمواجهة الصليبيين ومراقبة طرق التجارة.",
+                why: "للاستمتع بمسارات المشي وسط الغابات الخضراء الخلابة (تلفريك عجلون السياحي)، وزيارة القلعة التاريخية والإطلالات البانورامية الساحرة.",
+                spots: [
+                    { name: "قلعة عجلون الأيوبية", desc: "حصن عسكري تاريخي شامخ فوق قمة الجبل." },
+                    { name: "محمية غابات عجلون", desc: "منطقة بيئية محمية تزخر بالتنوع النباتي والحيواني ومسارات المشي." },
+                    { name: "تلفريك عجلون", desc: "أول تلفريك سياحي في الأردن يمنح إطلالات خلابة على الغابات والوديان." }
+                ],
+                heritage: "عصر زيتون الزيتون بالطرق التقليدية، الحرف الخشبية، وصناعة الصابون المحلي.",
+                food: "أكلات الزعتر والزيت البلدي، فطائر السبانخ والجبن الريفية.",
+                gallery: [
+                    "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1590073844006-33379778ae09?auto=format&fit=crop&w=600&q=80"
+                ]
+            },
+            karak: {
+                id: "karak",
+                name: "قلعة الصمود: الكرك",
+                tag: "أرض القلاع التاريخية الشامخة",
+                image: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80",
+                brief: "محافظة تاريخية جنوب عمّان، تشتهر بقلعتها العظيمة التي تقف شاهقاً فوق هضبة صخرية تحكي بطولات التاريخ.",
+                history: "لعبت الكرك دوراً استراتيجياً ومحورياً في العصور المؤابية والإسلامية والصليبية والمملوكية، وكانت مركزاً إدارياً هاماً.",
+                why: "لاستكشاف أسرار قلعة الكرك وأنفاقها العميقة، والتمتع بطبيعة وادي الموجب الساحرة والأودية المحيطة.",
+                spots: [
+                    { name: "قلعة الكرك التاريخية", desc: "حصن صليبي وإسلامي ضخم يحوي سراديب وممرات سرية مذهلة." },
+                    { name: "وادي الموجب (سيق الموجب)", desc: "محمية طبيعية أخدودية مذهلة تُلقب بـ (جاند كينون الأردن)." },
+                    { name: "متحف الكرك الأثري", desc: "يضم قطعاً أثرية نادرة تعود لعصور مختلفة." }
+                ],
+                heritage: "صناعة الجميد الكركي الأصيل، الحرف المصنوعة من صوف الأغنام والفلكلور الشعبي الأردني.",
+                food: "المنسف الكركي الأصيل بالجميد الكركي الشهير عالمياً.",
+                gallery: [
+                    "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1578895101408-1a364853a72f?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1580910051074-3eb694886505?auto=format&fit=crop&w=600&q=80"
+                ]
+            },
+            madaba: {
+                id: "madaba",
+                name: "مدينة الفسيفساء: مادبا",
+                tag: "لوحة الفسيفساء الأثرية الخالدة",
+                image: "https://images.unsplash.com/photo-1580910051074-3eb694886505?auto=format&fit=crop&w=1200&q=80",
+                brief: "تُعرف بمدينة الفسيفساء لتضمينها أرقى وأقدم الخرائط واللوحات الفسيفسائية البيزنطية في العالم، وعلى رأسها خريطة مادبا الشهيرة.",
+                history: "موقع تاريخي مقدّس وحضاري يعود لآلاف السنين، وذكرت في التناخ، وتزخر بالكنائس والمواقع التاريخية العريقة.",
+                why: "لمشاهدة خريطة الأراضي المقدسة الفسيفسائية في كنيسة القديس جرجس، وزيارة جبل نبو الذي يطل على الأردن وفلسطين.",
+                spots: [
+                    { name: "خريطة مادبا في كنيسة القديس جرجس", desc: "أقدم خريطة أصلية للأراضي المقدسة مرسومة بالفسيفساء." },
+                    { name: "جبل نبو", desc: "المكان الذي يُعتقد أن النبي موسى عليه السلام نظر منه إلى الأرض الموعودة." },
+                    { name: "ممشى مادبا التراثي", desc: "شوارع مرصوفة ومشاغل تقليدية لصناعة الفسيفساء." }
+                ],
+                heritage: "فن ترصيع وتشكيل الفسيفساء اليدوية، التطريز التراثي، وصناعة الحرف اليدوية.",
+                food: "الأطباق الشرقية الأردنية التقليدية والفطائر الريفية الشهية.",
+                gallery: [
+                    "https://images.unsplash.com/photo-1580910051074-3eb694886505?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1578895101408-1a364853a72f?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=80"
+                ]
+            },
+            balqa: {
+                id: "balqa",
+                name: "عبق التراث: البلقاء (السلط)",
+                tag: "مدينة التسامح والعمارة التراثية الفريدة",
+                image: "https://images.unsplash.com/photo-1590073844006-33379778ae09?auto=format&fit=crop&w=1200&q=80",
+                brief: "محافظة البلقاء وعاصمتها التاريخية (السلط) المُدرجة على قائمة التراث العالمي لليونسكو، تجمع بين روعة الحجر الأصفر التراثي وروح التآخي والوئام.",
+                history: "كانت العاصمة الإدارية والتجارية لشرق الأردن في أوائل القرن العشرين، وتتميز بمبانيها التراثية المصنوعة من الحجر الأصفر (المغرة).",
+                why: "لتجوال في درج السلط التاريخي، واستكشاف متحف التاريخ والآثار، والتعرف على نموذج التسامح والتعايش الفريد بين أبناء المدينة.",
+                spots: [
+                    { name: "شارع الحمام التراثي", desc: "سوق تقليدي قديم يعج بالحياة والحرف التراثية." },
+                    { name: "متحف أركيولوجيا السلط (بيت أبو جابر)", desc: "تحفة معمارية تراثية تحكي تاريخ المدينة." },
+                    { name: "مقام النبي شعيب", desc: "معلم ديني وتاريخي بارز في المحافظة." }
+                ],
+                heritage: "حياكة الأقمشة التراثية، صناعة الخزف، والحرف اليدوية التقليدية السلطية.",
+                food: "الشراك والسلطية، الأكلات الشعبية الأردنية العريقة.",
+                gallery: [
+                    "https://images.unsplash.com/photo-1590073844006-33379778ae09?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1578895101408-1a364853a72f?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80"
+                ]
+            },
+            zarqa: {
+                id: "zarqa",
+                name: "نبض الصناعة: الزرقاء",
+                tag: "مدينة الصناعة والقلعة التاريخية",
+                image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80",
+                brief: "محافظة حيوية وصناعية كبرى، تعتبر الرئة الاقتصادية للمملكة، وتزخر بالمعالم التاريخية كقلعة الزرقاء وقصر شبيب الأثري.",
+                history: "تأسست مدينتها الحديثة مع مرور سكة حديد الحجاز، وكانت محطة رئيسية لقوافل الحجاج والتجارة عبر التاريخ.",
+                why: "لاكتشاف قصر شبيب التاريخي، والتعرف على الدور الاقتصادي والصناعي والثقافي الهام للمحافظة في الأردن.",
+                spots: [
+                    { name: "قصر شبيب الأثري", desc: "قلعة تاريخية قديمة وسط المدينة شُيدت لحماية طريق الحج." },
+                    { name: "محمية الأزرق المائية", desc: "محمية طبيعية فريدة للطيور المهاجرة في الصحراء الشرقية." },
+                    { name: "قصر الحلابات", desc: "قصر أموي أثري يقع في البادية الشرقية للمحافظة." }
+                ],
+                heritage: "الصناعات اليدوية الحديثة، الفلكلور الشعبي المتنوع نظراً لتعدد ثقافات سكانها.",
+                food: "المشاوي الشعبية والمأكولات الأردنية والعربية المتنوعة.",
+                gallery: [
+                    "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=600&q=80"
+                ]
+            },
+            mafraq: {
+                id: "mafraq",
+                name: "بوابة البادية: المفرق",
+                tag: "قصور الصحراء والتاريخ الفلكي",
+                image: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1200&q=80",
+                brief: "محافظة واسعة تمتد في البادية الشمالية للأردن، وتزخر بالقصور الأموية الصحراوية والمعالم الأثرية البارزة.",
+                history: "كانت ممراً استراتيجياً للقوافل التجارية وطريق الحج الشامي، وتحوي مدناً تاريخية رومانية وبيزنطية مثل أم الجمال.",
+                why: "لاستكشاف مدينة أم الجمال الأثرية السوداء الفريدة ببنائها البازلتي، وزيارة القصور الصحراوية العريقة.",
+                spots: [
+                    { name: "مدينة أم الجمال الأثرية", desc: "موقع أثري مذهل مبني بالكامل من الحجر البازلتي الأسود." },
+                    { name: "محطة سكة حديد الحجاز في المفرق", desc: "معلم تاريخي يعود للحقبة العثمانية." },
+                    { name: "قصر الفضين", desc: "معلم تاريخي أموي في البادية." }
+                ],
+                heritage: "الصناعات البدوية التقليدية، سجاد البادية والصوف، والشعر الشعبي البدوي.",
+                food: "المفطح البدوي، المنسف باللحم البلدي والخبز البدوي.",
+                gallery: [
+                    "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=80"
+                ]
+            },
+            tafilah: {
+                id: "tafilah",
+                name: "شرفة الجبال: الطفيلة",
+                tag: "طبيعة جبلية عذراء وينابيع حارة",
+                image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80",
+                brief: "محافظة جبلية ساحرة جنوب الأردن، تتميز بغاباتها الخضراء في ضانا وينابيعها المعدنية الحارة في عفرا البربيطة.",
+                history: "شهدت حضارات الأدوميين والأنباط والرومان، وتضم مواقع تاريخية ودينية عريقة ومناظر طبيعية خطفت ألباب الرحالة.",
+                why: "للاسترخاء في مياه عفرا المعدنية العلاجية، واستكشاف محمية ضانا للحيوانات البرية والمناظر الخلابة للأودية العميقة.",
+                spots: [
+                    { name: "محمية ضانا للبيئة الطبيعية", desc: "أكبر محمية طبيعية في الأردن تجمع تنوعاً بيئياً ومناخياً مذهلاً." },
+                    { name: "حمامات عفرا وبربيطة", desc: "ينابيع معدنية حارة طبيعية علاجية وسط جبال الطفيلة الساحرة." },
+                    { name: "قلعة البصيرة التاريخية", desc: "موقع أثري أدومي قديم يطل على الوديان." }
+                ],
+                heritage: "صناعة الجبن البلدي الريفي، حياكة البسط البدوية، والحرف اليدوية الجبلية.",
+                food: "الرشوف الطفيلي التقليدي المصنوع من القمح والجميد، والزيتون الجبلي الأصيل.",
+                gallery: [
+                    "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1579606032856-e6d4554b915a?auto=format&fit=crop&w=600&q=80"
+                ]
+            }
+        };
+
+        // Initialize Cards Section on page load
+        function renderCards() {
+            const grid = document.getElementById('governorates-grid');
+            grid.innerHTML = '';
+            
+            Object.values(jordanData).forEach(gov => {
+                if (gov.id === 'petra') return; // Skip duplicate petra card in main grid
+                const card = document.createElement('div');
+                card.className = "glass-panel rounded-3xl overflow-hidden shadow-xl hover:border-jordan-gold transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col justify-between group cursor-pointer";
+                card.onclick = () => openGovModal(gov.id);
+                
+                card.innerHTML = `
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="${gov.image}" alt="${gov.name}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700" onerror="this.src='https://placehold.co/600x400/2B231D/F4EAD5?text=Jordan'">
+                        <div class="absolute inset-0 bg-gradient-to-t from-jordan-cardbg via-transparent to-transparent"></div>
+                        <span class="absolute top-3 right-3 px-3 py-1 bg-black/60 backdrop-blur-md text-jordan-gold text-xs font-bold rounded-full border border-jordan-gold/30">
+                            ${gov.tag}
+                        </span>
+                    </div>
+                    <div class="p-6 flex-grow flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-jordan-sand mb-2 group-hover:text-jordan-gold transition">${gov.name}</h3>
+                            <p class="text-xs text-jordan-sand/70 leading-relaxed mb-4 line-clamp-2">${gov.brief}</p>
+                        </div>
+                        <div class="flex items-center justify-between pt-4 border-t border-jordan-earth/30">
+                            <span class="text-xs font-bold text-jordan-gold flex items-center gap-1.5">
+                                <i class="fa-solid fa-compass"></i> اكتشف الحكاية
+                            </span>
+                            <div class="w-8 h-8 rounded-full bg-jordan-earth/30 group-hover:bg-jordan-gold group-hover:text-black flex items-center justify-center transition">
+                                <i class="fa-solid fa-arrow-left text-xs"></i>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Tooltip handlers for map
+        function showTooltip(event, name) {
+            const tooltip = document.getElementById('map-tooltip');
+            tooltip.innerText = name;
+            tooltip.classList.remove('hidden');
+            tooltip.style.left = (event.pageX + 15) + 'px';
+            tooltip.style.top = (event.pageY - 40) + 'px';
+        }
+
+        function hideTooltip() {
+            const tooltip = document.getElementById('map-tooltip');
+            tooltip.classList.add('hidden');
+        }
+
+        // Modal State and Logic
+        function openGovModal(govKey) {
+            const gov = jordanData[govKey];
+            if (!gov) return;
+
+            document.getElementById('modal-img').src = gov.image;
+            document.getElementById('modal-title').innerText = gov.name;
+            document.getElementById('modal-tag').innerText = gov.tag;
+            document.getElementById('modal-brief').innerText = gov.brief;
+            document.getElementById('modal-history').innerText = gov.history;
+            document.getElementById('modal-why').innerText = gov.why;
+            document.getElementById('modal-heritage').innerText = gov.heritage;
+            document.getElementById('modal-food').innerText = gov.food;
+
+            // Render Spots
+            const spotsContainer = document.getElementById('modal-spots');
+            spotsContainer.innerHTML = '';
+            gov.spots.forEach(spot => {
+                spotsContainer.innerHTML += `
+                    <div class="p-4 rounded-2xl bg-jordan-darkearth/60 border border-jordan-earth/30">
+                        <h4 class="text-sm font-bold text-jordan-gold mb-1"><i class="fa-solid fa-map-pin ml-1"></i> ${spot.name}</h4>
+                        <p class="text-xs text-jordan-sand/70 leading-relaxed">${spot.desc}</p>
+                    </div>
+                `;
+            });
+
+            // Render Gallery
+            const galleryContainer = document.getElementById('modal-gallery');
+            galleryContainer.innerHTML = '';
+            gov.gallery.forEach(imgUrl => {
+                galleryContainer.innerHTML += `
+                    <div class="h-28 rounded-xl overflow-hidden border border-jordan-gold/20 shadow-md">
+                        <img src="${imgUrl}" class="w-full h-full object-cover hover:scale-110 transition duration-500" onerror="this.src='https://placehold.co/400x300/2B231D/F4EAD5?text=Jordan'">
+                    </div>
+                `;
+            });
+
+            // Setup simulated audio
+            const audioEl = document.getElementById('gov-audio');
+            audioEl.src = ""; // Ready for mp3 file path insertion
+            resetAudioState();
+
+            // Show Modal
+            const modal = document.getElementById('gov-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeGovModal() {
+            const modal = document.getElementById('gov-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+            stopAudio();
+        }
+
+        // Audio Player Simulation
+        let isPlaying = false;
+        function toggleAudio() {
+            const icon = document.getElementById('audio-icon');
+            const statusText = document.getElementById('audio-status-text');
+            const btn = document.getElementById('play-audio-btn');
+
+            isPlaying = !isPlaying;
+            if (isPlaying) {
+                icon.className = "fa-solid fa-pause";
+                statusText.innerText = "جاري تشغيل النبذة الصوتية التعرّفية...";
+                statusText.classList.add("text-jordan-gold");
+                btn.classList.add("animate-pulse");
+            } else {
+                resetAudioState();
+            }
+        }
+
+        function resetAudioState() {
+            isPlaying = false;
+            const icon = document.getElementById('audio-icon');
+            const statusText = document.getElementById('audio-status-text');
+            const btn = document.getElementById('play-audio-btn');
+            icon.className = "fa-solid fa-play";
+            statusText.innerText = "استمع إلى قصة وحكاية المحافظة";
+            statusText.classList.remove("text-jordan-gold");
+            btn.classList.remove("animate-pulse");
+        }
+
+        function stopAudio() {
+            resetAudioState();
+        }
+
+        // Live Footer DateTime Updater
+        function updateLiveDateTime() {
+            const now = new Date();
+            const options = { 
+                day: 'numeric', 
+                month: 'long', 
+                year: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: true 
+            };
+            const formatted = now.toLocaleDateString('en-GB', options);
+            document.getElementById('live-datetime').innerText = formatted;
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            renderCards();
+            updateLiveDateTime();
+            setInterval(updateLiveDateTime, 1000);
+        };
+    </script>
+</body>
+</html>
