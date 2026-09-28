@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE NETWORK ENGINEER | 08:00 — NETWORK DOWN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Cairo:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', 'Cairo', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #04070d; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+        @keyframes pulse-slow { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .animate-pulse-slow { animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        .led-green { box-shadow: 0 0 10px rgba(16, 185, 129, 0.9); }
+        .led-red { box-shadow: 0 0 10px rgba(239, 68, 68, 0.9); }
+        .led-amber { box-shadow: 0 0 10px rgba(245, 158, 11, 0.9); }
+        .rack-slot { background: linear-gradient(90deg, #0a1022 0%, #04070d 100%); }
+    </style>
+</head>
+<body class="bg-[#04070d] text-slate-100 h-full flex flex-col overflow-hidden select-none">
+
+    <header class="bg-[#0a1022] border-b border-slate-800 px-4 py-2.5 flex items-center justify-between shrink-0 shadow-xl z-30">
+        <div class="flex items-center space-x-4 rtl:space-x-reverse">
+            <div class="flex items-center space-x-2 rtl:space-x-reverse bg-[#04070d] px-3 py-1.5 rounded-lg border border-slate-800">
+                <span id="header-clock" class="font-mono text-cyan-400 font-bold text-lg tracking-wider">08:00 AM</span>
+                <span class="text-xs text-slate-400 uppercase border-l border-slate-800 pl-2 rtl:pr-2 rtl:border-l-0 rtl:border-r rtl:pl-0 rtl:pr-2" id="ui-day-phase">Demo Active</span>
+            </div>
+            <div>
+                <h1 class="font-bold text-sm md:text-base text-slate-100 flex items-center gap-2">
+                    <span class="text-cyan-400"><i class="fa-solid fa-network-wired"></i></span>
+                    <span data-i18n="app-title">THE NETWORK ENGINEER</span>
+                    <span class="text-xs px-2 py-0.5 bg-cyan-950 text-cyan-300 rounded border border-cyan-800 font-mono" id="current-stage-badge">DEMO</span>
+                </h1>
+                <p class="text-xs text-slate-400" data-i18n="app-subtitle">08:00 — NETWORK DOWN | أنت مهندس الشبكة</p>
+            </div>
+        </div>
+
+        <!-- Dashboard Metrics Bar -->
+        <div class="hidden xl:flex items-center space-x-4 rtl:space-x-reverse text-xs">
+            <div class="bg-[#04070d] px-3 py-1.5 rounded border border-slate-800 flex items-center space-x-2 rtl:space-x-reverse">
+                <i class="fa-solid fa-user-shield text-cyan-400"></i>
+                <span class="text-slate-400" data-i18n="stat-eng">Engineer:</span>
+                <span class="font-mono font-bold text-slate-200">Tamara Al-Shabatat</span>
+            </div>
+            <div class="bg-[#04070d] px-3 py-1.5 rounded border border-slate-800 flex items-center space-x-2 rtl:space-x-reverse">
+                <i class="fa-solid fa-server text-indigo-400"></i>
+                <span class="text-slate-400" data-i18n="stat-devices">Devices:</span>
+                <span id="stat-devices-count" class="font-mono font-bold text-slate-200">3/45</span>
+            </div>
+            <div class="bg-[#04070d] px-3 py-1.5 rounded border border-slate-800 flex items-center space-x-2 rtl:space-x-reverse">
+                <i class="fa-solid fa-ticket text-amber-400"></i>
+                <span class="text-slate-400" data-i18n="stat-tickets">Open Tickets:</span>
+                <span id="stat-tickets-count" class="font-mono font-bold text-amber-400">1</span>
+            </div>
+            <div class="bg-[#04070d] px-3 py-1.5 rounded border border-slate-800 flex items-center space-x-2 rtl:space-x-reverse">
+                <i class="fa-solid fa-circle text-emerald-400 text-[10px] animate-pulse"></i>
+                <span class="text-slate-400" data-i18n="stat-network">Net Status:</span>
+                <span id="stat-network-status" class="font-mono font-bold text-emerald-400">ONLINE</span>
+            </div>
+        </div>
+
+        <!-- Utility Controls -->
+        <div class="flex items-center space-x-2 rtl:space-x-reverse">
+            <button onclick="toggleLanguage()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-xs font-bold rounded border border-slate-700 text-cyan-300 transition">
+                <span id="lang-label">عربي / EN</span>
+            </button>
+            <button onclick="openLogbook()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded border border-slate-700 text-slate-300 transition flex items-center gap-1.5">
+                <i class="fa-solid fa-book"></i> <span data-i18n="btn-logbook">Logbook</span>
+            </button>
+            <button onclick="openHelp()" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-xs rounded border border-slate-700 text-slate-300 transition" title="Handbook">
+                <i class="fa-solid fa-circle-question"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="flex-1 flex overflow-hidden relative">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 bg-[#070d1c] border-r border-slate-800 flex flex-col shrink-0 z-20">
+            <div class="p-3 border-b border-slate-800">
+                <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between">
+                    <span data-i18n="nav-workstation">Workday (08:00–15:00)</span>
+                    <span id="time-progress-pct" class="font-mono text-cyan-400 text-[10px]">08:00 (0%)</span>
+                </div>
+                <div class="w-full bg-[#04070d] rounded-full h-2 border border-slate-800 overflow-hidden">
+                    <div id="day-progress-bar" class="bg-gradient-to-r from-cyan-600 to-indigo-600 h-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- View Switcher -->
+            <nav class="flex-1 overflow-y-auto p-2 space-y-1">
+                <button onclick="switchTab('rooms')" id="tab-btn-rooms" class="w-full flex items-center space-x-3 rtl:space-x-reverse px-3 py-2.5 rounded-lg text-sm font-medium transition bg-cyan-950/50 text-cyan-300 border border-cyan-800/50">
+                    <i class="fa-solid fa-building w-5 text-cyan-400"></i>
+                    <span data-i18n="tab-rooms">Building & Rooms</span>
+                </button>
+                <button onclick="switchTab('rack')" id="tab-btn-rack" class="w-full flex items-center space-x-3 rtl:space-x-reverse px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-800/60">
+                    <i class="fa-solid fa-server w-5 text-indigo-400"></i>
+                    <span data-i18n="tab-rack">Server Room Rack (42U)</span>
+                </button>
+                <button onclick="switchTab('topology')" id="tab-btn-topology" class="w-full flex items-center space-x-3 rtl:space-x-reverse px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-800/60">
+                    <i class="fa-solid fa-network-wired w-5 text-emerald-400"></i>
+                    <span data-i18n="tab-topology">Live Topology Map</span>
+                </button>
+                <button onclick="switchTab('tickets')" id="tab-btn-tickets" class="w-full flex items-center space-x-3 rtl:space-x-reverse px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-800/60 relative">
+                    <i class="fa-solid fa-ticket w-5 text-amber-400"></i>
+                    <span data-i18n="tab-tickets">Tickets & Calls</span>
+                    <span id="tickets-badge" class="ml-auto rtl:mr-auto bg-amber-500 text-slate-950 font-bold px-1.5 py-0.5 rounded-full text-[10px]">1</span>
+                </button>
+                <button onclick="switchTab('tools')" id="tab-btn-tools" class="w-full flex items-center space-x-3 rtl:space-x-reverse px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-800/60">
+                    <i class="fa-solid fa-screwdriver-wrench w-5 text-rose-400"></i>
+                    <span data-i18n="tab-tools">Diagnostic Terminal & CLI</span>
+                </button>
+                <button onclick="switchTab('stages')" id="tab-btn-stages" class="w-full flex items-center space-x-3 rtl:space-x-reverse px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-800/60">
+                    <i class="fa-solid fa-list-check w-5 text-purple-400"></i>
+                    <span data-i18n="tab-stages">16 Stages & Demo</span>
+                </button>
+            </nav>
+
+            <!-- Current Objective Card -->
+            <div class="p-3 border-t border-slate-800 bg-[#04070d]/60">
+                <div class="text-[11px] font-bold text-cyan-400 uppercase tracking-wide mb-1 flex items-center justify-between">
+                    <span data-i18n="current-objective">Current Objective</span>
+                    <span id="stage-number-tag" class="font-mono text-slate-400">DEMO</span>
+                </div>
+                <p id="objective-text" class="text-xs text-slate-300 leading-relaxed line-clamp-3">Build a mini network for training room, configure IPs, test ping, repair cable failure, and verify subnet mask.</p>
+                <button onclick="openCurrentTaskModal()" class="mt-2 w-full py-1.5 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold text-xs rounded transition flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-play"></i> <span data-i18n="btn-view-task">Task Details / Action</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col bg-[#04070d] overflow-hidden relative">
+            
+            <!-- VIEW 1: BUILDING & ROOMS -->
+            <div id="view-rooms" class="flex-1 flex flex-col p-4 overflow-y-auto">
+                <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+                            <i class="fa-solid fa-building-user text-cyan-400"></i> 
+                            <span data-i18n="room-title">Al Noor Technology Facility</span>
+                        </h2>
+                        <p class="text-xs text-slate-400" data-i18n="room-subtitle">Select a department or room to inspect physical cables, endpoints, and staff.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs px-3 py-1.5 bg-[#0a1022] border border-slate-800 rounded text-cyan-300 font-mono" id="current-location-label">Location: Training Room</span>
+                    </div>
+                </div>
+
+                <!-- Rooms Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-6" id="rooms-grid"></div>
+
+                <!-- Active Room Detail Panel -->
+                <div id="room-detail-panel" class="bg-[#0a1022] border border-slate-800 rounded-xl p-4 mt-auto shadow-2xl hidden"></div>
+            </div>
+
+            <!-- VIEW 2: SERVER ROOM RACK (42U) -->
+            <div id="view-rack" class="flex-1 flex flex-col p-4 overflow-y-auto hidden">
+                <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+                            <i class="fa-solid fa-server text-indigo-400"></i> 
+                            <span data-i18n="rack-title">Server Room - 42U Network Rack</span>
+                        </h2>
+                        <p class="text-xs text-slate-400" data-i18n="rack-subtitle">Mount equipment, wire patch panels, and label cables with virtual label printer.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="openInstallModal()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-slate-100 text-xs font-bold rounded transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-plus"></i> <span data-i18n="btn-mount-eq">Mount Equipment</span>
+                        </button>
+                        <button onclick="openPatchCableModal()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded border border-slate-700 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-plug"></i> <span data-i18n="btn-patch-cables">Patch & Label</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex-1 bg-[#070d1c]/60 border border-slate-800 rounded-xl p-4 flex flex-col items-center justify-start overflow-y-auto">
+                    <div class="w-full max-w-3xl bg-[#04070d] border-2 border-slate-800 rounded-lg p-3 shadow-2xl relative">
+                        <div class="text-center font-mono text-xs text-slate-500 mb-2 border-b border-slate-800 pb-1">
+                            -- 42U ENTERPRISE RACK (AL NOOR CORE) --
+                        </div>
+                        <div id="rack-units-container" class="space-y-1.5"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 3: LIVE TOPOLOGY MAP -->
+            <div id="view-topology" class="flex-1 flex flex-col p-4 overflow-hidden hidden">
+                <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+                            <i class="fa-solid fa-network-wired text-emerald-400"></i> 
+                            <span data-i18n="topo-title">Enterprise Network Topology</span>
+                        </h2>
+                        <p class="text-xs text-slate-400" data-i18n="topo-subtitle">Real-time status of links, VLANs, routing, and active node connectivity.</p>
+                    </div>
+                    <button onclick="renderTopology()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded border border-slate-700">
+                        <i class="fa-solid fa-rotate"></i> <span data-i18n="btn-refresh">Refresh Map</span>
+                    </button>
+                </div>
+
+                <div class="flex-1 bg-[#070d1c]/60 border border-slate-800 rounded-xl p-4 flex flex-col items-center justify-center relative overflow-auto">
+                    <div id="topology-canvas-container" class="w-full h-full flex flex-col items-center justify-center p-6 space-y-4"></div>
+                </div>
+            </div>
+
+            <!-- VIEW 4: TICKETS & CALLS -->
+            <div id="view-tickets" class="flex-1 flex flex-col p-4 overflow-y-auto hidden">
+                <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+                            <i class="fa-solid fa-ticket text-amber-400"></i> 
+                            <span data-i18n="tickets-title">Helpdesk Tickets & Incoming Calls</span>
+                        </h2>
+                        <p class="text-xs text-slate-400" data-i18n="tickets-subtitle">Manage user reports, prioritize incidents, and resolve operational bottlenecks.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div class="lg:col-span-2 space-y-3" id="tickets-list-container"></div>
+                    <div class="space-y-4">
+                        <div class="bg-[#0a1022] border border-slate-800 rounded-xl p-4">
+                            <h3 class="text-sm font-bold text-slate-200 mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-phone-volume text-cyan-400"></i> <span data-i18n="phone-dispatch">Active Dispatch Line</span>
+                            </h3>
+                            <div id="active-call-box" class="bg-[#04070d] p-3 rounded-lg border border-slate-800 text-xs text-slate-400 text-center py-6">
+                                <i class="fa-solid fa-phone text-2xl text-slate-600 mb-2"></i>
+                                <p data-i18n="no-active-calls">No active incoming calls right now.</p>
+                            </div>
+                        </div>
+                        <div class="bg-[#0a1022] border border-slate-800 rounded-xl p-4">
+                            <h3 class="text-sm font-bold text-slate-200 mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-shield-halved text-rose-400"></i> <span data-i18n="shadow-it-monitor">Shadow IT Scanner</span>
+                            </h3>
+                            <div class="text-xs text-slate-400 space-y-2">
+                                <p data-i18n="shadow-it-desc">Scanning switch ports for unauthorized routers, access points, or unknown devices...</p>
+                                <div id="shadow-it-status" class="bg-[#04070d] p-2.5 rounded border border-slate-800 text-emerald-400 font-mono">
+                                    [OK] No rogue devices detected on active ports.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 5: DIAGNOSTIC TOOLS & CLI -->
+            <div id="view-tools" class="flex-1 flex flex-col p-4 overflow-y-auto hidden">
+                <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+                            <i class="fa-solid fa-screwdriver-wrench text-rose-400"></i> 
+                            <span data-i18n="tools-title">Network Engineer Terminal & Diagnostics</span>
+                        </h2>
+                        <p class="text-xs text-slate-400" data-i18n="tools-subtitle">Execute ping, traceroute, cable testing, ARP lookup, and enterprise CLI commands.</p>
+                    </div>
+                </div>
+
+                <div class="flex space-x-2 rtl:space-x-reverse mb-4 overflow-x-auto pb-1">
+                    <button onclick="switchToolTab('cli')" id="stool-cli" class="px-3 py-1.5 bg-[#0a1022] text-cyan-300 border border-slate-700 rounded text-xs font-mono font-bold">CLI Console</button>
+                    <button onclick="switchToolTab('ping')" id="stool-ping" class="px-3 py-1.5 bg-[#04070d] text-slate-300 border border-slate-800 rounded text-xs font-mono">Ping / Traceroute</button>
+                    <button onclick="switchToolTab('cable')" id="stool-cable" class="px-3 py-1.5 bg-[#04070d] text-slate-300 border border-slate-800 rounded text-xs font-mono">Cable Certifier</button>
+                    <button onclick="switchToolTab('arp')" id="stool-arp" class="px-3 py-1.5 bg-[#04070d] text-slate-300 border border-slate-800 rounded text-xs font-mono">ARP / MAC Table</button>
+                </div>
+
+                <div class="flex-1 bg-[#0a1022] border border-slate-800 rounded-xl p-4 flex flex-col font-mono text-xs">
+                    <!-- CLI -->
+                    <div id="tpanel-cli" class="flex-1 flex flex-col h-full">
+                        <div id="cli-output" class="flex-1 bg-[#04070d] p-3 rounded-lg border border-slate-800 overflow-y-auto text-emerald-400 space-y-1 mb-3 max-h-[350px]">
+                            <div>Al Noor OS v4.2 [Enterprise Network Core]</div>
+                            <div>Type 'help' to view available operational commands.</div>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-cyan-400 pt-1.5">></span>
+                            <input type="text" id="cli-input" onkeydown="handleCliInput(event)" placeholder="Enter command (e.g., ping 192.168.1.1, show ip interface brief, show vlan)..." class="flex-1 bg-[#04070d] border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500">
+                            <button onclick="executeCli()" class="px-4 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold rounded">Run</button>
+                        </div>
+                    </div>
+
+                    <!-- Ping -->
+                    <div id="tpanel-ping" class="hidden space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div>
+                                <label class="text-slate-400 block mb-1">Target IP / Host</label>
+                                <input type="text" id="ping-target" value="192.168.1.1" class="w-full bg-[#04070d] border border-slate-800 rounded p-2 text-slate-200">
+                            </div>
+                            <div>
+                                <label class="text-slate-400 block mb-1">Packet Count</label>
+                                <select id="ping-count" class="w-full bg-[#04070d] border border-slate-800 rounded p-2 text-slate-200">
+                                    <option value="4">4 Packets</option>
+                                    <option value="10">10 Packets</option>
+                                </select>
+                            </div>
+                            <div class="flex items-end">
+                                <button onclick="runPingTest()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold rounded">Execute Ping</button>
+                            </div>
+                        </div>
+                        <div id="ping-results" class="bg-[#04070d] p-4 rounded-lg border border-slate-800 text-slate-300 h-64 overflow-y-auto">
+                            Ready for diagnostic ping test...
+                        </div>
+                    </div>
+
+                    <!-- Cable Certifier -->
+                    <div id="tpanel-cable" class="hidden space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-slate-400 block mb-1">Select Cable Link</label>
+                                <select id="cable-tester-select" class="w-full bg-[#04070d] border border-slate-800 rounded p-2 text-slate-200">
+                                    <option value="rec-pc1">TR-01-PC01 -> Switch Port 1 (Cat6)</option>
+                                    <option value="acc-pc2">TR-02-PC02 -> Switch Port 5 (Cat6)</option>
+                                    <option value="srv-trunk">Core Switch -> Server Uplink (Trunk)</option>
+                                </select>
+                            </div>
+                            <div class="flex items-end">
+                                <button onclick="runCableTest()" class="w-full py-2 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold rounded">Run Cable Certifier</button>
+                            </div>
+                        </div>
+                        <div id="cable-test-output" class="bg-[#04070d] p-4 rounded-lg border border-slate-800 text-slate-300 h-64 overflow-y-auto">
+                            Select a cable link to test continuity, pair status, length, and T568B termination...
+                        </div>
+                    </div>
+
+                    <!-- ARP Table -->
+                    <div id="tpanel-arp" class="hidden space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-400">Core Switch MAC Address Table & ARP Cache</span>
+                            <button onclick="refreshArpTable()" class="px-3 py-1 bg-slate-800 text-cyan-400 rounded">Refresh</button>
+                        </div>
+                        <div class="bg-[#04070d] p-3 rounded-lg border border-slate-800 overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-slate-800 text-slate-500">
+                                        <th class="p-2">IP Address</th>
+                                        <th class="p-2">MAC Address</th>
+                                        <th class="p-2">Interface</th>
+                                        <th class="p-2">VLAN</th>
+                                        <th class="p-2">Type</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="arp-table-body" class="text-slate-300">
+                                    <tr><td class="p-2">192.168.1.1</td><td class="p-2">00:1A:2B:3C:4D:5E</td><td class="p-2">Gi0/1</td><td class="p-2">VLAN 10</td><td class="p-2 text-emerald-400">Dynamic</td></tr>
+                                    <tr><td class="p-2">192.168.1.10</td><td class="p-2">54:EE:75:12:34:56</td><td class="p-2">Gi0/2</td><td class="p-2">VLAN 10</td><td class="p-2 text-emerald-400">Dynamic</td></tr>
+                                    <tr><td class="p-2">192.168.20.10</td><td class="p-2">AA:BB:CC:DD:EE:FF</td><td class="p-2">Gi0/12</td><td class="p-2">VLAN 20</td><td class="p-2 text-emerald-400">Dynamic</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 6: 16 STAGES & DEMO -->
+            <div id="view-stages" class="flex-1 flex flex-col p-4 overflow-y-auto hidden">
+                <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-purple-400"></i> 
+                            <span data-i18n="stages-title">Enterprise Evolution Stages (Demo + 01 to 16)</span>
+                        </h2>
+                        <p class="text-xs text-slate-400" data-i18n="stages-subtitle">Track your working day progression from Demo Mode to a full enterprise network (08:00–15:00).</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pb-6" id="stages-grid-container"></div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Task / Action Modal -->
+    <div id="modal-task" class="fixed inset-0 bg-[#04070d]/85 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-[#0a1022] border border-slate-800 rounded-xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 id="modal-task-title" class="text-base font-bold text-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-tasks text-cyan-400"></i> Stage Action / Task
+                </h3>
+                <button onclick="closeModal('modal-task')" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div id="modal-task-body" class="text-sm text-slate-300 space-y-3"></div>
+            <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
+                <button onclick="closeModal('modal-task')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded">Close</button>
+                <button id="modal-task-action-btn" onclick="executeStageAction()" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-slate-950 text-xs font-bold rounded">Complete Action</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logbook Modal -->
+    <div id="modal-logbook" class="fixed inset-0 bg-[#04070d]/85 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-[#0a1022] border border-slate-800 rounded-xl max-w-2xl w-full p-6 shadow-2xl space-y-4 flex flex-col max-h-[80vh]">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 shrink-0">
+                <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-book text-cyan-400"></i> <span data-i18n="logbook-title">Engineer Logbook & Incident Notes</span>
+                </h3>
+                <button onclick="closeModal('modal-logbook')" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto space-y-3 font-mono text-xs" id="logbook-entries-container"></div>
+            <div class="pt-3 border-t border-slate-800 flex gap-2 shrink-0">
+                <input type="text" id="logbook-input" placeholder="Add engineering log note (e.g., Root cause identified...)" class="flex-1 bg-[#04070d] border border-slate-800 rounded p-2 text-slate-200">
+                <button onclick="addLogEntry()" class="px-4 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold rounded text-xs">Add Entry</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Handover / End Shift Modal -->
+    <div id="modal-handover" class="fixed inset-0 bg-[#04070d]/90 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-[#0a1022] border border-cyan-500 rounded-xl max-w-xl w-full p-6 shadow-2xl space-y-4">
+            <div class="border-b border-slate-800 pb-3 flex items-center justify-between">
+                <h3 class="text-lg font-bold text-cyan-400 flex items-center gap-2">
+                    <i class="fa-solid fa-award"></i> DAILY NETWORK ENGINEER REPORT (15:00)
+                </h3>
+            </div>
+            <div id="handover-summary-content" class="text-xs text-slate-300 space-y-3 font-mono"></div>
+            <div class="pt-3 border-t border-slate-800 flex justify-end">
+                <button onclick="location.reload()" class="px-5 py-2 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold text-xs rounded">Restart Shift / New Day</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="fixed bottom-4 right-4 rtl:right-auto rtl:left-4 z-50 space-y-2 pointer-events-none"></div>
+
+    <script>
+        let currentLanguage = 'en';
+        let currentTimeMinutes = 480; // 08:00 AM in minutes
+        let currentStageIndex = 0; // 0 = Demo Mode, 1-16 = Workday Stages
+        let activeTab = 'rooms';
+        let activeTool = 'cli';
+
+        // 16 Stages + Demo
+        const stagesData = [
+            { id: 0, time: "08:00 - 08:15", titleEn: "Demo Mode: Training Room Setup", titleAr: "الوضع التجريبي: إعداد غرفة التدريب", descEn: "Build a mini network for training room, configure IPs, and test fault resolution.", descAr: "بناء شبكة مصغرة لغرفة التدريب، ضبط عناوين IP، واختبار إصلاح الأعطال.", completed: false },
+            { id: 1, time: "08:00 - 08:25", titleEn: "Stage 01: Empty Room Inspection", titleAr: "المرحلة 01: معاينة الغرفة الفارغة", descEn: "Inspect building architecture, plan rack location, and workstation data points.", descAr: "معاينة بنية المبنى، تخطيط موقع الراك، ونقاط البيانات الخاصة بمحطات العمل.", completed: false },
+            { id: 2, time: "08:25 - 08:55", titleEn: "Stage 02: Structured Cabling", titleAr: "المرحلة 02: الكابلات الهيكلية", descEn: "Select Cat6 cables, route paths, measure lengths, and install wall outlets.", descAr: "اختيار كابلات Cat6، مسارات التوجيه، قياس الأطوال، وتركيب مخارج الحائط.", completed: false },
+            { id: 3, time: "08:55 - 09:25", titleEn: "Stage 03: Termination & Testing", titleAr: "المرحلة 03: التوصيل والاختبار", descEn: "Terminate RJ45 connectors (T568B), punch down patch panel, run cable certifier.", descAr: "تركيب موصلات RJ45، توصيل لوحة الباتش بانل، واختبار استمرارية الكابلات.", completed: false },
+            { id: 4, time: "09:25 - 09:50", titleEn: "Stage 04: Switch Installation", titleAr: "المرحلة 04: تركيب السويتش", descEn: "Mount switch in rack U04, connect patch panel to switch ports, inspect link LEDs.", descAr: "تثبيت السويتش في الراك، توصيل الباتش بانل بمنافذ السويتش، ومعاينة مؤشرات LED.", completed: false },
+            { id: 5, time: "09:50 - 10:15", titleEn: "Stage 05: IP Configuration", titleAr: "المرحلة 05: إعداد عناوين IP", descEn: "Configure static IPs, subnet masks, default gateways, and DNS on workstations.", descAr: "ضبط عناوين IP الثابتة، أقنعة الشبكة، البوابات الافتراضية، وDNS.", completed: false },
+            { id: 6, time: "10:15 - 10:40", titleEn: "Stage 06: First Real Incident", titleAr: "المرحلة 06: الحادث الأول", descEn: "Diagnose and resolve a sudden PC connectivity failure in the accounting department.", descAr: "تشخيص وإصلاح انقطاع مفاجئ لاتصال حاسوب في قسم المحاسبة.", completed: false },
+            { id: 7, time: "10:40 - 11:05", titleEn: "Stage 07: Internet Gateway & Firewall", titleAr: "المرحلة 07: بوابة الإنترنت والجدار الناري", descEn: "Install router & firewall, configure WAN/LAN interfaces, routing, and NAT.", descAr: "تثبيت الراوتر والجدار الناري، ضبط واجهات WAN/LAN، التوجيه، وNAT.", completed: false },
+            { id: 8, time: "11:05 - 11:35", titleEn: "Stage 08: VLAN Segmentation", titleAr: "المرحلة 08: تقسيم شبكات VLAN", descEn: "Create VLAN 10 (Admin), VLAN 20 (Training), VLAN 30 (Mgmt), configure trunk ports.", descAr: "إنشاء VLAN 10 و 20 و 30، وتهيئة منافذ الترانك (Trunk).", completed: false },
+            { id: 9, time: "11:35 - 12:00", titleEn: "Stage 09: DHCP & DNS Services", titleAr: "المرحلة 09: خدمات DHCP و DNS", descEn: "Configure DHCP server scopes, lease pools, and DNS resolution records.", descAr: "تهيئة خادم DHCP، نطاقات التأجير، وسجلات تحليل أسماء النطاقات DNS.", completed: false },
+            { id: 10, time: "12:00 - 12:25", titleEn: "Stage 10: Wireless Access Points", titleAr: "المرحلة 10: نقاط الوصول اللاسلكية", descEn: "Deploy Wi-Fi APs for corporate and guest networks with secure WPA3 SSIDs.", descAr: "نشر نقاط وصول Wi-Fi للشبكات الداخلية والضيوف مع تشفير WPA3.", completed: false },
+            { id: 11, time: "12:25 - 12:50", titleEn: "Stage 11: Monitoring & Performance", titleAr: "المرحلة 11: المراقبة والأداء", descEn: "Analyze bandwidth utilization, packet loss, latency, and interface error counters.", descAr: "تحليل استهلاك النطاق الترددي، الفقد، التأخير، وأخطاء الواجهات.", completed: false },
+            { id: 12, time: "12:50 - 13:15", titleEn: "Stage 12: Network Loop & Storm", titleAr: "المرحلة 12: حلقة الشبكة والاصطدام", descEn: "Investigate broadcast storm caused by an accidental cable loop; verify STP.", descAr: "التحقيق في عاصفة بث ناتجة عن حلقة كابلات خاطئة؛ التحقق من STP.", completed: false },
+            { id: 13, time: "13:15 - 13:35", titleEn: "Stage 13: Enterprise Server Deployment", titleAr: "المرحلة 13: نشر خادم المؤسسة", descEn: "Install file server, internal web portal, and troubleshoot service binding.", descAr: "تركيب خادم الملفات، بوابة الويب الداخلية، وحل مشاكل ربط الخدمات.", completed: false },
+            { id: 14, time: "13:35 - 14:00", titleEn: "Stage 14: Advanced Firewall Rules", titleAr: "المرحلة 14: قواعد الجدار الناري المتقدمة", descEn: "Enforce security policies between guest network, VLANs, and restricted servers.", descAr: "تطبيق سياسات الأمان بين شبكة الضيوف و VLANs والخوادم المقيدة.", completed: false },
+            { id: 15, time: "14:00 - 14:35", titleEn: "Stage 15: Multi-Fault Incident", titleAr: "المرحلة 15: حادث متعدد الأعطال", descEn: "Simultaneous departmental outages. Prioritize, troubleshoot, and restore service.", descAr: "انقطاعات متزامنة في الأقسام. تحديد الأولويات، التشخيص، واستعادة الخدمة.", completed: false },
+            { id: 16, time: "14:35 - 15:00", titleEn: "Stage 16: Final Handover & Report", titleAr: "المرحلة 16: التسليم النهائي والتقرير", descEn: "Execute final nightmare test, generate network engineer report, and handover.", descAr: "تنفيذ اختبار الكابوس النهائي، إصدار تقرير مهندس الشبكة، وتسليم النظام.", completed: false }
+        ];
+
+        const roomsData = [
+            { id: 'reception', nameEn: 'Reception', nameAr: 'الاستقبال', icon: 'fa-id-badge', devices: 2, status: 'ONLINE', descEn: 'Front desk reception with visitor kiosk and IP phone.', descAr: 'استقبال الواجهة مع كشك الزوار وهاتف IP.' },
+            { id: 'admin', nameEn: 'Administration', nameAr: 'الإدارة', icon: 'fa-user-tie', devices: 4, status: 'ONLINE', descEn: 'Management and executive administrative workstations.', descAr: 'محطات عمل الإدارة التنفيذية.' },
+            { id: 'accounting', nameEn: 'Accounting', nameAr: 'المحاسبة', icon: 'fa-calculator', devices: 5, status: 'WARNING', descEn: 'Financial department processing payroll and invoices.', descAr: 'قسم المالية لمعالجة الرواتب والفواتير.' },
+            { id: 'training', nameEn: 'Training Room', nameAr: 'غرفة التدريب', icon: 'fa-chalkboard-user', devices: 6, status: 'ONLINE', descEn: 'Training workstations for new personnel and sessions.', descAr: 'محطات تدريب الموظفين الجدد.' },
+            { id: 'management', nameEn: 'Management Office', nameAr: 'مكتب المدير', icon: 'fa-briefcase', devices: 3, status: 'ONLINE', descEn: 'Director office with private printer and secure network point.', descAr: 'مكتب المدير مع طابعة خاصة ونقطة شبكة مؤمنة.' },
+            { id: 'meeting', nameEn: 'Meeting Room', nameAr: 'غرفة الاجتماعات', icon: 'fa-users', devices: 2, status: 'ONLINE', descEn: 'Conference room with presentation display and VoIP conferencing.', descAr: 'غرفة المؤتمرات مع شاشة عرض ومؤتمرات صوتية.' },
+            { id: 'serverroom', nameEn: 'Server Room', nameAr: 'غرفة الخوادم', icon: 'fa-server', devices: 8, status: 'ONLINE', descEn: 'Core rack, switches, firewall, routers, and enterprise servers.', descAr: 'الراك الرئيسي، السويتشات، الجدار الناري، والراوترات وخوادم المؤسسة.' },
+            { id: 'storage', nameEn: 'Storage & Closet', nameAr: 'المستودع وغرفة الاتصالات', icon: 'fa-box-archive', devices: 1, status: 'ONLINE', descEn: 'Secondary IDF telecom closet with patch panels and backup UPS.', descAr: 'غرفة اتصالات فرعية مع لوحات التوصيل وبطارية UPS للاحتياط.' }
+        ];
+
+        // Rack Equipment Data (42U)
+        let rackEquipment = [
+            { u: 'U01-U02', name: 'APC Smart-UPS 3000VA', type: 'ups', status: 'ONLINE', power: '280W' },
+            { u: 'U04', name: 'Cisco Catalyst 3850 Core Switch (24-Port)', type: 'switch', status: 'ONLINE', ports: 24 },
+            { u: 'U06', name: 'Cat6 24-Port Patch Panel [TR-01-PP01]', type: 'patch', status: 'ONLINE', wired: 18 },
+            { u: 'U08', name: 'Cisco ISR 4431 Enterprise Router', type: 'router', status: 'ONLINE', wan: 'Active' },
+            { u: 'U10', name: 'Fortinet FortiGate 100F Firewall', type: 'firewall', status: 'ONLINE', sec: 'Enabled' },
+            { u: 'U14-U15', name: 'Dell PowerEdge R750 Enterprise Server', type: 'server', status: 'ONLINE', role: 'Active Directory / DNS / DHCP' }
+        ];
+
+        // Tickets & Incidents Data
+        let ticketsData = [
+            { id: 1041, priority: 'MEDIUM', dept: 'Reception', issueEn: 'Printer not responding to print jobs.', issueAr: 'الطابعة لا تستجيب لمهام الطباعة.', status: 'OPEN', time: '08:15 AM' }
+        ];
+
+        // Logbook Entries
+        let logbookEntries = [
+            { time: '08:00 AM', text: 'Arrived at Al Noor Technology facility. Initialized network operations workspace (Tamara Al-Shabatat).' },
+            { time: '08:15 AM', text: 'Started Demo Mode for training room deployment and physical link verification.' }
+        ];
+
+        let changeMetrics = {
+            changesCount: 0,
+            unnecessaryChanges: 0,
+            criticalModified: 0
+        };
+
+        // Localization Dictionary
+        const i18n = {
+            en: {
+                'app-title': 'THE NETWORK ENGINEER',
+                'app-subtitle': '08:00 — NETWORK DOWN | أنت مهندس الشبكة',
+                'stat-eng': 'Engineer:',
+                'stat-devices': 'Devices:',
+                'stat-tickets': 'Open Tickets:',
+                'stat-network': 'Net Status:',
+                'btn-logbook': 'Logbook',
+                'nav-workstation': 'Workday (08:00–15:00)',
+                'tab-rooms': 'Building & Rooms',
+                'tab-rack': 'Server Room Rack (42U)',
+                'tab-topology': 'Live Topology Map',
+                'tab-tickets': 'Tickets & Calls',
+                'tab-tools': 'Diagnostic Terminal & CLI',
+                'tab-stages': '16 Stages & Demo',
+                'current-objective': 'Current Objective',
+                'btn-view-task': 'Task Details / Action',
+                'room-title': 'Al Noor Technology Facility',
+                'room-subtitle': 'Select a department or room to inspect physical cables, endpoints, and staff.',
+                'rack-title': 'Server Room - 42U Network Rack',
+                'rack-subtitle': 'Mount equipment, wire patch panels, and label cables with virtual label printer.',
+                'btn-mount-eq': 'Mount Equipment',
+                'btn-patch-cables': 'Patch & Label',
+                'topo-title': 'Enterprise Network Topology',
+                'topo-subtitle': 'Real-time status of links, VLANs, routing, and active node connectivity.',
+                'btn-refresh': 'Refresh Map',
+                'tickets-title': 'Helpdesk Tickets & Incoming Calls',
+                'tickets-subtitle': 'Manage user reports, prioritize incidents, and resolve operational bottlenecks.',
+                'phone-dispatch': 'Active Dispatch Line',
+                'no-active-calls': 'No active incoming calls right now.',
+                'shadow-it-monitor': 'Shadow IT Scanner',
+                'shadow-it-desc': 'Scanning switch ports for unauthorized routers, access points, or unknown devices...',
+                'tools-title': 'Network Engineer Terminal & Diagnostics',
+                'tools-subtitle': 'Execute ping, traceroute, cable testing, ARP lookup, and enterprise CLI commands.',
+                'stages-title': 'Enterprise Evolution Stages (Demo + 01 to 16)',
+                'stages-subtitle': 'Track your working day progression from Demo Mode to a full enterprise network (08:00–15:00).',
+                'logbook-title': 'Engineer Logbook & Incident Notes'
+            },
+            ar: {
+                'app-title': 'مهندس الشبكة',
+                'app-subtitle': '08:00 — انقطاع الشبكة | THE NETWORK ENGINEER',
+                'stat-eng': 'المهندس:',
+                'stat-devices': 'الأجهزة:',
+                'stat-tickets': 'التذاكر المفتوحة:',
+                'stat-network': 'حالة الشبكة:',
+                'btn-logbook': 'سجل المهندس',
+                'nav-workstation': 'يوم العمل (08:00–15:00)',
+                'tab-rooms': 'المبنى والغرف',
+                'tab-rack': 'راك غرفة الخوادم (42U)',
+                'tab-topology': 'خريطة الطوبولوجيا الحية',
+                'tab-tickets': 'التذاكر والمكالمات',
+                'tab-tools': 'أدوات التشخيص و CLI',
+                'tab-stages': 'المراحل (16 + تجريبي)',
+                'current-objective': 'الهدف الحالي',
+                'btn-view-task': 'تفاصيل المهمة / الإجراء',
+                'room-title': 'منشأة شركة النور للتكنولوجيا',
+                'room-subtitle': 'اختر قسماً أو غرفة لمعاينة الكابلات الفيزيائية، الأجهزة، والموظفين.',
+                'rack-title': 'غرفة الخوادم - راك الشبكة 42U',
+                'rack-subtitle': 'تركيب المعدات وتوصيل لوحات الباتش بانل وتسمية الكابلات بالطابعة الافتراضية.',
+                'btn-mount-eq': 'تركيب معدة',
+                'btn-patch-cables': 'توصيل وتسمية الكابلات',
+                'topo-title': 'طوبولوجيا شبكة المؤسسة',
+                'topo-subtitle': 'حالة فورية للوصلات وشبكات VLAN والتوجيه واتصال العقد النشطة.',
+                'btn-refresh': 'تحديث الخريطة',
+                'tickets-title': 'تذاكر الدعم الفني والمكالمات الواردة',
+                'tickets-subtitle': 'إدارة بلاغات المستخدمين وترتيب الأولويات وحل العراقيل التشغيلية.',
+                'phone-dispatch': 'خط الاستجابة النشط',
+                'no-active-calls': 'لا توجد مكالمات واردة نشطة الآن.',
+                'shadow-it-monitor': 'فاحص تقنية الظل (Shadow IT)',
+                'shadow-it-desc': 'جاري فحص منافذ السويتش بحثاً عن راوترات أو نقاط وصول غير مصرح بها...',
+                'tools-title': 'وحدة تحكم مهندس الشبكة وأدوات التشخيص',
+                'tools-subtitle': 'تنفيذ أوامر Ping و Traceroute واختبار الكابلات وعناوين ARP.',
+                'stages-title': 'مراحل تطور المؤسسة (تجريبي + 01 إلى 16)',
+                'stages-subtitle': 'تتبع تقدم يوم عملك من الوضع التجريبي إلى شبكة مؤسسية كاملة (08:00–15:00).',
+                'logbook-title': 'سجل مهندس الشبكة وملاحظات الحوادث'
+            }
+        };
+
+        window.onload = function() {
+            renderRooms();
+            renderRack();
+            renderTopology();
+            renderTickets();
+            renderStages();
+            updateClockDisplay();
+            updateUIStrings();
+            
+            // Simulation clock ticker (progresses time realistically)
+            setInterval(simulationTick, 9000);
+        };
+
+        function simulationTick() {
+            currentTimeMinutes += 4;
+            if (currentTimeMinutes >= 900) {
+                currentTimeMinutes = 900; // 15:00 Shift End
+                triggerEndShiftHandover();
+            }
+            updateClockDisplay();
+            
+            // Trigger contextual incoming calls or shadow IT alerts
+            if (currentTimeMinutes === 530 && ticketsData.length < 3) {
+                triggerIncomingCall("Accounting", "The shared accounting folder is suddenly inaccessible on three workstations.");
+            } else if (currentTimeMinutes === 660 && ticketsData.length < 4) {
+                triggerIncomingCall("Management Office", "Director's Wi-Fi connection keeps dropping every few minutes.");
+            } else if (currentTimeMinutes === 780) {
+                document.getElementById('shadow-it-status').innerText = "[ALERT] Rogue AP detected on Switch SW-01 Port 17 (VLAN 20)!";
+                document.getElementById('shadow-it-status').className = "bg-[#04070d] p-2.5 rounded border border-rose-800 text-rose-400 font-mono animate-pulse";
+                showToast("Shadow IT Scanner: Unauthorized access point detected in Accounting department!", "warning");
+            }
+        }
+
+        function updateClockDisplay() {
+            let hours = Math.floor(currentTimeMinutes / 60);
+            let mins = currentTimeMinutes % 60;
+            let ampm = hours >= 12 ? 'PM' : 'AM';
+            let displayHours = hours % 12;
+            displayHours = displayHours ? displayHours : 12;
+            let timeStr = `${String(displayHours).padStart(2, '0')}:${String(mins).padStart(2, '0')} ${ampm}`;
+            
+            document.getElementById('header-clock').innerText = timeStr;
+            
+            let progressPct = Math.round(((currentTimeMinutes - 480) / 420) * 100);
+            if (progressPct > 100) progressPct = 100;
+            if (progressPct < 0) progressPct = 0;
+            
+            document.getElementById('day-progress-bar').style.width = progressPct + '%';
+            document.getElementById('time-progress-pct').innerText = `${timeStr} (${progressPct}%)`;
+        }
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'en' ? 'ar' : 'en';
+            document.documentElement.dir = currentLanguage === 'ar' ? 'rtl' : 'ltr';
+            document.documentElement.lang = currentLanguage;
+            document.getElementById('lang-label').innerText = currentLanguage === 'en' ? 'عربي / EN' : 'English / AR';
+            updateUIStrings();
+            renderRooms();
+            renderRack();
+            renderStages();
+        }
+
+        function updateUIStrings() {
+            const dict = i18n[currentLanguage];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (dict[key]) el.innerText = dict[key];
+            });
+        }
+
+        function switchTab(tabId) {
+            ['rooms', 'rack', 'topology', 'tickets', 'tools', 'stages'].forEach(t => {
+                document.getElementById(`view-${t}`).classList.add('hidden');
+                document.getElementById(`tab-btn-${t}`).className = "w-full flex items-center space-x-3 rtl:space-x-reverse px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-800/60";
+            });
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            document.getElementById(`tab-btn-${tabId}`).className = "w-full flex items-center space-x-3 rtl:space-x-reverse px-3 py-2.5 rounded-lg text-sm font-medium transition bg-cyan-950/50 text-cyan-300 border border-cyan-800/50";
+            activeTab = tabId;
+
+            if (tabId === 'topology') renderTopology();
+            if (tabId === 'tickets') renderTickets();
+            if (tabId === 'stages') renderStages();
+        }
+
+        function switchToolTab(toolId) {
+            ['cli', 'ping', 'cable', 'arp'].forEach(t => {
+                document.getElementById(`tpanel-${t}`).classList.add('hidden');
+                document.getElementById(`stool-${t}`).className = "px-3 py-1.5 bg-[#04070d] text-slate-300 border border-slate-800 rounded text-xs font-mono";
+            });
+            document.getElementById(`tpanel-${toolId}`).classList.remove('hidden');
+            document.getElementById(`stool-${toolId}`).className = "px-3 py-1.5 bg-[#0a1022] text-cyan-300 border border-slate-700 rounded text-xs font-mono font-bold";
+            activeTool = toolId;
+        }
+
+        function renderRooms() {
+            const container = document.getElementById('rooms-grid');
+            container.innerHTML = '';
+            roomsData.forEach(room => {
+                let statusColor = room.status === 'ONLINE' ? 'bg-emerald-500 led-green' : 'bg-amber-500 led-amber';
+                let name = currentLanguage === 'ar' ? room.nameAr : room.nameEn;
+                let desc = currentLanguage === 'ar' ? room.descAr : room.descEn;
+
+                container.innerHTML += `
+                    <div onclick="selectRoom('${room.id}')" class="bg-[#0a1022] border border-slate-800 hover:border-cyan-500/50 rounded-xl p-4 cursor-pointer transition shadow-lg flex flex-col justify-between group">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="w-10 h-10 rounded-lg bg-cyan-950 text-cyan-400 flex items-center justify-center text-lg border border-cyan-900">
+                                    <i class="fa-solid ${room.icon}"></i>
+                                </div>
+                                <div class="flex items-center space-x-1.5 rtl:space-x-reverse">
+                                    <span class="w-2.5 h-2.5 rounded-full ${statusColor} animate-pulse"></span>
+                                    <span class="text-[10px] font-mono text-slate-400 uppercase">${room.status}</span>
+                                </div>
+                            </div>
+                            <h3 class="font-bold text-sm text-slate-200 group-hover:text-cyan-300 transition">${name}</h3>
+                            <p class="text-xs text-slate-400 mt-1 line-clamp-2">${desc}</p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-500">
+                            <span><i class="fa-solid fa-desktop mr-1"></i> ${room.devices} Endpoints</span>
+                            <span class="text-cyan-400 font-semibold group-hover:underline">Inspect →</span>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('stat-devices-count').innerText = `${roomsData.reduce((acc, r) => acc + r.devices, 0)}/45 Active`;
+        }
+
+        function selectRoom(roomId) {
+            const room = roomsData.find(r => r.id === roomId);
+            if (!room) return;
+            let name = currentLanguage === 'ar' ? room.nameAr : room.nameEn;
+            let desc = currentLanguage === 'ar' ? room.descAr : room.descEn;
+
+            document.getElementById('current-location-label').innerText = `Location: ${name}`;
+            const panel = document.getElementById('room-detail-panel');
+            panel.classList.remove('hidden');
+            panel.innerHTML = `
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-bold text-base text-slate-100 flex items-center gap-2">
+                        <i class="fa-solid ${room.icon} text-cyan-400"></i> ${name} — Department Inspection
+                    </h3>
+                    <button onclick="document.getElementById('room-detail-panel').classList.add('hidden')" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <p class="text-xs text-slate-300 mb-3">${desc}</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="bg-[#04070d] p-3 rounded-lg border border-slate-800">
+                        <span class="text-[11px] text-slate-400 block mb-1">Cabling Standard</span>
+                        <span class="font-mono text-emerald-400 text-xs">Cat6 Solid Copper (T568B)</span>
+                    </div>
+                    <div class="bg-[#04070d] p-3 rounded-lg border border-slate-800">
+                        <span class="text-[11px] text-slate-400 block mb-1">VLAN Assignment</span>
+                        <span class="font-mono text-cyan-400 text-xs">VLAN 10 (Access Layer)</span>
+                    </div>
+                    <div class="bg-[#04070d] p-3 rounded-lg border border-slate-800">
+                        <span class="text-[11px] text-slate-400 block mb-1">Connected Workstations</span>
+                        <span class="font-mono text-indigo-400 text-xs">${room.devices} Endpoints Online</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderRack() {
+            const container = document.getElementById('rack-units-container');
+            container.innerHTML = '';
+            rackEquipment.forEach(eq => {
+                container.innerHTML += `
+                    <div class="bg-[#0a1022] border border-slate-800 hover:border-indigo-500/40 rounded p-2.5 flex items-center justify-between text-xs transition">
+                        <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                            <span class="font-mono text-cyan-400 font-bold bg-[#04070d] px-2 py-1 rounded border border-slate-800">${eq.u}</span>
+                            <div>
+                                <span class="font-semibold text-slate-200">${eq.name}</span>
+                                <span class="text-slate-400 block text-[10px]">Type: ${eq.type.toUpperCase()} | Virtual Label Printer Verified</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 led-green animate-pulse"></span>
+                            <span class="font-mono text-[10px] text-emerald-400">${eq.status}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function openInstallModal() {
+            changeMetrics.changesCount++;
+            changeMetrics.criticalModified++;
+            showTaskModal("Mount New Enterprise Equipment", "Select equipment to install into available 42U rack units (U16–U22 available):", () => {
+                rackEquipment.push({ u: 'U16', name: 'Cisco Layer 2 Edge Switch 24P PoE+', type: 'switch', status: 'ONLINE', ports: 24 });
+                renderRack();
+                showToast("Equipment successfully mounted and powered on in rack U16.", "success");
+            });
+        }
+
+        function openPatchCableModal() {
+            changeMetrics.changesCount++;
+            showTaskModal("Virtual Label Printer & Patching", "Connect patch panel ports to switch interface modules using Cat6 patch cords. Label format: TR-01-PC03-SW01-P12.", () => {
+                showToast("Patch panel successfully wired and labeled with virtual printer.", "success");
+                addLogEntry("Patched and labeled new Cat6 cables in server rack. Verified continuity.");
+            });
+        }
+
+        function renderTopology() {
+            const container = document.getElementById('topology-canvas-container');
+            container.innerHTML = `
+                <div class="flex flex-col items-center space-y-4">
+                    <!-- Internet -->
+                    <div class="bg-[#0a1022] border border-cyan-500/50 px-6 py-2.5 rounded-xl shadow-lg text-center">
+                        <i class="fa-solid fa-globe text-cyan-400 text-xl mb-1"></i>
+                        <div class="text-xs font-bold text-slate-100">INTERNET (ISP WAN)</div>
+                        <span class="text-[10px] text-emerald-400 font-mono">● 100Mbps Fiber Link (UP)</span>
+                    </div>
+                    <div class="w-0.5 h-5 bg-slate-700"></div>
+                    <!-- Firewall -->
+                    <div class="bg-[#0a1022] border border-indigo-500/50 px-6 py-2.5 rounded-xl shadow-lg text-center">
+                        <i class="fa-solid fa-shield-halved text-indigo-400 text-xl mb-1"></i>
+                        <div class="text-xs font-bold text-slate-100">FORTINET FORTIGATE 100F FIREWALL</div>
+                        <span class="text-[10px] text-emerald-400 font-mono">● Security Policies & NAT Active</span>
+                    </div>
+                    <div class="w-0.5 h-5 bg-slate-700"></div>
+                    <!-- Core Switch -->
+                    <div class="bg-[#0a1022] border border-emerald-500/50 px-8 py-3 rounded-xl shadow-lg text-center">
+                        <i class="fa-solid fa-server text-emerald-400 text-2xl mb-1"></i>
+                        <div class="text-xs font-bold text-slate-100">CISCO CATALYST 3850 CORE SWITCH</div>
+                        <span class="text-[10px] text-emerald-400 font-mono">● 24 Ports Active / Trunking OK</span>
+                    </div>
+                    <div class="w-full max-w-xl h-0.5 bg-slate-700 my-2 relative flex justify-around">
+                        <div class="w-0.5 h-5 bg-slate-700"></div>
+                        <div class="w-0.5 h-5 bg-slate-700"></div>
+                        <div class="w-0.5 h-5 bg-slate-700"></div>
+                    </div>
+                    <!-- VLANs Subnets -->
+                    <div class="grid grid-cols-3 gap-6 w-full max-w-xl">
+                        <div class="bg-[#0a1022] border border-slate-800 p-3 rounded-lg text-center">
+                            <span class="text-[10px] font-mono text-cyan-400">VLAN 10</span>
+                            <div class="text-xs font-bold text-slate-200 mt-1">Administration</div>
+                            <span class="text-[10px] text-emerald-400">● 4 Nodes Online</span>
+                        </div>
+                        <div class="bg-[#0a1022] border border-slate-800 p-3 rounded-lg text-center">
+                            <span class="text-[10px] font-mono text-amber-400">VLAN 20</span>
+                            <div class="text-xs font-bold text-slate-200 mt-1">Accounting</div>
+                            <span class="text-[10px] text-emerald-400">● 5 Nodes Online</span>
+                        </div>
+                        <div class="bg-[#0a1022] border border-slate-800 p-3 rounded-lg text-center">
+                            <span class="text-[10px] font-mono text-purple-400">VLAN 30</span>
+                            <div class="text-xs font-bold text-slate-200 mt-1">Training Room</div>
+                            <span class="text-[10px] text-emerald-400">● 6 Nodes Online</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTickets() {
+            const container = document.getElementById('tickets-list-container');
+            container.innerHTML = '';
+            ticketsData.forEach(ticket => {
+                let prioColor = ticket.priority === 'HIGH' ? 'text-rose-400 bg-rose-950 border-rose-800' : 'text-amber-400 bg-amber-950 border-amber-800';
+                let issue = currentLanguage === 'ar' ? ticket.issueAr : ticket.issueEn;
+
+                container.innerHTML += `
+                    <div class="bg-[#0a1022] border border-slate-800 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-lg">
+                        <div>
+                            <div class="flex items-center space-x-2 rtl:space-x-reverse mb-1">
+                                <span class="font-mono text-xs font-bold text-cyan-400">TICKET #${ticket.id}</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-mono border ${prioColor}">${ticket.priority}</span>
+                                <span class="text-xs text-slate-400">Dept: ${ticket.dept}</span>
+                            </div>
+                            <p class="text-sm text-slate-200 font-medium">${issue}</p>
+                            <span class="text-[10px] text-slate-500 mt-1 block">Reported at ${ticket.time} — Assigned to Tamara Al-Shabatat</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="resolveTicket(${ticket.id})" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-bold rounded transition">
+                                Resolve Incident
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('stat-tickets-count').innerText = ticketsData.length;
+            
+            if(ticketsData.length > 0) {
+                const badge = document.getElementById('tickets-badge');
+                badge.innerText = ticketsData.length;
+                badge.classList.remove('hidden');
+            } else {
+                document.getElementById('tickets-badge').classList.add('hidden');
+            }
+        }
+
+        function resolveTicket(ticketId) {
+            ticketsData = ticketsData.filter(t => t.id !== ticketId);
+            renderTickets();
+            showToast(`Ticket #${ticketId} resolved successfully. Root cause documented.`, "success");
+            addLogEntry(`Resolved ticket #${ticketId}. Verified connectivity and updated network documentation.`);
+        }
+
+        function triggerIncomingCall(dept, message) {
+            const box = document.getElementById('active-call-box');
+            box.innerHTML = `
+                <div class="bg-[#04070d] p-4 rounded-lg border border-cyan-500/40 text-left space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-cyan-400 flex items-center gap-1.5"><i class="fa-solid fa-phone-volume animate-bounce"></i> Incoming Call (${dept})</span>
+                        <span class="text-[10px] text-slate-400 font-mono">Just Now</span>
+                    </div>
+                    <p class="text-xs text-slate-200 italic">"${message}"</p>
+                    <div class="flex gap-2 pt-2">
+                        <button onclick="answerCall('${dept}', '${message}')" class="flex-1 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold text-xs rounded">Answer Call</button>
+                        <button onclick="dismissCall()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded">Decline</button>
+                    </div>
+                </div>
+            `;
+            showToast(`Incoming call from ${dept} department!`, "warning");
+        }
+
+        function answerCall(dept, message) {
+            ticketsData.push({
+                id: Math.floor(1050 + Math.random() * 50),
+                priority: 'HIGH',
+                dept: dept,
+                issueEn: message,
+                issueAr: message,
+                status: 'INVESTIGATING',
+                time: 'Live Call'
+            });
+            renderTickets();
+            dismissCall();
+            showToast(`Accepted call from ${dept}. Ticket generated and added to queue.`, "success");
+        }
+
+        function dismissCall() {
+            document.getElementById('active-call-box').innerHTML = `
+                <i class="fa-solid fa-phone text-2xl text-slate-600 mb-2"></i>
+                <p data-i18n="no-active-calls">No active incoming calls right now.</p>
+            `;
+        }
+
+        function renderStages() {
+            const container = document.getElementById('stages-grid-container');
+            container.innerHTML = '';
+            stagesData.forEach(st => {
+                let title = currentLanguage === 'ar' ? st.titleAr : st.titleEn;
+                let desc = currentLanguage === 'ar' ? st.descAr : st.descEn;
+                let isCurrent = st.id === currentStageIndex;
+                let cardBorder = isCurrent ? 'border-cyan-500 bg-cyan-950/20 shadow-cyan-500/10' : 'border-slate-800 bg-[#0a1022]';
+
+                container.innerHTML += `
+                    <div class="border ${cardBorder} rounded-xl p-4 flex flex-col justify-between shadow-lg">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-mono text-xs text-cyan-400 font-bold">${st.time}</span>
+                                <span class="text-[10px] font-mono px-2 py-0.5 rounded ${st.completed ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-slate-800 text-slate-400'}">${st.completed ? 'COMPLETED' : (isCurrent ? 'ACTIVE' : 'PENDING')}</span>
+                            </div>
+                            <h3 class="font-bold text-sm text-slate-100 mb-1">${title}</h3>
+                            <p class="text-xs text-slate-400">${desc}</p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-slate-800 flex justify-end">
+                            <button onclick="startStage(${st.id})" class="px-3 py-1 bg-cyan-600 hover:bg-cyan-500 text-slate-950 text-xs font-bold rounded">
+                                ${isCurrent ? 'Execute Stage' : 'Inspect Stage'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('current-stage-badge').innerText = currentStageIndex === 0 ? 'DEMO' : `STAGE ${String(currentStageIndex).padStart(2, '0')}`;
+        }
+
+        function startStage(stageId) {
+            currentStageIndex = stageId;
+            const st = stagesData[stageId];
+            let title = currentLanguage === 'ar' ? st.titleAr : st.titleEn;
+            let desc = currentLanguage === 'ar' ? st.descAr : st.descEn;
+
+            showTaskModal(title, `${desc}\n\nPerform all physical and logical checks to verify operation. When completed, click finish to advance workday.`, () => {
+                stagesData[stageId].completed = true;
+                renderStages();
+                showToast(`Stage ${stageId === 0 ? 'Demo' : stageId} completed successfully!`, "success");
+                addLogEntry(`Completed ${title}. Network verification confirmed healthy status.`);
+            });
+        }
+
+        function handleCliInput(e) {
+            if (e.key === 'Enter') executeCli();
+        }
+
+        function executeCli() {
+            const input = document.getElementById('cli-input');
+            const output = document.getElementById('cli-output');
+            const cmd = input.value.trim();
+            if (!cmd) return;
+
+            output.innerHTML += `<div class="text-slate-200">> ${cmd}</div>`;
+            changeMetrics.changesCount++;
+            
+            let response = "";
+            const lower = cmd.toLowerCase();
+            if (lower === 'help') {
+                response = "Available commands: ping [ip], show ip interface brief, show vlan, show mac-address-table, traceroute [ip], uptime";
+            } else if (lower.startsWith('ping')) {
+                response = "PING 192.168.1.1 (192.168.1.1) 56(84) bytes of data.\n64 bytes from 192.168.1.1: icmp_seq=1 ttl=64 time=0.412 ms\n64 bytes from 192.168.1.1: icmp_seq=2 ttl=64 time=0.385 ms\n--- 192.168.1.1 ping statistics ---\n2 packets transmitted, 2 received, 0% packet loss, time 1001ms";
+            } else if (lower.includes('show ip interface')) {
+                response = "Interface          IP-Address      OK? Method Status                Protocol\nVlan10             192.168.1.254   YES manual up                    up\nVlan20             192.168.20.254  YES manual up                    up\nGigabitEthernet0/1 unassigned      YES unset  up                    up";
+            } else if (lower.includes('show vlan')) {
+                response = "VLAN Name                     Status    Ports\n---- ----------------         --------- ------------------------------\n10   Administration           active    Gi0/1, Gi0/2, Gi0/3\n20   Accounting               active    Gi0/4, Gi0/5, Gi0/6\n30   Training_Room            active    Gi0/7, Gi0/8, Gi0/9";
+            } else {
+                response = `Command executed successfully: '${cmd}'. No errors reported by operating system.`;
+            }
+
+            output.innerHTML += `<div class="text-cyan-400 whitespace-pre-line">${response}</div>`;
+            input.value = '';
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function runPingTest() {
+            const target = document.getElementById('ping-target').value;
+            const res = document.getElementById('ping-results');
+            res.innerHTML = `PING ${target} with 32 bytes of data:\nReply from ${target}: bytes=32 time=1ms TTL=128\nReply from ${target}: bytes=32 time=2ms TTL=128\nReply from ${target}: bytes=32 time=1ms TTL=128\n\nPing statistics for ${target}:\n    Packets: Sent = 3, Received = 3, Lost = 0 (0% loss),`;
+        }
+
+        function runCableTest() {
+            const out = document.getElementById('cable-test-output');
+            out.innerHTML = `FLUKENETWORKS CABLE CERTIFIER REPORT\n--------------------------------------\nCable ID: TR-01-PC01-SW01-P01\nCable Type: Cat6 UTP Solid Copper\nLength: 38.4 Meters [Pass]\nWire Map (T568B):\n  Pair 1 (Pins 1-2): OK (Continuity / Impedance)\n  Pair 2 (Pins 3-6): OK (Continuity / Impedance)\n  Pair 3 (Pins 4-5): OK (Continuity / Impedance)\n  Pair 4 (Pins 7-8): OK (Continuity / Impedance)\nOverall Result: PASS (Category 6 Certified)`;
+        }
+
+        function refreshArpTable() {
+            showToast("ARP Table and MAC address cache refreshed from Core Switch.", "success");
+        }
+
+        let currentModalCallback = null;
+        function showTaskModal(title, body, callback) {
+            document.getElementById('modal-task-title').innerText = title;
+            document.getElementById('modal-task-body').innerText = body;
+            currentModalCallback = callback;
+            document.getElementById('modal-task').classList.remove('hidden');
+        }
+
+        function executeStageAction() {
+            if (currentModalCallback) currentModalCallback();
+            closeModal('modal-task');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function openLogbook() {
+            const container = document.getElementById('logbook-entries-container');
+            container.innerHTML = '';
+            logbookEntries.forEach(entry => {
+                container.innerHTML += `
+                    <div class="border-b border-slate-800 pb-2">
+                        <span class="text-cyan-400 font-bold">[${entry.time}]</span>
+                        <span class="text-slate-300 ml-2">${entry.text}</span>
+                    </div>
+                `;
+            });
+            document.getElementById('modal-logbook').classList.remove('hidden');
+        }
+
+        function addLogEntry() {
+            const input = document.getElementById('logbook-input');
+            const text = input.value.trim();
+            if(!text) return;
+            let hours = Math.floor(currentTimeMinutes / 60);
+            let mins = currentTimeMinutes % 60;
+            let timeStr = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')} AM`;
+            
+            logbookEntries.push({ time: timeStr, text: text });
+            input.value = '';
+            openLogbook();
+            showToast("Log entry recorded in engineer logbook.", "success");
+        }
+
+        function openHelp() {
+            showTaskModal("Network Engineer Handbook (Tamara Al-Shabatat)", "Welcome to The Network Engineer immersive simulation.\n\n- Navigate between Rooms, Server Rack, Topology, Tickets, and Diagnostic Tools using the left sidebar.\n- Complete all 16 stages and Demo from 08:00 AM to 03:00 PM.\n- Handle incoming tickets, diagnose network faults using CLI & Cable Certifier, and maintain enterprise uptime.", () => {});
+        }
+
+        function openCurrentTaskModal() {
+            const st = stagesData[currentStageIndex];
+            let title = currentLanguage === 'ar' ? st.titleAr : st.titleEn;
+            let desc = currentLanguage === 'ar' ? st.descAr : st.descEn;
+            showTaskModal(title, `${desc}\n\nReview your rack patch cables, check interface states, and resolve any pending tickets.`, () => {
+                stagesData[currentStageIndex].completed = true;
+                renderStages();
+                showToast("Current stage objective completed.", "success");
+            });
+        }
+
+        function triggerEndShiftHandover() {
+            const content = document.getElementById('handover-summary-content');
+            content.innerHTML = `
+                <div>Shift Duration: 08:00 AM — 15:00 PM (100% Completed)</div>
+                <div>Assigned Network Engineer: Tamara Al-Shabatat</div>
+                <div>Total Configuration Changes Logged: ${changeMetrics.changesCount}</div>
+                <div>Critical Devices Modified: ${changeMetrics.criticalModified}</div>
+                <div>Unnecessary Changes: ${changeMetrics.unnecessaryChanges}</div>
+                <div>Remaining Open Tickets: ${ticketsData.length}</div>
+                <div class="text-emerald-400 pt-2 font-bold">Status: Enterprise network successfully built, tested, and handed over to management.</div>
+            `;
+            document.getElementById('modal-handover').classList.remove('hidden');
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            let borderColor = type === 'success' ? 'border-emerald-500 text-emerald-400' : (type === 'warning' ? 'border-amber-500 text-amber-400' : 'border-cyan-500 text-cyan-400');
+            
+            toast.className = `bg-[#0a1022] border ${borderColor} px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3 rtl:space-x-reverse text-xs font-mono animate-bounce pointer-events-auto`;
+            toast.innerHTML = `
+                <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-triangle-exclamation'} text-base"></i>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 4000);
+        }
+    </script>
+    <footer class="bg-[#04070d] border-t border-slate-900 py-2 px-4 text-center text-[11px] text-slate-500 shrink-0 font-mono">
+   2026 تمارا الشباطات (عربي و انجليزي) — THE NETWORK ENGINEER 
+    </footer>
+</body>
+</html>
