@@ -4,36 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مختبر المنطق الرقمي — Digital Logic Laboratory | Tamara Alshabatat</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Inter & Amiri -->
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        gold: '#FEA405',
-                        'gold-dark': '#d48803',
-                        'gold-light': '#ffc042',
-                        academicGreen: '#8AA624',
-                        'academicGreen-dark': '#6f851b',
-                        sage: '#A2AF9B',
-                        'sage-light': '#c8d1c4',
-                        bgWarm: '#F7F5EF',
-                        neutralLight: '#EEF0EC',
-                        darkText: '#20251F',
-                        burgundy: '#733B4B',
-                        academicBlue: '#427AB5'
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'Amiri', 'sans-serif'],
-                        amiri: ['Amiri', 'serif']
-                    }
-                }
-            }
+            theme: { extend: { colors: {
+                gold: '#FEA405', 'gold-dark': '#d48803', 'gold-light': '#ffc042',
+                academicGreen: '#8AA624', 'academicGreen-dark': '#6f851b',
+                sage: '#A2AF9B', 'sage-light': '#c8d1c4', bgWarm: '#F7F5EF',
+                neutralLight: '#EEF0EC', darkText: '#20251F',
+                burgundy: '#733B4B', academicBlue: '#427AB5'
+            }, fontFamily: { sans: ['Inter','Amiri','sans-serif'], amiri: ['Amiri','serif'] } } }
         }
     </script>
     <style>
@@ -47,7 +29,6 @@
 </head>
 <body class="min-h-screen flex flex-col selection:bg-gold selection:text-darkText">
 
-    <!-- Top Academic Navigation Bar -->
     <header class="bg-darkText text-white shadow-md border-b-4 border-gold sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center">
             <div class="flex items-center space-x-3 rtl:space-x-reverse">
@@ -59,21 +40,15 @@
                     <p id="navSubtitle" class="text-xs text-sage">Digital Logic Laboratory • Interactive Academic Environment</p>
                 </div>
             </div>
-
-            <!-- Mode Switcher, Language Switcher & Controls -->
             <div class="flex flex-wrap items-center gap-2 mt-2 sm:mt-0">
-                <!-- Language Switcher -->
                 <div class="bg-darkText/80 border border-sage/30 rounded-lg p-1 flex items-center text-xs">
                     <button id="btnLangAr" onclick="switchLanguage('ar')" class="px-2.5 py-1 rounded font-medium transition bg-gold text-darkText shadow">العربية</button>
                     <button id="btnLangEn" onclick="switchLanguage('en')" class="px-2.5 py-1 rounded font-medium transition text-sage hover:text-white">English</button>
                 </div>
-
-                <!-- Mode Switcher -->
                 <div class="bg-darkText/80 border border-sage/30 rounded-lg p-1 flex items-center text-xs">
                     <button id="btnStudentMode" onclick="switchMode('student')" class="px-3 py-1 rounded font-medium transition bg-academicGreen text-white shadow" data-i18n="studentModeBtn">وضع الطالب</button>
                     <button id="btnLecturerMode" onclick="switchMode('lecturer')" class="px-3 py-1 rounded font-medium transition text-sage hover:text-white" data-i18n="lecturerModeBtn">وضع المحاضر</button>
                 </div>
-
                 <button onclick="openModal('modalDashboard')" class="bg-gold hover:bg-gold-light text-darkText px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow">
                     <i class="fa-solid fa-chart-line"></i> <span data-i18n="dashboardBtn">لوحة القيادة</span>
                 </button>
@@ -81,36 +56,22 @@
         </div>
     </header>
 
-    <!-- Main Application Container -->
     <main class="flex-grow max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 my-4">
-
-        <!-- Left / Sidebar Column: Modules Navigation -->
         <aside class="lg:col-span-3 space-y-4">
             <div class="bg-white rounded-2xl p-4 shadow-sm border border-sage/40">
                 <h2 class="text-sm font-bold text-darkText border-b border-neutralLight pb-2 mb-3 flex items-center justify-between">
                     <span class="flex items-center gap-2"><i class="fa-solid fa-book-open text-gold"></i> <span data-i18n="modulesTitle">الوحدات التعليمية</span></span>
                     <span id="modulesCountBadge" class="text-xs bg-sage/20 text-darkText px-2 py-0.5 rounded-full font-normal">7 مجالات</span>
                 </h2>
-                <nav id="moduleList" class="space-y-1.5 text-xs">
-                    <!-- Injected by JS -->
-                </nav>
+                <nav id="moduleList" class="space-y-1.5 text-xs"></nav>
             </div>
-
-            <!-- Contextual Quick Controls Card (Dynamic per mode) -->
             <div id="quickControlsCard" class="bg-white rounded-2xl p-4 shadow-sm border border-sage/40 space-y-3">
                 <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider" data-i18n="sessionControls">تحكم الجلسة</h3>
-                <!-- Content changes depending on Student vs Lecturer mode -->
             </div>
         </aside>
-
-        <!-- Center Column: Dynamic Workspace (Student Practice or Lecturer Theory) -->
-        <section class="lg:col-span-9 space-y-4" id="mainWorkspaceSection">
-            <!-- Injected by JS based on active mode -->
-        </section>
-
+        <section class="lg:col-span-9 space-y-4" id="mainWorkspaceSection"></section>
     </main>
 
-    <!-- Dashboard Modal -->
     <div id="modalDashboard" class="fixed inset-0 bg-darkText/60 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border-t-4 border-gold space-y-4">
             <div class="flex justify-between items-center border-b border-neutralLight pb-3">
@@ -138,7 +99,6 @@
                         <div id="dashMastery" class="text-sm font-bold text-gold-dark mt-1" data-i18n="masteryFoundation">أساسي</div>
                     </div>
                 </div>
-
                 <div class="space-y-2">
                     <h4 class="font-bold text-darkText" data-i18n="domainCompetency">الكفاءة حسب المجالات</h4>
                     <div class="space-y-2" id="domainCompetencyList"></div>
@@ -150,7 +110,6 @@
         </div>
     </div>
 
-    <!-- Alert / Hint Modal -->
     <div id="modalAlert" class="fixed inset-0 bg-darkText/60 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border-t-4 border-gold space-y-4">
             <h3 id="modalAlertTitle" class="text-base font-bold text-darkText flex items-center gap-2">
@@ -163,278 +122,1306 @@
         </div>
     </div>
 
-    <!-- Footer -->
     <footer class="bg-white border-t border-sage/30 mt-auto py-4 text-center text-xs text-gray-500 space-y-1">
         <div class="font-medium text-darkText" data-i18n="footerTitle">مختبر المنطق الرقمي والتجريب التفاعلي للخوارزميات المنطقية وخريطة كارنو</div>
         <div>جميع الحقوق محفوظة لتمارا الشباطات — 2026 © Tamara Alshbatat — All Rights Reserved</div>
     </footer>
 
     <script>
-        // Dictionary for Bilingual Support (Arabic & English)
         const i18n = {
             ar: {
-                navTitle: "مختبر المنطق الرقمي الجامعي",
-                navSubtitle: "Digital Logic Laboratory • Interactive Academic Environment",
-                studentModeBtn: "وضع الطالب",
-                lecturerModeBtn: "وضع المحاضر",
-                dashboardBtn: "لوحة القيادة",
-                modulesTitle: "الوحدات التعليمية",
-                sessionControls: "تحكم الجلسة",
-                newCaseBtn: "حالة تدريبية جديدة",
-                hintBtn: "طلب تلميح أكاديمي",
-                resetBtn: "إعادة ضبط",
-                verifyBtn: "تحقق من الإجابة",
+                navTitle: "مختبر المنطق الرقمي الجامعي", navSubtitle: "Digital Logic Laboratory • Interactive Academic Environment",
+                studentModeBtn: "وضع الطالب", lecturerModeBtn: "وضع المحاضر", dashboardBtn: "لوحة القيادة",
+                modulesTitle: "الوحدات التعليمية", sessionControls: "تحكم الجلسة",
+                newCaseBtn: "حالة تدريبية جديدة", hintBtn: "طلب تلميح أكاديمي", resetBtn: "إعادة ضبط", verifyBtn: "تحقق من الإجابة",
                 explanationTitle: "التفسير والقواعد الأكاديمية",
                 explanationPlaceholder: "قم بحل التدريب أو اضغط على «تحقق» لعرض الشرح الأكاديمي التفصيلي.",
-                academicPerformance: "الأداء الأكاديمي",
-                totalSolved: "الحالات المحلولة",
-                accuracyRate: "نسبة الدقة",
-                currentMastery: "المستوى الحالي",
-                attempts: "المحاولات",
-                dashboardTitle: "تحليل الأداء الأكاديمي",
-                statSolvedLabel: "الحالات المحلولة",
-                statAccuracyLabel: "نسبة الدقة",
-                statAttemptsLabel: "المحاولات الكلية",
-                statMasteryLabel: "مستوى الكفاءة",
-                domainCompetency: "تحليل المجالات الدراسية",
-                closeModal: "إغلاق اللوحة",
-                academicNotice: "تنبيه أكاديمي",
-                okBtn: "موافق",
+                dashboardTitle: "تحليل الأداء الأكاديمي", statSolvedLabel: "الحالات المحلولة", statAccuracyLabel: "نسبة الدقة",
+                statAttemptsLabel: "المحاولات", statMasteryLabel: "مستوى الكفاءة", domainCompetency: "الكفاءة حسب المجالات",
+                closeModal: "إغلاق اللوحة", academicNotice: "تنبيه أكاديمي", okBtn: "موافق",
                 footerTitle: "مختبر المنطق الرقمي والتجريب التفاعلي للخوارزميات المنطقية وخريطة كارنو",
-                masteryFoundation: "أساسي (Foundation)",
-                masteryDeveloping: "متطور (Developing)",
-                masteryCompetent: "متمكن (Competent)",
-                masteryAdvanced: "متقدم (Advanced)",
-                masteryMastery: "احتراف (Mastery)",
+                masteryFoundation: "أساسي (Foundation)", masteryDeveloping: "متطور (Developing)",
+                masteryCompetent: "متمكن (Competent)", masteryAdvanced: "متقدم (Advanced)", masteryMastery: "احتراف (Mastery)",
                 lecturerModeHeader: "وضع المحاضر — المنصة النظرية والعرض الصفي",
                 presentationModeBtn: "وضع العرض (Presentation Mode)",
                 lecturerNotesTitle: "ملاحظات المحاضر وتوجيهات الشرح الصفي",
-                teachingObjective: "الهدف التعليمي:",
-                commonMisconception: "الأخطاء الشائعة للطلاب:",
-                classroomDiscussion: "سؤال للنقاش الصفي:",
-                definition: "التعريف الأكاديمي",
-                symbol: "الرمز المنطقي",
-                booleanExpr: "التعبير البولياني",
-                truthTable: "جدول الحقيقة",
-                logicalBehavior: "السلوك المنطقي",
-                example: "مثال تطبيقي",
+                teachingObjective: "الهدف التعليمي:", commonMisconception: "الأخطاء الشائعة للطلاب:",
+                classroomDiscussion: "سؤال للنقاش الصفي:", definition: "التعريف الأكاديمي",
                 keyObservation: "ملاحظة رئيسية",
-                whyItWorks: "لماذا يعمل هذا القانون؟",
-                commonMistake: "الخطأ الشائع",
-                stepByStepTitle: "التنفيذ الخطي خطوة بخطوة (Step-by-Step Execution)",
-                nextStep: "الخطوة التالية",
-                prevStep: "الخطوة السابقة",
-                stepOf: "خطوة {current} من {total}",
                 correctVerification: "إجابة صحيحة (Correct Verification)",
                 incorrectVerification: "إجابة غير صحيحة (Incorrect Answer)"
             },
             en: {
-                navTitle: "University Digital Logic Lab",
-                navSubtitle: "Digital Logic Laboratory • Interactive Academic Environment",
-                studentModeBtn: "Student Mode",
-                lecturerModeBtn: "Lecturer Mode",
-                dashboardBtn: "Dashboard",
-                modulesTitle: "Academic Modules",
-                sessionControls: "Session Controls",
-                newCaseBtn: "New Training Case",
-                hintBtn: "Request Academic Hint",
-                resetBtn: "Reset Workspace",
-                verifyBtn: "Verify Answer",
+                navTitle: "University Digital Logic Lab", navSubtitle: "Digital Logic Laboratory • Interactive Academic Environment",
+                studentModeBtn: "Student Mode", lecturerModeBtn: "Lecturer Mode", dashboardBtn: "Dashboard",
+                modulesTitle: "Academic Modules", sessionControls: "Session Controls",
+                newCaseBtn: "New Training Case", hintBtn: "Request Academic Hint", resetBtn: "Reset Workspace", verifyBtn: "Verify Answer",
                 explanationTitle: "Academic Explanation & Rules",
                 explanationPlaceholder: "Solve the exercise or click 'Verify' to inspect detailed academic reasoning.",
-                academicPerformance: "Academic Performance",
-                totalSolved: "Total Solved",
-                accuracyRate: "Accuracy Rate",
-                currentMastery: "Mastery Level",
-                attempts: "Attempts",
-                dashboardTitle: "Academic Performance Analytics",
-                statSolvedLabel: "Solved Cases",
-                statAccuracyLabel: "Accuracy Rate",
-                statAttemptsLabel: "Total Attempts",
-                statMasteryLabel: "Mastery Level",
-                domainCompetency: "Domain Competency Analysis",
-                closeModal: "Close Dashboard",
-                academicNotice: "Academic Notice",
-                okBtn: "OK",
+                dashboardTitle: "Academic Performance Analytics", statSolvedLabel: "Solved Cases", statAccuracyLabel: "Accuracy Rate",
+                statAttemptsLabel: "Total Attempts", statMasteryLabel: "Mastery Level", domainCompetency: "Domain Competency Analysis",
+                closeModal: "Close Dashboard", academicNotice: "Academic Notice", okBtn: "OK",
                 footerTitle: "Digital Logic Laboratory & Interactive K-Map Simulation",
-                masteryFoundation: "Foundation",
-                masteryDeveloping: "Developing",
-                masteryCompetent: "Competent",
-                masteryAdvanced: "Advanced",
-                masteryMastery: "Mastery",
+                masteryFoundation: "Foundation", masteryDeveloping: "Developing",
+                masteryCompetent: "Competent", masteryAdvanced: "Advanced", masteryMastery: "Mastery",
                 lecturerModeHeader: "Lecturer Mode — Theoretical & Classroom Presentation Platform",
                 presentationModeBtn: "Presentation Mode",
                 lecturerNotesTitle: "Lecturer Notes & Classroom Teaching Guidelines",
-                teachingObjective: "Teaching Objective:",
-                commonMisconception: "Common Student Misconception:",
-                classroomDiscussion: "Classroom Discussion Question:",
-                definition: "Academic Definition",
-                symbol: "Logic Symbol",
-                booleanExpr: "Boolean Expression",
-                truthTable: "Truth Table",
-                logicalBehavior: "Logical Behavior",
-                example: "Applied Example",
+                teachingObjective: "Teaching Objective:", commonMisconception: "Common Student Misconception:",
+                classroomDiscussion: "Classroom Discussion Question:", definition: "Academic Definition",
                 keyObservation: "Key Observation",
-                whyItWorks: "Why This Law Works",
-                commonMistake: "Common Mistake",
-                stepByStepTitle: "Step-by-Step Execution Workflow",
-                nextStep: "Next Step",
-                prevStep: "Previous Step",
-                stepOf: "Step {current} of {total}",
-                correctVerification: "Correct Verification",
-                incorrectVerification: "Incorrect Answer"
+                correctVerification: "Correct Verification", incorrectVerification: "Incorrect Answer"
             }
         };
 
-        // Theoretical Data for Lecturer Mode (Modules 1 to 7)
-        const lecturerModulesData = [
-            {
-                id: 1,
-                nameAr: "المجال 01: مقدمة في المنطق الرقمي",
-                nameEn: "Module 01: Introduction to Digital Logic",
-                subtitleAr: "Digital Logic Foundations & Binary Systems",
-                subtitleEn: "Digital Logic Foundations & Binary Systems",
-                content: {
-                    definitionAr: "المنطق الرقمي هو فرع من الهندسة الكهربائية وعلوم الكمبيوتر يتعامل مع معالجة الإشارات المنفصلة (Digital Signals) الممثلة بقيمتين ثنائيتين أساسيتين: 0 (LOW / False) و 1 (HIGH / True).",
-                    definitionEn: "Digital logic is the foundation of digital electronics and computer architecture, operating on discrete signals represented by binary values: 0 (LOW / False) and 1 (HIGH / True).",
-                    keyObservationAr: "تعتمد الدوائر الرقمية على ترانزستورات تعمل كمفاتيح إلكترونية، مما يوفر مناعة عالية ضد التشويش مقارنة بالأنظمة التناظرية (Analog Systems).",
-                    keyObservationEn: "Digital circuits utilize transistors operating as electronic switches, offering superior noise immunity compared to analog systems.",
-                    exampleAr: "أنظمة الحاسوب الحديثة، المعגלات، والهواتف الذكية تعتمد بالكامل على البوابات المنطقية الأساسية.",
-                    exampleEn: "Modern computing systems, microprocessors, and smart devices rely entirely on fundamental logic gates.",
-                    teachingObjectiveAr: "توضيح الفرق الجوهري بين الأنظمة التناظرية والرقمية، وأهمية النظام الثنائي (Binary System).",
-                    teachingObjectiveEn: "Clarify the fundamental distinction between analog and digital systems, and the importance of the binary numbering system.",
-                    commonMisconceptionAr: "الاعتقاد بأن الجهد الكهربائي في المنطق الرقمي هو إما 0 فولت تماماً أو 5 فولت تماماً، بينما يوجد نطاق مسموح (Noise Margins).",
-                    commonMisconceptionEn: "Believing that digital voltage is strictly 0V or 5V, when in practice defined voltage ranges exist (Noise Margins).",
-                    classroomDiscussionAr: "لماذا تحولت صناعة الحوسبة الحديثة بالكامل من المعالجات التناظرية إلى المعالجات الرقمية الثنائية؟",
-                    classroomDiscussionEn: "Why did modern computing entirely transition from analog to binary digital processors?"
-                }
+        // ========== بنك الأسئلة الكامل: 100 سؤال فريد ==========
+        // كل سؤال له stageId من 1 إلى 100
+        const questionBank = [
+            // ===== المجال 01: الأساسيات (1-10) =====
+            { stageId: 1, domainId: 1, type: 'choice',
+              titleAr: "أساسيات المنطق الثنائي", titleEn: "Binary Logic Foundations",
+              promptAr: "إذا كان المدخل A = 1 والمدخل B = 0، فما هو ناتج بوابة AND وبوابة OR على التوالي؟",
+              promptEn: "If input A = 1 and input B = 0, what are the outputs of AND and OR gates respectively?",
+              options: [
+                { id: 'a', textAr: "AND = 0, OR = 1", textEn: "AND = 0, OR = 1", correct: true },
+                { id: 'b', textAr: "AND = 1, OR = 0", textEn: "AND = 1, OR = 0", correct: false },
+                { id: 'c', textAr: "AND = 1, OR = 1", textEn: "AND = 1, OR = 1", correct: false }
+              ],
+              explanationAr: "AND تعطي 1 فقط عندما تكون جميع المدخلات 1 (1·0=0). OR تعطي 1 إذا كان مدخل واحد على الأقل 1 (1+0=1).",
+              explanationEn: "AND outputs 1 only when all inputs are 1 (1·0=0). OR outputs 1 if at least one input is 1 (1+0=1)."
             },
-            {
-                id: 2,
-                nameAr: "المجال 02: البوابات المنطقية",
-                nameEn: "Module 02: Logic Gates",
-                subtitleAr: "Logic Gates, Symbols, Truth Tables & Behaviors",
-                subtitleEn: "Logic Gates, Symbols, Truth Tables & Behaviors",
-                gates: [
-                    {
-                        nameAr: "بوابة AND", nameEn: "AND Gate",
-                        expr: "Y = A · B",
-                        descAr: "تعطي نخرجاً قيمته 1 فقط إذا كانت جميع المدخلات تساوي 1.",
-                        descEn: "Produces HIGH (1) output only if all inputs are HIGH (1).",
-                        truth: "0·0=0, 0·1=0, 1·0=0, 1·1=1"
-                    },
-                    {
-                        nameAr: "بوابة OR", nameEn: "OR Gate",
-                        expr: "Y = A + B",
-                        descAr: "تعطي نخرجاً قيمته 1 إذا كان مدخل واحد على الأقل يساوي 1.",
-                        descEn: "Produces HIGH (1) output if at least one input is HIGH (1).",
-                        truth: "0+0=0, 0+1=1, 1+0=1, 1+1=1"
-                    },
-                    {
-                        nameAr: "بوابة NOT (العاكس)", nameEn: "NOT Gate (Inverter)",
-                        expr: "Y = A'",
-                        descAr: "تعكس حالة المدخل، إذا كان المدخل 1 يصبح النخرج 0 والعكس صحيح.",
-                        descEn: "Inverts the input state: 0 becomes 1, and 1 becomes 0.",
-                        truth: "0→1, 1→0"
-                    },
-                    {
-                        nameAr: "بوابة NAND", nameEn: "NAND Gate",
-                        expr: "Y = (A · B)'",
-                        descAr: "بوابة AND متبوعة بعاكس NOT. تعطي 0 فقط إذا كانت جميع المدخلات 1.",
-                        descEn: "AND gate followed by a NOT. Outputs 0 only when all inputs are 1 (Universal Gate).",
-                        truth: "0·0=1, 0·1=1, 1·0=1, 1·1=0"
-                    },
-                    {
-                        nameAr: "بوابة NOR", nameEn: "NOR Gate",
-                        expr: "Y = (A + B)'",
-                        descAr: "بوابة OR متبوعة بعاكس NOT. تعطي 1 فقط إذا كانت جميع المدخلات 0.",
-                        descEn: "OR gate followed by a NOT. Outputs 1 only when all inputs are 0 (Universal Gate).",
-                        truth: "0+0=1, 0+1=0, 1+0=0, 1+1=0"
-                    },
-                    {
-                        nameAr: "بوابة XOR (الاستثناء)", nameEn: "XOR Gate (Exclusive-OR)",
-                        expr: "Y = A ⊕ B",
-                        descAr: "تعطي 1 إذا كان المدخلان مختلفين، و 0 إذا كانا متطابقين.",
-                        descEn: "Outputs 1 when inputs are different, and 0 when identical.",
-                        truth: "0⊕0=0, 0⊕1=1, 1⊕0=1, 1⊕1=0"
-                    }
-                ],
-                content: {
-                    teachingObjectiveAr: "فهم الخصائص الكهربائية والمنطقية للبوابات الأساسية والعالمية (Universal Gates).",
-                    teachingObjectiveEn: "Understand the electrical and logical characteristics of fundamental and universal gates.",
-                    commonMisconceptionAr: "الخلط بين جدول حقيقة NAND و NOR.",
-                    commonMisconceptionEn: "Confusing the truth tables of NAND and NOR gates."
-                }
+            { stageId: 2, domainId: 1, type: 'choice',
+              titleAr: "أساسيات المنطق الثنائي", titleEn: "Binary Logic Foundations",
+              promptAr: "ما هو ناتج بوابة NOT على المدخل A = 0؟",
+              promptEn: "What is the output of a NOT gate for input A = 0?",
+              options: [
+                { id: 'a', textAr: "NOT = 1", textEn: "NOT = 1", correct: true },
+                { id: 'b', textAr: "NOT = 0", textEn: "NOT = 0", correct: false },
+                { id: 'c', textAr: "لا يمكن التحديد", textEn: "Cannot determine", correct: false }
+              ],
+              explanationAr: "بوابة NOT تعكس قيمة المدخل: 0 تصبح 1، و 1 تصبح 0.",
+              explanationEn: "A NOT gate inverts the input: 0 becomes 1, and 1 becomes 0."
             },
-            {
-                id: 3,
-                nameAr: "المجال 03: جداول الحقيقة المتقدمة",
-                nameEn: "Module 03: Advanced Truth Tables",
-                subtitleAr: "Truth Table Construction & Combinational Analysis",
-                subtitleEn: "Truth Table Construction & Combinational Analysis",
-                content: {
-                    definitionAr: "جدول الحقيقة هو تمثيل رياضي يعرض جميع القيم الممكنة للمدخلات في الدوائر التوافقية (Combinational Circuits) وما يقابلها من نواتج.",
-                    definitionEn: "A truth table is a mathematical table displaying all possible input combinations and their corresponding outputs in combinational circuits.",
-                    keyObservationAr: "عدد الأسطر في جدول الحقيقة لدائرة تحتوي على $n$ من المتغيرات يساوي دائماً $2^n$.",
-                    keyObservationEn: "The number of rows in a truth table for $n$ variables is always $2^n$.",
-                    teachingObjectiveAr: "تمكين الطلاب من بناء جداول الحقيقة لأي تعبير منطقي معقد وتحويله إلى صيغة جبرية.",
-                    teachingObjectiveEn: "Empower students to construct truth tables for complex logic expressions and convert them into algebraic forms."
-                }
+            { stageId: 3, domainId: 1, type: 'choice',
+              titleAr: "أساسيات المنطق الثنائي", titleEn: "Binary Logic Foundations",
+              promptAr: "إذا كان المدخل A = 1 والمدخل B = 1، فما هو ناتج بوابة XOR؟",
+              promptEn: "If inputs A = 1 and B = 1, what is the output of an XOR gate?",
+              options: [
+                { id: 'a', textAr: "XOR = 0", textEn: "XOR = 0", correct: true },
+                { id: 'b', textAr: "XOR = 1", textEn: "XOR = 1", correct: false },
+                { id: 'c', textAr: "XOR = A + B", textEn: "XOR = A + B", correct: false }
+              ],
+              explanationAr: "XOR تعطي 0 عندما يكون المدخلان متطابقين (1 ⊕ 1 = 0).",
+              explanationEn: "XOR outputs 0 when inputs are identical (1 ⊕ 1 = 0)."
             },
-            {
-                id: 4,
-                nameAr: "المجال 04: الجبر البولياني وقوانينه",
-                nameEn: "Module 04: Boolean Algebra Laws",
-                subtitleAr: "Boolean Identities, Algebraic Simplification & De Morgan's Laws",
-                subtitleEn: "Boolean Identities, Algebraic Simplification & De Morgan's Laws",
-                laws: [
-                    { nameAr: "قانون الهوية (Identity Law)", nameEn: "Identity Law", formula: "A · 1 = A, A + 0 = A", descAr: "ربط المتغير بـ 1 في AND أو بـ 0 في OR لا يغير قيمته." },
-                    { nameAr: "قانون الامتصاص (Absorption Law)", nameEn: "Absorption Law", formula: "A + AB = A, A(A + B) = A", descAr: "المتغير الإضافي يُمتص بواسطة المتغير الأساسي." },
-                    { nameAr: "قانون ديمورغان (De Morgan's Laws)", nameEn: "De Morgan's Laws", formula: "(A + B)' = A' · B' , (A · B)' = A' + B'", descAr: "توزيع النفي يعكس العملية بين الضرب والجمع." }
-                ],
-                content: {
-                    teachingObjectiveAr: "إتقان تبسيط التعبيرات المنطقية رياضياً لتقليل عدد البوابات المطلوبة في التصميم الفعلي.",
-                    teachingObjectiveEn: "Master algebraic simplification of logic expressions to minimize required hardware gates."
-                }
+            { stageId: 4, domainId: 1, type: 'choice',
+              titleAr: "أساسيات المنطق الثنائي", titleEn: "Binary Logic Foundations",
+              promptAr: "ما هي القيمة الثنائية للعدد العشري 5؟",
+              promptEn: "What is the binary value of decimal number 5?",
+              options: [
+                { id: 'a', textAr: "101", textEn: "101", correct: true },
+                { id: 'b', textAr: "110", textEn: "110", correct: false },
+                { id: 'c', textAr: "011", textEn: "011", correct: false }
+              ],
+              explanationAr: "5 = 4 + 1 = 101₂ (أي 1×4 + 0×2 + 1×1).",
+              explanationEn: "5 = 4 + 1 = 101₂ (1×4 + 0×2 + 1×1)."
             },
-            {
-                id: 5,
-                nameAr: "المجال 05: المينترم والماكسترْم (SOP / POS)",
-                nameEn: "Module 05: Minterms & Maxterms (SOP/POS)",
-                subtitleAr: "Canonical Expressions, Sum of Products & Product of Sums",
-                subtitleEn: "Canonical Expressions, Sum of Products & Product of Sums",
-                content: {
-                    definitionAr: "المينترم (Minterm) هو حاصل ضرب (AND) لجميع متغيرات الدائرة بحيث تأخذ القيمة 1 عندما تكون النتيجة 1 (Sum of Products - SOP). الماكسترْم (Maxterm) هو مجموع (OR) للمتغيرات (Product of Sums - POS).",
-                    definitionEn: "A Minterm is a product term where all variables appear in complemented or uncomplemented form yielding 1 (SOP). A Maxterm is a sum term yielding 0 (POS)."
-                }
+            { stageId: 5, domainId: 1, type: 'choice',
+              titleAr: "أساسيات المنطق الثنائي", titleEn: "Binary Logic Foundations",
+              promptAr: "كم عدد القيم الممكنة لعدد ثنائي مكوّن من 4 بتات؟",
+              promptEn: "How many possible values can a 4-bit binary number represent?",
+              options: [
+                { id: 'a', textAr: "16 قيمة (2⁴)", textEn: "16 values (2⁴)", correct: true },
+                { id: 'b', textAr: "8 قيم (2³)", textEn: "8 values (2³)", correct: false },
+                { id: 'c', textAr: "4 قيم", textEn: "4 values", correct: false }
+              ],
+              explanationAr: "عدد القيم = 2ⁿ حيث n عدد البتات. لـ 4 بتات: 2⁴ = 16 قيمة (0-15).",
+              explanationEn: "Number of values = 2ⁿ where n is bit count. For 4 bits: 2⁴ = 16 values (0-15)."
             },
-            {
-                id: 6,
-                nameAr: "المجال 06: خرائط كارنو (K-Maps)",
-                nameEn: "Module 06: Karnaugh Map Simplification",
-                subtitleAr: "2, 3, and 4-Variable K-Maps, Adjacency, Grouping & Edge Wrapping",
-                subtitleEn: "2, 3, and 4-Variable K-Maps, Adjacency, Grouping & Edge Wrapping",
-                content: {
-                    definitionAr: "خريطة كارنو (K-Map) هي تمثيل رسومي لجدول الحقيقة يتيح تبسيط التعبيرات البوليانية بسهولة بالاعتماد على كود جراي (Gray Code) والتجمعات المتجاورة (Powers of 2: 1, 2, 4, 8).",
-                    definitionEn: "A Karnaugh Map is a graphical representation of a truth table enabling rapid Boolean minimization using Gray code adjacency and powers of 2 grouping.",
-                    keyObservationAr: "خاصية الالتفاف (Edge Wrapping) تعني أن الخلايا في أطراف الخريطة تعتبر متجاورة رياضياً.",
-                    keyObservationEn: "Edge wrapping dictates that cells on opposite borders are logically adjacent."
-                }
+            { stageId: 6, domainId: 1, type: 'choice',
+              titleAr: "أساسيات المنطق الثنائي", titleEn: "Binary Logic Foundations",
+              promptAr: "ما الفرق الجوهري بين الإشارة الرقمية والإشارة التناظرية؟",
+              promptEn: "What is the fundamental difference between digital and analog signals?",
+              options: [
+                { id: 'a', textAr: "الرقمية قيم منفصلة، التناظرية قيم متصلة", textEn: "Digital has discrete values, analog has continuous values", correct: true },
+                { id: 'b', textAr: "الرقمية أسرع دائماً", textEn: "Digital is always faster", correct: false },
+                { id: 'c', textAr: "لا يوجد فرق", textEn: "No difference", correct: false }
+              ],
+              explanationAr: "الإشارة الرقمية تأخذ قيماً منفصلة (0 أو 1) بينما التناظرية تأخذ أي قيمة في نطاق متصل.",
+              explanationEn: "Digital signals take discrete values (0 or 1) while analog signals take any value in a continuous range."
             },
-            {
-                id: 7,
-                nameAr: "المجال 07: تصميم الدوائر والتشخيص",
-                nameEn: "Module 07: Circuit Design & Fault Diagnosis",
-                subtitleAr: "Combinational Design, Testing & Stuck-at Fault Models",
-                subtitleEn: "Combinational Design, Testing & Stuck-at Fault Models",
-                content: {
-                    definitionAr: "مرحلة تصميم الدوائر واختبار الأعطال (مثل عطل الالتصاق Stuck-at-0 و Stuck-at-1) لضمان الموثوقية الصناعية للأنظمة الرقمية.",
-                    definitionEn: "Circuit design and fault testing (such as Stuck-at-0 and Stuck-at-1 models) to ensure industrial reliability of digital systems."
-                }
+            { stageId: 7, domainId: 1, type: 'choice',
+              titleAr: "أساسيات المنطق الثنائي", titleEn: "Binary Logic Foundations",
+              promptAr: "ما هو ناتج عملية 1 + 1 في النظام الثنائي (بدون Carry-In)؟",
+              promptEn: "What is 1 + 1 in binary (without Carry-In)?",
+              options: [
+                { id: 'a', textAr: "10 مع Carry = 1", textEn: "10 with Carry = 1", correct: true },
+                { id: 'b', textAr: "2", textEn: "2", correct: false },
+                { id: 'c', textAr: "0 فقط", textEn: "0 only", correct: false }
+              ],
+              explanationAr: "في النظام الثنائي: 1+1 = 10₂ (الناتج 0 والاحتفاظ 1).",
+              explanationEn: "In binary: 1+1 = 10₂ (result 0 with carry 1)."
+            },
+            { stageId: 8, domainId: 1, type: 'choice',
+              titleAr: "أساسيات المنطق الثنائي", titleEn: "Binary Logic Foundations",
+              promptAr: "ما المقصود بمصطلح LOW في المنطق الرقمي؟",
+              promptEn: "What does the term LOW mean in digital logic?",
+              options: [
+                { id: 'a', textAr: "القيمة المنطقية 0 (جهد منخفض)", textEn: "Logic value 0 (low voltage)", correct: true },
+                { id: 'b', textAr: "القيمة المنطقية 1", textEn: "Logic value 1", correct: false },
+                { id: 'c', textAr: "حالة غير معروفة", textEn: "Unknown state", correct: false }
+              ],
+              explanationAr: "LOW تعني الحالة المنطقية 0 وتُمثّل بجهد كهربائي منخفض (عادة قريب من 0V).",
+              explanationEn: "LOW refers to logic state 0, represented by low voltage (typically near 0V)."
+            },
+            { stageId: 9, domainId: 1, type: 'choice',
+              titleAr: "أساسيات المنطق الثنائي", titleEn: "Binary Logic Foundations",
+              promptAr: "لماذا يُفضّل استخدام النظام الثنائي في الإلكترونيات الرقمية؟",
+              promptEn: "Why is the binary system preferred in digital electronics?",
+              options: [
+                { id: 'a', textAr: "سهولة التمييز بين حالتين (0 و 1) ومناعة ضد التشويش", textEn: "Easy distinction between two states (0 and 1) and noise immunity", correct: true },
+                { id: 'b', textAr: "لأنه أسرع من النظام العشري", textEn: "Because it's faster than decimal", correct: false },
+                { id: 'c', textAr: "لأنه يستخدم ذاكرة أقل", textEn: "Because it uses less memory", correct: false }
+              ],
+              explanationAr: "النظام الثنائي يوفّر مناعة عالية ضد التشويش وسهولة التمييز بين حالتين فقط.",
+              explanationEn: "The binary system provides high noise immunity and easy distinction between only two states."
+            },
+            { stageId: 10, domainId: 1, type: 'choice',
+              titleAr: "أساسيات المنطق الثنائي", titleEn: "Binary Logic Foundations",
+              promptAr: "ما ناتج تحويل العدد الثنائي 1101 إلى عشري؟",
+              promptEn: "Convert binary 1101 to decimal.",
+              options: [
+                { id: 'a', textAr: "13", textEn: "13", correct: true },
+                { id: 'b', textAr: "11", textEn: "11", correct: false },
+                { id: 'c', textAr: "14", textEn: "14", correct: false }
+              ],
+              explanationAr: "1101₂ = 8+4+0+1 = 13.",
+              explanationEn: "1101₂ = 8+4+0+1 = 13."
+            },
+
+            // ===== المجال 02: البوابات المنطقية (11-25) =====
+            { stageId: 11, domainId: 2, type: 'choice',
+              titleAr: "البوابات المنطقية", titleEn: "Logic Gates",
+              promptAr: "ما هي البوابة التي تعطي ناتج 0 فقط عندما تكون جميع المدخلات 1؟",
+              promptEn: "Which gate outputs 0 only when all inputs are 1?",
+              options: [
+                { id: 'a', textAr: "NAND", textEn: "NAND", correct: true },
+                { id: 'b', textAr: "NOR", textEn: "NOR", correct: false },
+                { id: 'c', textAr: "AND", textEn: "AND", correct: false }
+              ],
+              explanationAr: "NAND = NOT(AND). تعطي 0 فقط عندما تكون جميع المدخلات 1.",
+              explanationEn: "NAND = NOT(AND). Outputs 0 only when all inputs are 1."
+            },
+            { stageId: 12, domainId: 2, type: 'choice',
+              titleAr: "البوابات المنطقية", titleEn: "Logic Gates",
+              promptAr: "ما هي البوابة التي تعطي ناتج 1 فقط عندما تكون جميع المدخلات 0؟",
+              promptEn: "Which gate outputs 1 only when all inputs are 0?",
+              options: [
+                { id: 'a', textAr: "NOR", textEn: "NOR", correct: true },
+                { id: 'b', textAr: "NAND", textEn: "NAND", correct: false },
+                { id: 'c', textAr: "OR", textEn: "OR", correct: false }
+              ],
+              explanationAr: "NOR = NOT(OR). تعطي 1 فقط عندما تكون جميع المدخلات 0.",
+              explanationEn: "NOR = NOT(OR). Outputs 1 only when all inputs are 0."
+            },
+            { stageId: 13, domainId: 2, type: 'choice',
+              titleAr: "البوابات المنطقية", titleEn: "Logic Gates",
+              promptAr: "لماذا تُسمى بوابات NAND و NOR بالبوابات العالمية (Universal Gates)؟",
+              promptEn: "Why are NAND and NOR gates called Universal Gates?",
+              options: [
+                { id: 'a', textAr: "لأنه يمكن بناء أي بوابة منطقية أخرى باستخدامها فقط", textEn: "Because any other logic gate can be built using only them", correct: true },
+                { id: 'b', textAr: "لأنها الأسرع", textEn: "Because they're the fastest", correct: false },
+                { id: 'c', textAr: "لأنها الأرخص", textEn: "Because they're the cheapest", correct: false }
+              ],
+              explanationAr: "يمكن بناء AND، OR، NOT، XOR باستخدام NAND فقط أو NOR فقط، لذلك تُسمى عالمية.",
+              explanationEn: "AND, OR, NOT, XOR can all be built using only NAND or only NOR, hence universal."
+            },
+            { stageId: 14, domainId: 2, type: 'choice',
+              titleAr: "البوابات المنطقية", titleEn: "Logic Gates",
+              promptAr: "إذا كان المدخلان A=1, B=1، فما ناتج بوابة NAND؟",
+              promptEn: "If inputs A=1, B=1, what is the NAND gate output?",
+              options: [
+                { id: 'a', textAr: "0", textEn: "0", correct: true },
+                { id: 'b', textAr: "1", textEn: "1", correct: false },
+                { id: 'c', textAr: "لا يمكن التحديد", textEn: "Cannot determine", correct: false }
+              ],
+              explanationAr: "NAND(1,1) = NOT(1·1) = NOT(1) = 0.",
+              explanationEn: "NAND(1,1) = NOT(1·1) = NOT(1) = 0."
+            },
+            { stageId: 15, domainId: 2, type: 'choice',
+              titleAr: "البوابات المنطقية", titleEn: "Logic Gates",
+              promptAr: "ما هي البوابة التي تعطي 1 إذا كان المدخلان مختلفين، و 0 إذا كانا متطابقين؟",
+              promptEn: "Which gate outputs 1 when inputs differ and 0 when identical?",
+              options: [
+                { id: 'a', textAr: "XOR", textEn: "XOR", correct: true },
+                { id: 'b', textAr: "XNOR", textEn: "XNOR", correct: false },
+                { id: 'c', textAr: "AND", textEn: "AND", correct: false }
+              ],
+              explanationAr: "XOR (Exclusive-OR) تعطي 1 عند اختلاف المدخلات.",
+              explanationEn: "XOR (Exclusive-OR) outputs 1 when inputs differ."
+            },
+            { stageId: 16, domainId: 2, type: 'choice',
+              titleAr: "البوابات المنطقية", titleEn: "Logic Gates",
+              promptAr: "ما الفرق بين XOR و XNOR؟",
+              promptEn: "What is the difference between XOR and XNOR?",
+              options: [
+                { id: 'a', textAr: "XNOR هي عكس XOR تماماً", textEn: "XNOR is the exact inverse of XOR", correct: true },
+                { id: 'b', textAr: "لا يوجد فرق", textEn: "No difference", correct: false },
+                { id: 'c', textAr: "XNOR أسرع", textEn: "XNOR is faster", correct: false }
+              ],
+              explanationAr: "XNOR = NOT(XOR). تعطي 1 عند تطابق المدخلات و 0 عند اختلافها.",
+              explanationEn: "XNOR = NOT(XOR). Outputs 1 when inputs match and 0 when they differ."
+            },
+            { stageId: 17, domainId: 2, type: 'choice',
+              titleAr: "البوابات المنطقية", titleEn: "Logic Gates",
+              promptAr: "إذا كان المدخلان A=0, B=0، فما ناتج بوابة NOR؟",
+              promptEn: "If inputs A=0, B=0, what is the NOR gate output?",
+              options: [
+                { id: 'a', textAr: "1", textEn: "1", correct: true },
+                { id: 'b', textAr: "0", textEn: "0", correct: false },
+                { id: 'c', textAr: "2", textEn: "2", correct: false }
+              ],
+              explanationAr: "NOR(0,0) = NOT(0+0) = NOT(0) = 1.",
+              explanationEn: "NOR(0,0) = NOT(0+0) = NOT(0) = 1."
+            },
+            { stageId: 18, domainId: 2, type: 'choice',
+              titleAr: "البوابات المنطقية", titleEn: "Logic Gates",
+              promptAr: "كم عدد البوابات المنطقية الأساسية؟",
+              promptEn: "How many basic logic gates are there?",
+              options: [
+                { id: 'a', textAr: "7 بوابات (AND, OR, NOT, NAND, NOR, XOR, XNOR)", textEn: "7 gates (AND, OR, NOT, NAND, NOR, XOR, XNOR)", correct: true },
+                { id: 'b', textAr: "3 بوابات فقط", textEn: "Only 3 gates", correct: false },
+                { id: 'c', textAr: "10 بوابات", textEn: "10 gates", correct: false }
+              ],
+              explanationAr: "البوابات الأساسية: AND, OR, NOT. والباقي مشتقة: NAND, NOR, XOR, XNOR.",
+              explanationEn: "Basic gates: AND, OR, NOT. Derived: NAND, NOR, XOR, XNOR."
+            },
+            { stageId: 19, domainId: 2, type: 'choice',
+              titleAr: "البوابات المنطقية", titleEn: "Logic Gates",
+              promptAr: "كيف يمكن بناء بوابة NOT باستخدام بوابة NAND فقط؟",
+              promptEn: "How can a NOT gate be built using only NAND gates?",
+              options: [
+                { id: 'a', textAr: "بتوصيل المدخل نفسه بالطرفين", textEn: "By connecting the same input to both terminals", correct: true },
+                { id: 'b', textAr: "لا يمكن بناؤها", textEn: "Cannot be built", correct: false },
+                { id: 'c', textAr: "باستخدام 3 بوابات NAND", textEn: "Using 3 NAND gates", correct: false }
+              ],
+              explanationAr: "NAND(A,A) = NOT(A·A) = NOT(A). يكفي توصيل المدخل بالطرفين.",
+              explanationEn: "NAND(A,A) = NOT(A·A) = NOT(A). Just connect input to both terminals."
+            },
+            { stageId: 20, domainId: 2, type: 'choice',
+              titleAr: "البوابات المنطقية", titleEn: "Logic Gates",
+              promptAr: "إذا كان المدخلان A=1, B=0، فما ناتج بوابة XNOR؟",
+              promptEn: "If inputs A=1, B=0, what is the XNOR output?",
+              options: [
+                { id: 'a', textAr: "0", textEn: "0", correct: true },
+                { id: 'b', textAr: "1", textEn: "1", correct: false },
+                { id: 'c', textAr: "لا يمكن التحديد", textEn: "Cannot determine", correct: false }
+              ],
+              explanationAr: "XNOR(1,0) = NOT(1⊕0) = NOT(1) = 0.",
+              explanationEn: "XNOR(1,0) = NOT(1⊕0) = NOT(1) = 0."
+            },
+            { stageId: 21, domainId: 2, type: 'choice',
+              titleAr: "البوابات المنطقية", titleEn: "Logic Gates",
+              promptAr: "ما هو الرمز البولياني لبوابة NAND؟",
+              promptEn: "What is the Boolean symbol for a NAND gate?",
+              options: [
+                { id: 'a', textAr: "Y = (A · B)'", textEn: "Y = (A · B)'", correct: true },
+                { id: 'b', textAr: "Y = A + B", textEn: "Y = A + B", correct: false },
+                { id: 'c', textAr: "Y = A · B", textEn: "Y = A · B", correct: false }
+              ],
+              explanationAr: "NAND = NOT(AND) = (A·B)'.",
+              explanationEn: "NAND = NOT(AND) = (A·B)'."
+            },
+            { stageId: 22, domainId: 2, type: 'choice',
+              titleAr: "البوابات المنطقية", titleEn: "Logic Gates",
+              promptAr: "كم عدد المدخلات التي يمكن لبوابة منطقية قياسية أن تستقبلها؟",
+              promptEn: "How many inputs can a standard logic gate accept?",
+              options: [
+                { id: 'a', textAr: "2 أو أكثر حسب التصميم", textEn: "2 or more depending on design", correct: true },
+                { id: 'b', textAr: "2 فقط دائماً", textEn: "Exactly 2 always", correct: false },
+                { id: 'c', textAr: "1 فقط", textEn: "Only 1", correct: false }
+              ],
+              explanationAr: "البوابات المنطقية يمكن أن تحتوي على 2 أو 3 أو أكثر من المدخلات حسب التصميم.",
+              explanationEn: "Logic gates can have 2, 3, or more inputs depending on design."
+            },
+            { stageId: 23, domainId: 2, type: 'choice',
+              titleAr: "البوابات المنطقية", titleEn: "Logic Gates",
+              promptAr: "ما هي البوابة التي تُستخدم لبناء دوائر المقارنة (Comparators)؟",
+              promptEn: "Which gate is used to build comparator circuits?",
+              options: [
+                { id: 'a', textAr: "XOR", textEn: "XOR", correct: true },
+                { id: 'b', textAr: "AND", textEn: "AND", correct: false },
+                { id: 'c', textAr: "OR", textEn: "OR", correct: false }
+              ],
+              explanationAr: "XOR تُستخدم لمقارنة البتات لأنها تعطي 1 عند اختلافها.",
+              explanationEn: "XOR is used for bit comparison as it outputs 1 when they differ."
+            },
+            { stageId: 24, domainId: 2, type: 'choice',
+              titleAr: "البوابات المنطقية", titleEn: "Logic Gates",
+              promptAr: "ما هو ناتج AND(1,1,1) لبوابة بثلاثة مدخلات؟",
+              promptEn: "What is AND(1,1,1) for a 3-input gate?",
+              options: [
+                { id: 'a', textAr: "1", textEn: "1", correct: true },
+                { id: 'b', textAr: "0", textEn: "0", correct: false },
+                { id: 'c', textAr: "3", textEn: "3", correct: false }
+              ],
+              explanationAr: "AND تعطي 1 فقط عندما تكون جميع المدخلات 1: 1·1·1 = 1.",
+              explanationEn: "AND outputs 1 only when all inputs are 1: 1·1·1 = 1."
+            },
+            { stageId: 25, domainId: 2, type: 'choice',
+              titleAr: "البوابات المنطقية", titleEn: "Logic Gates",
+              promptAr: "ما هو ناتج OR(0,0,0,1) لبوابة بأربعة مدخلات؟",
+              promptEn: "What is OR(0,0,0,1) for a 4-input gate?",
+              options: [
+                { id: 'a', textAr: "1", textEn: "1", correct: true },
+                { id: 'b', textAr: "0", textEn: "0", correct: false },
+                { id: 'c', textAr: "4", textEn: "4", correct: false }
+              ],
+              explanationAr: "OR تعطي 1 إذا كان مدخل واحد على الأقل 1: 0+0+0+1 = 1.",
+              explanationEn: "OR outputs 1 if at least one input is 1: 0+0+0+1 = 1."
+            },
+
+            // ===== المجال 03: جداول الحقيقة (26-40) =====
+            { stageId: 26, domainId: 3, type: 'choice',
+              titleAr: "جداول الحقيقة", titleEn: "Truth Tables",
+              promptAr: "كم عدد الأسطر في جدول حقيقة لدائرة بـ 3 متغيرات؟",
+              promptEn: "How many rows in a truth table for a 3-variable circuit?",
+              options: [
+                { id: 'a', textAr: "8 أسطر (2³)", textEn: "8 rows (2³)", correct: true },
+                { id: 'b', textAr: "6 أسطر", textEn: "6 rows", correct: false },
+                { id: 'c', textAr: "3 أسطر", textEn: "3 rows", correct: false }
+              ],
+              explanationAr: "عدد الأسطر = 2ⁿ. لـ 3 متغيرات: 2³ = 8 أسطر.",
+              explanationEn: "Rows = 2ⁿ. For 3 variables: 2³ = 8 rows."
+            },
+            { stageId: 27, domainId: 3, type: 'choice',
+              titleAr: "جداول الحقيقة", titleEn: "Truth Tables",
+              promptAr: "كم عدد الأسطر في جدول حقيقة لدائرة بـ 4 متغيرات؟",
+              promptEn: "How many rows in a truth table for a 4-variable circuit?",
+              options: [
+                { id: 'a', textAr: "16 سطراً (2⁴)", textEn: "16 rows (2⁴)", correct: true },
+                { id: 'b', textAr: "8 أسطر", textEn: "8 rows", correct: false },
+                { id: 'c', textAr: "32 سطراً", textEn: "32 rows", correct: false }
+              ],
+              explanationAr: "2⁴ = 16 سطراً.",
+              explanationEn: "2⁴ = 16 rows."
+            },
+            { stageId: 28, domainId: 3, type: 'choice',
+              titleAr: "جداول الحقيقة", titleEn: "Truth Tables",
+              promptAr: "في جدول حقيقة لبوابة AND بمدخلين، كم سطراً يعطي الناتج 1؟",
+              promptEn: "In a 2-input AND truth table, how many rows output 1?",
+              options: [
+                { id: 'a', textAr: "سطر واحد فقط (1,1)", textEn: "Only 1 row (1,1)", correct: true },
+                { id: 'b', textAr: "سطران", textEn: "2 rows", correct: false },
+                { id: 'c', textAr: "3 أسطر", textEn: "3 rows", correct: false }
+              ],
+              explanationAr: "AND تعطي 1 فقط في حالة واحدة: عندما تكون جميع المدخلات 1.",
+              explanationEn: "AND outputs 1 only in one case: when all inputs are 1."
+            },
+            { stageId: 29, domainId: 3, type: 'choice',
+              titleAr: "جداول الحقيقة", titleEn: "Truth Tables",
+              promptAr: "في جدول حقيقة لبوابة OR بمدخلين، كم سطراً يعطي الناتج 0؟",
+              promptEn: "In a 2-input OR truth table, how many rows output 0?",
+              options: [
+                { id: 'a', textAr: "سطر واحد فقط (0,0)", textEn: "Only 1 row (0,0)", correct: true },
+                { id: 'b', textAr: "سطران", textEn: "2 rows", correct: false },
+                { id: 'c', textAr: "3 أسطر", textEn: "3 rows", correct: false }
+              ],
+              explanationAr: "OR تعطي 0 فقط عندما تكون جميع المدخلات 0.",
+              explanationEn: "OR outputs 0 only when all inputs are 0."
+            },
+            { stageId: 30, domainId: 3, type: 'choice',
+              titleAr: "جداول الحقيقة", titleEn: "Truth Tables",
+              promptAr: "في جدول حقيقة لبوابة XOR بمدخلين، كم سطراً يعطي الناتج 1؟",
+              promptEn: "In a 2-input XOR truth table, how many rows output 1?",
+              options: [
+                { id: 'a', textAr: "سطران (0,1) و (1,0)", textEn: "2 rows: (0,1) and (1,0)", correct: true },
+                { id: 'b', textAr: "سطر واحد", textEn: "1 row", correct: false },
+                { id: 'c', textAr: "4 أسطر", textEn: "4 rows", correct: false }
+              ],
+              explanationAr: "XOR تعطي 1 عند اختلاف المدخلات: حالتان.",
+              explanationEn: "XOR outputs 1 when inputs differ: 2 cases."
+            },
+            { stageId: 31, domainId: 3, type: 'choice',
+              titleAr: "جداول الحقيقة", titleEn: "Truth Tables",
+              promptAr: "ما هو ترتيب القيم في جدول الحقيقة القياسي لمتغيرين (A,B)؟",
+              promptEn: "What is the standard order in a 2-variable truth table (A,B)?",
+              options: [
+                { id: 'a', textAr: "(0,0), (0,1), (1,0), (1,1)", textEn: "(0,0), (0,1), (1,0), (1,1)", correct: true },
+                { id: 'b', textAr: "(0,0), (1,0), (0,1), (1,1)", textEn: "(0,0), (1,0), (0,1), (1,1)", correct: false },
+                { id: 'c', textAr: "(1,1), (0,0), (1,0), (0,1)", textEn: "(1,1), (0,0), (1,0), (0,1)", correct: false }
+              ],
+              explanationAr: "الترتيب القياسي يتبع العد الثنائي التصاعدي: 00, 01, 10, 11.",
+              explanationEn: "Standard order follows ascending binary counting: 00, 01, 10, 11."
+            },
+            { stageId: 32, domainId: 3, type: 'choice',
+              titleAr: "جداول الحقيقة", titleEn: "Truth Tables",
+              promptAr: "ما الذي يميّز جدول حقيقة بوابة NAND بمدخلين؟",
+              promptEn: "What characterizes the 2-input NAND truth table?",
+              options: [
+                { id: 'a', textAr: "يعطي 0 فقط في حالة (1,1)", textEn: "Outputs 0 only in case (1,1)", correct: true },
+                { id: 'b', textAr: "يعطي 1 فقط في حالة (1,1)", textEn: "Outputs 1 only in case (1,1)", correct: false },
+                { id: 'c', textAr: "جميع المخرجات 0", textEn: "All outputs are 0", correct: false }
+              ],
+              explanationAr: "NAND هي عكس AND، لذلك تعطي 0 فقط عندما تعطي AND القيمة 1.",
+              explanationEn: "NAND is the inverse of AND, so it outputs 0 only when AND outputs 1."
+            },
+            { stageId: 33, domainId: 3, type: 'choice',
+              titleAr: "جداول الحقيقة", titleEn: "Truth Tables",
+              promptAr: "ما الذي يميّز جدول حقيقة بوابة NOR بمدخلين؟",
+              promptEn: "What characterizes the 2-input NOR truth table?",
+              options: [
+                { id: 'a', textAr: "يعطي 1 فقط في حالة (0,0)", textEn: "Outputs 1 only in case (0,0)", correct: true },
+                { id: 'b', textAr: "يعطي 0 فقط في حالة (0,0)", textEn: "Outputs 0 only in case (0,0)", correct: false },
+                { id: 'c', textAr: "جميع المخرجات 1", textEn: "All outputs are 1", correct: false }
+              ],
+              explanationAr: "NOR هي عكس OR، لذلك تعطي 1 فقط عندما تعطي OR القيمة 0.",
+              explanationEn: "NOR is the inverse of OR, so it outputs 1 only when OR outputs 0."
+            },
+            { stageId: 34, domainId: 3, type: 'choice',
+              titleAr: "جداول الحقيقة", titleEn: "Truth Tables",
+              promptAr: "كيف نحصل على التعبير البولياني SOP من جدول الحقيقة؟",
+              promptEn: "How do we derive the SOP Boolean expression from a truth table?",
+              options: [
+                { id: 'a', textAr: "بأخذ الأسطر التي ناتجها 1 وجمعها", textEn: "By taking rows with output 1 and summing them", correct: true },
+                { id: 'b', textAr: "بأخذ الأسطر التي ناتجها 0", textEn: "By taking rows with output 0", correct: false },
+                { id: 'c', textAr: "بأخذ جميع الأسطر", textEn: "By taking all rows", correct: false }
+              ],
+              explanationAr: "SOP = Sum of Products. نجمع مينترمات الأسطر التي تعطي 1.",
+              explanationEn: "SOP = Sum of Products. We sum minterms of rows with output 1."
+            },
+            { stageId: 35, domainId: 3, type: 'choice',
+              titleAr: "جداول الحقيقة", titleEn: "Truth Tables",
+              promptAr: "كيف نحصل على التعبير البولياني POS من جدول الحقيقة؟",
+              promptEn: "How do we derive the POS Boolean expression from a truth table?",
+              options: [
+                { id: 'a', textAr: "بأخذ الأسطر التي ناتجها 0 وضربها", textEn: "By taking rows with output 0 and multiplying them", correct: true },
+                { id: 'b', textAr: "بأخذ الأسطر التي ناتجها 1", textEn: "By taking rows with output 1", correct: false },
+                { id: 'c', textAr: "بجمع جميع الأسطر", textEn: "By summing all rows", correct: false }
+              ],
+              explanationAr: "POS = Product of Sums. نضرب ماكسترمات الأسطر التي تعطي 0.",
+              explanationEn: "POS = Product of Sums. We multiply maxterms of rows with output 0."
+            },
+            { stageId: 36, domainId: 3, type: 'choice',
+              titleAr: "جداول الحقيقة", titleEn: "Truth Tables",
+              promptAr: "ما فائدة جدول الحقيقة في تصميم الدوائر الرقمية؟",
+              promptEn: "What is the usefulness of a truth table in digital circuit design?",
+              options: [
+                { id: 'a', textAr: "يعرض جميع الاحتمالات ويساعد في استخلاص التعبير البولياني", textEn: "Shows all possibilities and helps derive Boolean expression", correct: true },
+                { id: 'b', textAr: "يوفر الطاقة", textEn: "Saves power", correct: false },
+                { id: 'c', textAr: "يقلل عدد البوابات", textEn: "Reduces gate count", correct: false }
+              ],
+              explanationAr: "جدول الحقيقة هو الأساس لاستخلاص التعبير المنطقي المبسّط للدائرة.",
+              explanationEn: "The truth table is the basis for deriving the simplified logic expression."
+            },
+            { stageId: 37, domainId: 3, type: 'choice',
+              titleAr: "جداول الحقيقة", titleEn: "Truth Tables",
+              promptAr: "ما ناتج الدالة F = A + B في السطر (A=0, B=0)؟",
+              promptEn: "What is F = A + B output for row (A=0, B=0)?",
+              options: [
+                { id: 'a', textAr: "0", textEn: "0", correct: true },
+                { id: 'b', textAr: "1", textEn: "1", correct: false },
+                { id: 'c', textAr: "2", textEn: "2", correct: false }
+              ],
+              explanationAr: "F = 0 + 0 = 0.",
+              explanationEn: "F = 0 + 0 = 0."
+            },
+            { stageId: 38, domainId: 3, type: 'choice',
+              titleAr: "جداول الحقيقة", titleEn: "Truth Tables",
+              promptAr: "ما ناتج الدالة F = A·B في السطر (A=1, B=1)؟",
+              promptEn: "What is F = A·B output for row (A=1, B=1)?",
+              options: [
+                { id: 'a', textAr: "1", textEn: "1", correct: true },
+                { id: 'b', textAr: "0", textEn: "0", correct: false },
+                { id: 'c', textAr: "2", textEn: "2", correct: false }
+              ],
+              explanationAr: "F = 1·1 = 1.",
+              explanationEn: "F = 1·1 = 1."
+            },
+            { stageId: 39, domainId: 3, type: 'choice',
+              titleAr: "جداول الحقيقة", titleEn: "Truth Tables",
+              promptAr: "كم عدد المتغيرات إذا كان جدول الحقيقة يحتوي على 32 سطراً؟",
+              promptEn: "How many variables if the truth table has 32 rows?",
+              options: [
+                { id: 'a', textAr: "5 متغيرات (2⁵=32)", textEn: "5 variables (2⁵=32)", correct: true },
+                { id: 'b', textAr: "4 متغيرات", textEn: "4 variables", correct: false },
+                { id: 'c', textAr: "6 متغيرات", textEn: "6 variables", correct: false }
+              ],
+              explanationAr: "2ⁿ = 32، إذن n = 5.",
+              explanationEn: "2ⁿ = 32, so n = 5."
+            },
+            { stageId: 40, domainId: 3, type: 'choice',
+              titleAr: "جداول الحقيقة", titleEn: "Truth Tables",
+              promptAr: "ما هو المينترم (Minterm)؟",
+              promptEn: "What is a Minterm?",
+              options: [
+                { id: 'a', textAr: "حاصل ضرب (AND) لجميع متغيرات الدائرة يعطي 1 في سطر واحد", textEn: "Product (AND) of all variables yielding 1 for one row", correct: true },
+                { id: 'b', textAr: "مجموع (OR) لجميع المتغيرات", textEn: "Sum (OR) of all variables", correct: false },
+                { id: 'c', textAr: "نتيجة قسمة المتغيرات", textEn: "Result of dividing variables", correct: false }
+              ],
+              explanationAr: "المينترم هو تعبير AND لجميع المتغيرات (بأشكالها الأصلية أو المتممة) يعطي 1 لسطر واحد فقط.",
+              explanationEn: "A Minterm is an AND expression of all variables (original or complemented) yielding 1 for only one row."
+            },
+
+            // ===== المجال 04: الجبر البولياني (41-55) =====
+            { stageId: 41, domainId: 4, type: 'choice',
+              titleAr: "الجبر البولياني", titleEn: "Boolean Algebra",
+              promptAr: "ما ناتج تبسيط: F = A + AB؟",
+              promptEn: "Simplify: F = A + AB",
+              options: [
+                { id: 'a', textAr: "F = A (قانون الامتصاص)", textEn: "F = A (Absorption Law)", correct: true },
+                { id: 'b', textAr: "F = B", textEn: "F = B", correct: false },
+                { id: 'c', textAr: "F = AB", textEn: "F = AB", correct: false }
+              ],
+              explanationAr: "قانون الامتصاص: A + AB = A(1+B) = A·1 = A.",
+              explanationEn: "Absorption Law: A + AB = A(1+B) = A·1 = A."
+            },
+            { stageId: 42, domainId: 4, type: 'choice',
+              titleAr: "الجبر البولياني", titleEn: "Boolean Algebra",
+              promptAr: "ما ناتج تبسيط: F = A(A + B)؟",
+              promptEn: "Simplify: F = A(A + B)",
+              options: [
+                { id: 'a', textAr: "F = A", textEn: "F = A", correct: true },
+                { id: 'b', textAr: "F = AB", textEn: "F = AB", correct: false },
+                { id: 'c', textAr: "F = A + B", textEn: "F = A + B", correct: false }
+              ],
+              explanationAr: "A(A+B) = AA + AB = A + AB = A.",
+              explanationEn: "A(A+B) = AA + AB = A + AB = A."
+            },
+            { stageId: 43, domainId: 4, type: 'choice',
+              titleAr: "الجبر البولياني", titleEn: "Boolean Algebra",
+              promptAr: "حسب قانون ديمورغان، ما تبسيط (A · B)'؟",
+              promptEn: "By De Morgan's Law, simplify (A · B)'",
+              options: [
+                { id: 'a', textAr: "A' + B'", textEn: "A' + B'", correct: true },
+                { id: 'b', textAr: "A' · B'", textEn: "A' · B'", correct: false },
+                { id: 'c', textAr: "A + B", textEn: "A + B", correct: false }
+              ],
+              explanationAr: "ديمورغان الأول: (A·B)' = A' + B'.",
+              explanationEn: "De Morgan's First: (A·B)' = A' + B'."
+            },
+            { stageId: 44, domainId: 4, type: 'choice',
+              titleAr: "الجبر البولياني", titleEn: "Boolean Algebra",
+              promptAr: "حسب قانون ديمورغان، ما تبسيط (A + B)'؟",
+              promptEn: "By De Morgan's Law, simplify (A + B)'",
+              options: [
+                { id: 'a', textAr: "A' · B'", textEn: "A' · B'", correct: true },
+                { id: 'b', textAr: "A' + B'", textEn: "A' + B'", correct: false },
+                { id: 'c', textAr: "A · B", textEn: "A · B", correct: false }
+              ],
+              explanationAr: "ديمورغان الثاني: (A+B)' = A' · B'.",
+              explanationEn: "De Morgan's Second: (A+B)' = A' · B'."
+            },
+            { stageId: 45, domainId: 4, type: 'choice',
+              titleAr: "الجبر البولياني", titleEn: "Boolean Algebra",
+              promptAr: "ما ناتج: A + A' ؟",
+              promptEn: "What is A + A'?",
+              options: [
+                { id: 'a', textAr: "1 (قانون النفي المزدوج)", textEn: "1 (Complement Law)", correct: true },
+                { id: 'b', textAr: "0", textEn: "0", correct: false },
+                { id: 'c', textAr: "A", textEn: "A", correct: false }
+              ],
+              explanationAr: "A + A' = 1 دائماً (قانون التكامل).",
+              explanationEn: "A + A' = 1 always (Complement Law)."
+            },
+            { stageId: 46, domainId: 4, type: 'choice',
+              titleAr: "الجبر البولياني", titleEn: "Boolean Algebra",
+              promptAr: "ما ناتج: A · A' ؟",
+              promptEn: "What is A · A'?",
+              options: [
+                { id: 'a', textAr: "0", textEn: "0", correct: true },
+                { id: 'b', textAr: "1", textEn: "1", correct: false },
+                { id: 'c', textAr: "A", textEn: "A", correct: false }
+              ],
+              explanationAr: "A · A' = 0 دائماً (لا يمكن أن يكون المتغير 0 و 1 معاً).",
+              explanationEn: "A · A' = 0 always (a variable cannot be both 0 and 1)."
+            },
+            { stageId: 47, domainId: 4, type: 'choice',
+              titleAr: "الجبر البولياني", titleEn: "Boolean Algebra",
+              promptAr: "ما ناتج: A + 0 ؟",
+              promptEn: "What is A + 0?",
+              options: [
+                { id: 'a', textAr: "A", textEn: "A", correct: true },
+                { id: 'b', textAr: "0", textEn: "0", correct: false },
+                { id: 'c', textAr: "1", textEn: "1", correct: false }
+              ],
+              explanationAr: "قانون الهوية: A + 0 = A.",
+              explanationEn: "Identity Law: A + 0 = A."
+            },
+            { stageId: 48, domainId: 4, type: 'choice',
+              titleAr: "الجبر البولياني", titleEn: "Boolean Algebra",
+              promptAr: "ما ناتج: A · 1 ؟",
+              promptEn: "What is A · 1?",
+              options: [
+                { id: 'a', textAr: "A", textEn: "A", correct: true },
+                { id: 'b', textAr: "1", textEn: "1", correct: false },
+                { id: 'c', textAr: "0", textEn: "0", correct: false }
+              ],
+              explanationAr: "قانون الهوية: A · 1 = A.",
+              explanationEn: "Identity Law: A · 1 = A."
+            },
+            { stageId: 49, domainId: 4, type: 'choice',
+              titleAr: "الجبر البولياني", titleEn: "Boolean Algebra",
+              promptAr: "ما ناتج: A + 1 ؟",
+              promptEn: "What is A + 1?",
+              options: [
+                { id: 'a', textAr: "1", textEn: "1", correct: true },
+                { id: 'b', textAr: "A", textEn: "A", correct: false },
+                { id: 'c', textAr: "0", textEn: "0", correct: false }
+              ],
+              explanationAr: "قانون الحد الأعلى: A + 1 = 1 دائماً.",
+              explanationEn: "Annulment Law: A + 1 = 1 always."
+            },
+            { stageId: 50, domainId: 4, type: 'choice',
+              titleAr: "الجبر البولياني", titleEn: "Boolean Algebra",
+              promptAr: "ما ناتج: A · 0 ؟",
+              promptEn: "What is A · 0?",
+              options: [
+                { id: 'a', textAr: "0", textEn: "0", correct: true },
+                { id: 'b', textAr: "A", textEn: "A", correct: false },
+                { id: 'c', textAr: "1", textEn: "1", correct: false }
+              ],
+              explanationAr: "قانون الحد الأدنى: A · 0 = 0 دائماً.",
+              explanationEn: "Annulment Law: A · 0 = 0 always."
+            },
+            { stageId: 51, domainId: 4, type: 'choice',
+              titleAr: "الجبر البولياني", titleEn: "Boolean Algebra",
+              promptAr: "ما ناتج: (A')' ؟",
+              promptEn: "What is (A')'?",
+              options: [
+                { id: 'a', textAr: "A (النفي المزدوج)", textEn: "A (Double Negation)", correct: true },
+                { id: 'b', textAr: "A'", textEn: "A'", correct: false },
+                { id: 'c', textAr: "1", textEn: "1", correct: false }
+              ],
+              explanationAr: "قانون النفي المزدوج: (A')' = A.",
+              explanationEn: "Double Negation Law: (A')' = A."
+            },
+            { stageId: 52, domainId: 4, type: 'choice',
+              titleAr: "الجبر البولياني", titleEn: "Boolean Algebra",
+              promptAr: "ما ناتج: A + A ؟",
+              promptEn: "What is A + A?",
+              options: [
+                { id: 'a', textAr: "A (Idempotent Law)", textEn: "A (Idempotent Law)", correct: true },
+                { id: 'b', textAr: "2A", textEn: "2A", correct: false },
+                { id: 'c', textAr: "A'", textEn: "A'", correct: false }
+              ],
+              explanationAr: "قانون التكرار: A + A = A.",
+              explanationEn: "Idempotent Law: A + A = A."
+            },
+            { stageId: 53, domainId: 4, type: 'choice',
+              titleAr: "الجبر البولياني", titleEn: "Boolean Algebra",
+              promptAr: "ما ناتج: A · A ؟",
+              promptEn: "What is A · A?",
+              options: [
+                { id: 'a', textAr: "A", textEn: "A", correct: true },
+                { id: 'b', textAr: "A²", textEn: "A²", correct: false },
+                { id: 'c', textAr: "2A", textEn: "2A", correct: false }
+              ],
+              explanationAr: "قانون التكرار: A · A = A.",
+              explanationEn: "Idempotent Law: A · A = A."
+            },
+            { stageId: 54, domainId: 4, type: 'choice',
+              titleAr: "الجبر البولياني", titleEn: "Boolean Algebra",
+              promptAr: "ما ناتج: A + A'B ؟",
+              promptEn: "What is A + A'B?",
+              options: [
+                { id: 'a', textAr: "A + B", textEn: "A + B", correct: true },
+                { id: 'b', textAr: "A", textEn: "A", correct: false },
+                { id: 'c', textAr: "AB", textEn: "AB", correct: false }
+              ],
+              explanationAr: "قانون التوزيع: A + A'B = (A + A')(A + B) = 1·(A+B) = A + B.",
+              explanationEn: "Distributive: A + A'B = (A + A')(A + B) = 1·(A+B) = A + B."
+            },
+            { stageId: 55, domainId: 4, type: 'choice',
+              titleAr: "الجبر البولياني", titleEn: "Boolean Algebra",
+              promptAr: "ما ناتج تبسيط: F = AB + AB' ؟",
+              promptEn: "Simplify: F = AB + AB'",
+              options: [
+                { id: 'a', textAr: "F = A", textEn: "F = A", correct: true },
+                { id: 'b', textAr: "F = B", textEn: "F = B", correct: false },
+                { id: 'c', textAr: "F = AB", textEn: "F = AB", correct: false }
+              ],
+              explanationAr: "AB + AB' = A(B + B') = A·1 = A.",
+              explanationEn: "AB + AB' = A(B + B') = A·1 = A."
+            },
+
+            // ===== المجال 05: المينترم والماكسترْم (56-70) =====
+            { stageId: 56, domainId: 5, type: 'choice',
+              titleAr: "SOP و POS", titleEn: "SOP & POS",
+              promptAr: "ما معنى SOP في التعبيرات البوليانية؟",
+              promptEn: "What does SOP mean in Boolean expressions?",
+              options: [
+                { id: 'a', textAr: "Sum of Products (مجموع حواصل الضرب)", textEn: "Sum of Products", correct: true },
+                { id: 'b', textAr: "Set of Pins", textEn: "Set of Pins", correct: false },
+                { id: 'c', textAr: "System of Processes", textEn: "System of Processes", correct: false }
+              ],
+              explanationAr: "SOP = Sum of Products، أي مجموع مينترمات (AND terms) مجموعة بعملية OR.",
+              explanationEn: "SOP = Sum of Products, sum of minterms (AND terms) combined with OR."
+            },
+            { stageId: 57, domainId: 5, type: 'choice',
+              titleAr: "SOP و POS", titleEn: "SOP & POS",
+              promptAr: "ما معنى POS في التعبيرات البوليانية؟",
+              promptEn: "What does POS mean in Boolean expressions?",
+              options: [
+                { id: 'a', textAr: "Product of Sums (حاصل ضرب المجاميع)", textEn: "Product of Sums", correct: true },
+                { id: 'b', textAr: "Power of Signals", textEn: "Power of Signals", correct: false },
+                { id: 'c', textAr: "Point of Source", textEn: "Point of Source", correct: false }
+              ],
+              explanationAr: "POS = Product of Sums، أي حاصل ضرب ماكسترمات (OR terms) مضروبة بعملية AND.",
+              explanationEn: "POS = Product of Sums, product of maxterms (OR terms) multiplied with AND."
+            },
+            { stageId: 58, domainId: 5, type: 'choice',
+              titleAr: "SOP و POS", titleEn: "SOP & POS",
+              promptAr: "لمينترم m₃ لدائرة بمتغيرين (A,B)، ما هو التعبير؟",
+              promptEn: "For minterm m₃ of a 2-variable circuit (A,B), what is the expression?",
+              options: [
+                { id: 'a', textAr: "AB (كلا المتغيرين بصيغته الأصلية)", textEn: "AB (both variables uncomplemented)", correct: true },
+                { id: 'b', textAr: "A'B'", textEn: "A'B'", correct: false },
+                { id: 'c', textAr: "A'B", textEn: "A'B", correct: false }
+              ],
+              explanationAr: "m₃ = 3 = 11₂، لذا التعبير هو AB.",
+              explanationEn: "m₃ = 3 = 11₂, so the expression is AB."
+            },
+            { stageId: 59, domainId: 5, type: 'choice',
+              titleAr: "SOP و POS", titleEn: "SOP & POS",
+              promptAr: "لمينترم m₀ لدائرة بمتغيرين، ما هو التعبير؟",
+              promptEn: "For minterm m₀ of a 2-variable circuit, what is the expression?",
+              options: [
+                { id: 'a', textAr: "A'B'", textEn: "A'B'", correct: true },
+                { id: 'b', textAr: "AB", textEn: "AB", correct: false },
+                { id: 'c', textAr: "A + B", textEn: "A + B", correct: false }
+              ],
+              explanationAr: "m₀ = 0 = 00₂، لذا التعبير هو A'B'.",
+              explanationEn: "m₀ = 0 = 00₂, so the expression is A'B'."
+            },
+            { stageId: 60, domainId: 5, type: 'choice',
+              titleAr: "SOP و POS", titleEn: "SOP & POS",
+              promptAr: "كيف نكتب F = Σ(1, 2) كتعبير SOP لدائرة بمتغيرين؟",
+              promptEn: "How to write F = Σ(1, 2) as SOP for a 2-variable circuit?",
+              options: [
+                { id: 'a', textAr: "F = A'B + AB'", textEn: "F = A'B + AB'", correct: true },
+                { id: 'b', textAr: "F = AB + A'B'", textEn: "F = AB + A'B'", correct: false },
+                { id: 'c', textAr: "F = A + B", textEn: "F = A + B", correct: false }
+              ],
+              explanationAr: "m₁ = A'B, m₂ = AB'. لذا F = A'B + AB'.",
+              explanationEn: "m₁ = A'B, m₂ = AB'. So F = A'B + AB'."
+            },
+            { stageId: 61, domainId: 5, type: 'choice',
+              titleAr: "SOP و POS", titleEn: "SOP & POS",
+              promptAr: "كم عدد المينترمات الممكنة لدائرة بـ 3 متغيرات؟",
+              promptEn: "How many possible minterms for a 3-variable circuit?",
+              options: [
+                { id: 'a', textAr: "8 (m₀ إلى m₇)", textEn: "8 (m₀ to m₇)", correct: true },
+                { id: 'b', textAr: "4", textEn: "4", correct: false },
+                { id: 'c', textAr: "16", textEn: "16", correct: false }
+              ],
+              explanationAr: "2³ = 8 مينترمات (m₀ إلى m₇).",
+              explanationEn: "2³ = 8 minterms (m₀ to m₇)."
+            },
+            { stageId: 62, domainId: 5, type: 'choice',
+              titleAr: "SOP و POS", titleEn: "SOP & POS",
+              promptAr: "ما هو الماكسترم M₀ لدائرة بمتغيرين؟",
+              promptEn: "What is maxterm M₀ for a 2-variable circuit?",
+              options: [
+                { id: 'a', textAr: "A + B", textEn: "A + B", correct: true },
+                { id: 'b', textAr: "A' + B'", textEn: "A' + B'", correct: false },
+                { id: 'c', textAr: "AB", textEn: "AB", correct: false }
+              ],
+              explanationAr: "الماكسترم يكتب بالعكس: M₀ (0=00) = A + B (نفي كل بت).",
+              explanationEn: "Maxterm is written inverted: M₀ (0=00) = A + B (each bit complemented)."
+            },
+            { stageId: 63, domainId: 5, type: 'choice',
+              titleAr: "SOP و POS", titleEn: "SOP & POS",
+              promptAr: "ما الفرق بين المينترم والماكسترم؟",
+              promptEn: "What's the difference between Minterm and Maxterm?",
+              options: [
+                { id: 'a', textAr: "المينترم ناتجه 1 في سطر واحد، الماكسترم ناتجه 0 في سطر واحد", textEn: "Minterm yields 1 for one row, Maxterm yields 0 for one row", correct: true },
+                { id: 'b', textAr: "لا يوجد فرق", textEn: "No difference", correct: false },
+                { id: 'c', textAr: "المينترم يستخدم OR فقط", textEn: "Minterm uses only OR", correct: false }
+              ],
+              explanationAr: "المينترم يعطي 1 لتركيبة واحدة (AND terms)، الماكسترم يعطي 0 لتركيبة واحدة (OR terms).",
+              explanationEn: "Minterm yields 1 for one combination (AND terms), Maxterm yields 0 for one combination (OR terms)."
+            },
+            { stageId: 64, domainId: 5, type: 'choice',
+              titleAr: "SOP و POS", titleEn: "SOP & POS",
+              promptAr: "للتعبير F = Σ(0,1,2,3) بمتغيرين، ما هو التبسيط؟",
+              promptEn: "For F = Σ(0,1,2,3) with 2 variables, what's the simplification?",
+              options: [
+                { id: 'a', textAr: "F = 1 (جميع الحالات)", textEn: "F = 1 (all cases)", correct: true },
+                { id: 'b', textAr: "F = 0", textEn: "F = 0", correct: false },
+                { id: 'c', textAr: "F = A", textEn: "F = A", correct: false }
+              ],
+              explanationAr: "عندما تشمل الدالة جميع المينترمات الممكنة، الناتج دائماً 1.",
+              explanationEn: "When the function includes all possible minterms, output is always 1."
+            },
+            { stageId: 65, domainId: 5, type: 'choice',
+              titleAr: "SOP و POS", titleEn: "SOP & POS",
+              promptAr: "للتعبير F = Π(0,1,2,3) بمتغيرين، ما هو التبسيط؟",
+              promptEn: "For F = Π(0,1,2,3) with 2 variables, what's the simplification?",
+              options: [
+                { id: 'a', textAr: "F = 0 (لا توجد حالات)", textEn: "F = 0 (no cases)", correct: true },
+                { id: 'b', textAr: "F = 1", textEn: "F = 1", correct: false },
+                { id: 'c', textAr: "F = A'", textEn: "F = A'", correct: false }
+              ],
+              explanationAr: "Π تشمل جميع الماكسترمات، لذا الناتج دائماً 0.",
+              explanationEn: "Π includes all maxterms, so output is always 0."
+            },
+            { stageId: 66, domainId: 5, type: 'choice',
+              titleAr: "SOP و POS", titleEn: "SOP & POS",
+              promptAr: "في F = Σ(1,3,5,7) لدائرة بـ 3 متغيرات، ما هو المتغير المشترك؟",
+              promptEn: "In F = Σ(1,3,5,7) for 3 variables, what's the common variable?",
+              options: [
+                { id: 'a', textAr: "C = 1 (لأن جميع الأرقام فردية)", textEn: "C = 1 (all numbers are odd)", correct: true },
+                { id: 'b', textAr: "A = 0", textEn: "A = 0", correct: false },
+                { id: 'c', textAr: "B = 1", textEn: "B = 1", correct: false }
+              ],
+              explanationAr: "جميع الأرقام فردية أي C=1 دائماً، لذا F = C.",
+              explanationEn: "All numbers are odd meaning C=1 always, so F = C."
+            },
+            { stageId: 67, domainId: 5, type: 'choice',
+              titleAr: "SOP و POS", titleEn: "SOP & POS",
+              promptAr: "ما هي الصيغة القياسية (Canonical Form)؟",
+              promptEn: "What is the Canonical Form?",
+              options: [
+                { id: 'a', textAr: "صيغة تحتوي على جميع المتغيرات في كل حد", textEn: "Form containing all variables in each term", correct: true },
+                { id: 'b', textAr: "صيغة مختصرة", textEn: "Abbreviated form", correct: false },
+                { id: 'c', textAr: "صيغة بدون متغيرات", textEn: "Form without variables", correct: false }
+              ],
+              explanationAr: "الصيغة القياسية تحتوي على جميع المتغيرات في كل حد (إما أصلية أو متممة).",
+              explanationEn: "Canonical form contains all variables in each term (either original or complemented)."
+            },
+            { stageId: 68, domainId: 5, type: 'choice',
+              titleAr: "SOP و POS", titleEn: "SOP & POS",
+              promptAr: "كيف نحوّل من SOP إلى POS؟",
+              promptEn: "How to convert from SOP to POS?",
+              options: [
+                { id: 'a', textAr: "بأخذ المينترمات الناقصة كـ ماكسترمات", textEn: "By taking missing minterms as maxterms", correct: true },
+                { id: 'b', textAr: "بالضرب المباشر", textEn: "By direct multiplication", correct: false },
+                { id: 'c', textAr: "لا يمكن التحويل", textEn: "Cannot be converted", correct: false }
+              ],
+              explanationAr: "POS يُبنى من المينترمات التي لم تظهر في SOP (الحالات التي الناتج فيها 0).",
+              explanationEn: "POS is built from minterms NOT appearing in SOP (cases where output is 0)."
+            },
+            { stageId: 69, domainId: 5, type: 'choice',
+              titleAr: "SOP و POS", titleEn: "SOP & POS",
+              promptAr: "لـ F = Σ(0,2) بمتغيرين، ما هو التعبير المكافئ؟",
+              promptEn: "For F = Σ(0,2) with 2 variables, what's the equivalent expression?",
+              options: [
+                { id: 'a', textAr: "F = B'", textEn: "F = B'", correct: true },
+                { id: 'b', textAr: "F = B", textEn: "F = B", correct: false },
+                { id: 'c', textAr: "F = A'", textEn: "F = A'", correct: false }
+              ],
+              explanationAr: "m₀=A'B' و m₂=AB'. إذاً F = A'B' + AB' = B'(A' + A) = B'.",
+              explanationEn: "m₀=A'B' and m₂=AB'. So F = A'B' + AB' = B'(A' + A) = B'."
+            },
+            { stageId: 70, domainId: 5, type: 'choice',
+              titleAr: "SOP و POS", titleEn: "SOP & POS",
+              promptAr: "لماذا نستخدم التعبيرات القياسية SOP/POS؟",
+              promptEn: "Why do we use canonical SOP/POS expressions?",
+              options: [
+                { id: 'a', textAr: "لأنها تسمح بالتبسيط المنهجي ومن ثم استخدام K-Map", textEn: "Because they allow systematic simplification then K-Map usage", correct: true },
+                { id: 'b', textAr: "لأنها الأسرع", textEn: "Because they're the fastest", correct: false },
+                { id: 'c', textAr: "لأنها تحتاج بوابات أقل دائماً", textEn: "Because they always need fewer gates", correct: false }
+              ],
+              explanationAr: "الصيغة القياسية هي نقطة البداية للتبسيط باستخدام K-Map أو قوانين الجبر.",
+              explanationEn: "Canonical form is the starting point for simplification using K-Map or Boolean laws."
+            },
+
+            // ===== المجال 06: خرائط كارنو (71-90) =====
+            { stageId: 71, domainId: 6, type: 'choice',
+              titleAr: "خرائط كارنو", titleEn: "Karnaugh Maps",
+              promptAr: "ما هي خريطة كارنو (K-Map)؟",
+              promptEn: "What is a Karnaugh Map (K-Map)?",
+              options: [
+                { id: 'a', textAr: "تمثيل رسومي لجدول الحقيقة يُستخدم لتبسيط التعبيرات", textEn: "Graphical representation of truth table used for simplification", correct: true },
+                { id: 'b', textAr: "نوع من البوابات المنطقية", textEn: "A type of logic gate", correct: false },
+                { id: 'c', textAr: "لغة برمجة", textEn: "A programming language", correct: false }
+              ],
+              explanationAr: "خريطة كارنو هي تمثيل رسومي يعتمد على كود جراي لتسهيل التبسيط البصري.",
+              explanationEn: "A K-Map is a graphical representation using Gray code for visual simplification."
+            },
+            { stageId: 72, domainId: 6, type: 'choice',
+              titleAr: "خرائط كارنو", titleEn: "Karnaugh Maps",
+              promptAr: "ما هو كود جراي (Gray Code) المستخدم في K-Map؟",
+              promptEn: "What is Gray Code used in K-Maps?",
+              options: [
+                { id: 'a', textAr: "ترتيب يتغير فيه بت واحد فقط بين كل خليتين متجاورتين", textEn: "Order where only one bit changes between adjacent cells", correct: true },
+                { id: 'b', textAr: "ترتيب تصاعدي عادي", textEn: "Normal ascending order", correct: false },
+                { id: 'c', textAr: "ترتيب عشوائي", textEn: "Random order", correct: false }
+              ],
+              explanationAr: "كود جراي: 00, 01, 11, 10 - بت واحد يتغير فقط بين المتجاورات.",
+              explanationEn: "Gray Code: 00, 01, 11, 10 - only one bit changes between adjacents."
+            },
+            { stageId: 73, domainId: 6, type: 'choice',
+              titleAr: "خرائط كارنو", titleEn: "Karnaugh Maps",
+              promptAr: "كم عدد الخلايا في خريطة كارنو لـ 3 متغيرات؟",
+              promptEn: "How many cells in a 3-variable K-Map?",
+              options: [
+                { id: 'a', textAr: "8 خلايا", textEn: "8 cells", correct: true },
+                { id: 'b', textAr: "4 خلايا", textEn: "4 cells", correct: false },
+                { id: 'c', textAr: "16 خلية", textEn: "16 cells", correct: false }
+              ],
+              explanationAr: "عدد الخلايا = 2ⁿ. لـ 3 متغيرات: 2³ = 8 خلايا.",
+              explanationEn: "Cells = 2ⁿ. For 3 variables: 2³ = 8 cells."
+            },
+            { stageId: 74, domainId: 6, type: 'choice',
+              titleAr: "خرائط كارنو", titleEn: "Karnaugh Maps",
+              promptAr: "ما هي قاعدة التجميع في K-Map؟",
+              promptEn: "What is the grouping rule in K-Maps?",
+              options: [
+                { id: 'a', textAr: "يجب أن تكون كل مجموعة قوة للعدد 2 (1, 2, 4, 8, ...)", textEn: "Each group must be a power of 2 (1, 2, 4, 8, ...)", correct: true },
+                { id: 'b', textAr: "أي عدد عشوائي من الواحدات", textEn: "Any random number of 1s", correct: false },
+                { id: 'c', textAr: "3 خلايا فقط", textEn: "Only 3 cells", correct: false }
+              ],
+              explanationAr: "قاعدة K-Map الأساسية: يجب أن يكون حجم كل مجموعة قوة للعدد 2.",
+              explanationEn: "Basic K-Map rule: each group must have size as a power of 2."
+            },
+            { stageId: 75, domainId: 6, type: 'choice',
+              titleAr: "خرائط كارنو", titleEn: "Karnaugh Maps",
+              promptAr: "ما هي خاصية الالتفاف (Edge Wrapping) في K-Map؟",
+              promptEn: "What is Edge Wrapping in K-Maps?",
+              options: [
+                { id: 'a', textAr: "الخلايا في الأطراف تعتبر متجاورة منطقياً", textEn: "Cells on edges are logically adjacent", correct: true },
+                { id: 'b', textAr: "لا يمكن تجميع خلايا الأطراف", textEn: "Edge cells cannot be grouped", correct: false },
+                { id: 'c', textAr: "يجب حذف خلايا الأطراف", textEn: "Edge cells must be deleted", correct: false }
+              ],
+              explanationAr: "بسبب كود جراي، الخلايا في الأطراف المتقابلة (يمين/يسار، أعلى/أسفل) متجاورة منطقياً.",
+              explanationEn: "Due to Gray code, opposite border cells (left/right, top/bottom) are logically adjacent."
+            },
+            { stageId: 76, domainId: 6, type: 'choice',
+              titleAr: "خرائط كارنو", titleEn: "Karnaugh Maps",
+              promptAr: "لتبسيط F = Σ(0,1,2,3) بخريطة كارنو 2 متغيرات، ما الناتج؟",
+              promptEn: "Simplify F = Σ(0,1,2,3) using 2-var K-Map?",
+              options: [
+                { id: 'a', textAr: "F = 1 (تجميع كل الخلايا)", textEn: "F = 1 (group all cells)", correct: true },
+                { id: 'b', textAr: "F = A", textEn: "F = A", correct: false },
+                { id: 'c', textAr: "F = 0", textEn: "F = 0", correct: false }
+              ],
+              explanationAr: "جميع الخلايا = 1، لذا مجموعة واحدة بحجم 4 تعطي F = 1.",
+              explanationEn: "All cells = 1, so one group of size 4 gives F = 1."
+            },
+            { stageId: 77, domainId: 6, type: 'choice',
+              titleAr: "خرائط كارنو", titleEn: "Karnaugh Maps",
+              promptAr: "في K-Map، تجميع خليتين متجاورتين يحذف كم متغيراً؟",
+              promptEn: "In K-Map, grouping 2 adjacent cells eliminates how many variables?",
+              options: [
+                { id: 'a', textAr: "متغير واحد", textEn: "One variable", correct: true },
+                { id: 'b', textAr: "متغيران", textEn: "Two variables", correct: false },
+                { id: 'c', textAr: "لا يحذف شيئاً", textEn: "Eliminates nothing", correct: false }
+              ],
+              explanationAr: "كل مضاعفة لحجم المجموعة تحذف متغيراً واحداً. مجموعة 2 تحذف 1، مجموعة 4 تحذف 2.",
+              explanationEn: "Each doubling of group size eliminates one variable. Group of 2 eliminates 1, group of 4 eliminates 2."
+            },
+            { stageId: 78, domainId: 6, type: 'choice',
+              titleAr: "خرائط كارنو", titleEn: "Karnaugh Maps",
+              promptAr: "تجميع 4 خلايا متجاورة في K-Map يحذف كم متغيراً؟",
+              promptEn: "Grouping 4 adjacent cells in K-Map eliminates how many variables?",
+              options: [
+                { id: 'a', textAr: "متغيران", textEn: "Two variables", correct: true },
+                { id: 'b', textAr: "متغير واحد", textEn: "One variable", correct: false },
+                { id: 'c', textAr: "3 متغيرات", textEn: "Three variables", correct: false }
+              ],
+              explanationAr: "مجموعة من 4 = 2² تحذف متغيرين.",
+              explanationEn: "Group of 4 = 2² eliminates 2 variables."
+            },
+            { stageId: 79, domainId: 6, type: 'choice',
+              titleAr: "خرائط كارنو", titleEn: "Karnaugh Maps",
+              promptAr: "تجميع 8 خلايا متجاورة يحذف كم متغيراً؟",
+              promptEn: "Grouping 8 adjacent cells eliminates how many variables?",
+              options: [
+                { id: 'a', textAr: "3 متغيرات", textEn: "Three variables", correct: true },
+                { id: 'b', textAr: "2 متغيران", textEn: "Two variables", correct: false },
+                { id: 'c', textAr: "4 متغيرات", textEn: "Four variables", correct: false }
+              ],
+              explanationAr: "مجموعة من 8 = 2³ تحذف 3 متغيرات.",
+              explanationEn: "Group of 8 = 2³ eliminates 3 variables."
+            },
+            { stageId: 80, domainId: 6, type: 'choice',
+              titleAr: "خرائط كارنو", titleEn: "Karnaugh Maps",
+              promptAr: "ما هي أفضل استراتيجية للتجميع في K-Map؟",
+              promptEn: "What's the best grouping strategy in K-Map?",
+              options: [
+                { id: 'a', textAr: "استخدام أكبر عدد ممكن من المجموعات الكبيرة مع تغطية كل الواحدات", textEn: "Use largest possible groups covering all 1s", correct: true },
+                { id: 'b', textAr: "تجميع خليتين فقط", textEn: "Only group 2 cells", correct: false },
+                { id: 'c', textAr: "تجميع عشوائي", textEn: "Random grouping", correct: false }
+              ],
+              explanationAr: "الهدف: تغطية كل الواحدات بأقل عدد من أكبر المجموعات.",
+              explanationEn: "Goal: cover all 1s with fewest and largest groups."
+            },
+            { stageId: 81, domainId: 6, type: 'choice',
+              titleAr: "خرائط كارنو", titleEn: "Karnaugh Maps",
+              promptAr: "هل يمكن أن تتداخل المجموعات في K-Map؟",
+              promptEn: "Can groups overlap in K-Map?",
+              options: [
+                { id: 'a', textAr: "نعم، التداخل مسموح لتغطية الواحدات", textEn: "Yes, overlapping is allowed to cover 1s", correct: true },
+                { id: 'b', textAr: "لا، ممنوع تماماً", textEn: "No, totally forbidden", correct: false },
+                { id: 'c', textAr: "فقط في الخلايا الزوجية", textEn: "Only in even cells", correct: false }
+              ],
+              explanationAr: "التداخل مسموح ومفيد لتشكيل مجموعات أكبر.",
+              explanationEn: "Overlapping is allowed and useful to form larger groups."
+            },
+            { stageId: 82, domainId: 6, type: 'choice',
+              titleAr: "خرائط كارنو", titleEn: "Karnaugh Maps",
+              promptAr: "في K-Map لـ 4 متغيرات، كم عدد الخلايا؟",
+              promptEn: "In a 4-variable K-Map, how many cells?",
+              options: [
+                { id: 'a', textAr: "16 خلية", textEn: "16 cells", correct: true },
+                { id: 'b', textAr: "8 خلايا", textEn: "8 cells", correct: false },
+                { id: 'c', textAr: "32 خلية", textEn: "32 cells", correct: false }
+              ],
+              explanationAr: "2⁴ = 16 خلية لـ 4 متغيرات.",
+              explanationEn: "2⁴ = 16 cells for 4 variables."
+            },
+            { stageId: 83, domainId: 6, type: 'choice',
+              titleAr: "خرائط كارنو", titleEn: "Karnaugh Maps",
+              promptAr: "في K-Map لـ 4 متغيرات، كيف تُرتب الصفوف والأعمدة؟",
+              promptEn: "In a 4-variable K-Map, how are rows/columns ordered?",
+              options: [
+                { id: 'a', textAr: "00, 01, 11, 10 (كود جراي)", textEn: "00, 01, 11, 10 (Gray Code)", correct: true },
+                { id: 'b', textAr: "00, 01, 10, 11", textEn: "00, 01, 10, 11", correct: false },
+                { id: 'c', textAr: "01, 10, 00, 11", textEn: "01, 10, 00, 11", correct: false }
+              ],
+              explanationAr: "كود جراي: 00, 01, 11, 10 لأن كل خطوة تغيّر بتاً واحداً فقط.",
+              explanationEn: "Gray Code: 00, 01, 11, 10 as each step changes only one bit."
+            },
+            { stageId: 84, domainId: 6, type: 'choice',
+              titleAr: "خرائط كارنو", titleEn: "Karnaugh Maps",
+              promptAr: "هل يمكن تجميع الخلايا الأربع في زوايا K-Map؟",
+              promptEn: "Can the 4 corner cells of K-Map be grouped together?",
+              options: [
+                { id: 'a', textAr: "نعم، بفضل خاصية الالتفاف", textEn: "Yes, thanks to Edge Wrapping", correct: true },
+                { id: 'b', textAr: "لا، غير ممكن", textEn: "No, impossible", correct: false },
+                { id: 'c', textAr: "فقط في K-Map بـ 3 متغيرات", textEn: "Only in 3-variable K-Map", correct: false }
+              ],
+              explanationAr: "الزوايا الأربع متجاورة منطقياً بسبب خاصية الالتفاف.",
+              explanationEn: "The 4 corners are logically adjacent due to Edge Wrapping."
+            },
+            { stageId: 85, domainId: 6, type: 'choice',
+              titleAr: "خرائط كارنو", titleEn: "Karnaugh Maps",
+              promptAr: "ما الفرق بين K-Map و جدول الحقيقة؟",
+              promptEn: "What's the difference between K-Map and Truth Table?",
+              options: [
+                { id: 'a', textAr: "K-Map تمثيل رسومي ثنائي الأبعاد يسهّل التبسيط البصري", textEn: "K-Map is a 2D graphical representation easing visual simplification", correct: true },
+                { id: 'b', textAr: "لا يوجد فرق", textEn: "No difference", correct: false },
+                { id: 'c', textAr: "جدول الحقيقة أبسط", textEn: "Truth table is simpler", correct: false }
+              ],
+              explanationAr: "K-Map هي تحويل جدول الحقيقة إلى صورة ثنائية الأبعاد تُسهّل التبسيط.",
+              explanationEn: "K-Map transforms the truth table into a 2D view that eases simplification."
+            },
+            { stageId: 86, domainId: 6, type: 'choice',
+              titleAr: "خرائط كارنو", titleEn: "Karnaugh Maps",
+              promptAr: "هل يمكن استخدام K-Map لدوائر بأكثر من 4 متغيرات؟",
+              promptEn: "Can K-Map be used for circuits with more than 4 variables?",
+              options: [
+                { id: 'a', textAr: "نعم لكن يصبح معقداً (5, 6 متغيرات)", textEn: "Yes but becomes complex (5, 6 variables)", correct: true },
+                { id: 'b', textAr: "لا، فقط 4 متغيرات", textEn: "No, only 4 variables", correct: false },
+                { id: 'c', textAr: "فقط لمتغير واحد", textEn: "Only for one variable", correct: false }
+              ],
+              explanationAr: "K-Map يمكن استخدامها حتى 5 أو 6 متغيرات لكن بصعوبة، وبدائل أخرى مثل Quine-McCluskey تُفضل.",
+              explanationEn: "K-Map can be used up to 5-6 variables but with difficulty; alternatives like Quine-McCluskey are preferred."
+            },
+            { stageId: 87, domainId: 6, type: 'choice',
+              titleAr: "خرائط كارنو", titleEn: "Karnaugh Maps",
+              promptAr: "في K-Map، هل يمكن تجميع خليتين غير متجاورتين ظاهرياً؟",
+              promptEn: "In K-Map, can two apparently non-adjacent cells be grouped?",
+              options: [
+                { id: 'a', textAr: "نعم، إذا كانتا متجاورتين بفضل الالتفاف (wrapping)", textEn: "Yes, if adjacent due to edge wrapping", correct: true },
+                { id: 'b', textAr: "لا، مستحيل", textEn: "No, impossible", correct: false },
+                { id: 'c', textAr: "فقط إذا كانتا زوجيتين", textEn: "Only if both even", correct: false }
+              ],
+              explanationAr: "الالتفاف يجعل خلايا الأطراف المتقابلة متجاورة منطقياً.",
+              explanationEn: "Edge wrapping makes opposite border cells logically adjacent."
+            },
+            { stageId: 88, domainId: 6, type: 'choice',
+              titleAr: "خرائط كارنو", titleEn: "Karnaugh Maps",
+              promptAr: "ما هو الهدف الأساسي من K-Map؟",
+              promptEn: "What's the main goal of K-Map?",
+              options: [
+                { id: 'a', textAr: "تبسيط التعبيرات البوليانية للحصول على دوائر أبسط", textEn: "Simplify Boolean expressions to get simpler circuits", correct: true },
+                { id: 'b', textAr: "زيادة عدد البوابات", textEn: "Increase gate count", correct: false },
+                { id: 'c', textAr: "تصعيب التصميم", textEn: "Complicate design", correct: false }
+              ],
+              explanationAr: "K-Map تسهّل الحصول على أبسط تعبير (أقل عدد حدود ومتغيرات).",
+              explanationEn: "K-Map eases getting the simplest expression (fewest terms/variables)."
+            },
+            { stageId: 89, domainId: 6, type: 'choice',
+              titleAr: "خرائط كارنو", titleEn: "Karnaugh Maps",
+              promptAr: "عند تبسيط F = Σ(0,1,2,5,6,7) في K-Map لـ 3 متغيرات، ما أفضل تجميع؟",
+              promptEn: "When simplifying F = Σ(0,1,2,5,6,7) in 3-var K-Map, best grouping?",
+              options: [
+                { id: 'a', textAr: "استخدام عدة مجموعات متداخلة (مجموعة 4 + مجموعتين)", textEn: "Use overlapping groups (group of 4 + two groups)", correct: true },
+                { id: 'b', textAr: "مجموعة واحدة فقط", textEn: "Only one group", correct: false },
+                { id: 'c', textAr: "تجميع خليتين فقط", textEn: "Only group 2 cells", correct: false }
+              ],
+              explanationAr: "نستخدم أكبر مجموعة ممكنة ثم نغطي الباقي بمجموعات متداخلة.",
+              explanationEn: "Use largest group then cover remaining with overlapping groups."
+            },
+            { stageId: 90, domainId: 6, type: 'choice',
+              titleAr: "خرائط كارنو", titleEn: "Karnaugh Maps",
+              promptAr: "متى نستخدم K-Map في التصميم الرقمي؟",
+              promptEn: "When do we use K-Map in digital design?",
+              options: [
+                { id: 'a', textAr: "بعد استخلاص التعبير القياسي وقبل بناء الدائرة", textEn: "After deriving canonical expression and before circuit construction", correct: true },
+                { id: 'b', textAr: "قبل جدول الحقيقة", textEn: "Before truth table", correct: false },
+                { id: 'c', textAr: "أثناء اختبار الأعطال فقط", textEn: "Only during fault testing", correct: false }
+              ],
+              explanationAr: "K-Map خطوة وسيطة بين التعبير القياسي وبناء الدائرة النهائية.",
+              explanationEn: "K-Map is an intermediate step between canonical expression and final circuit."
+            },
+
+            // ===== المجال 07: التشخيص والتصميم (91-100) =====
+            { stageId: 91, domainId: 7, type: 'choice',
+              titleAr: "التشخيص والتصميم", titleEn: "Design & Diagnosis",
+              promptAr: "ما هو عطل Stuck-at-0؟",
+              promptEn: "What is a Stuck-at-0 fault?",
+              options: [
+                { id: 'a', textAr: "خط في الدائرة يبقى دائماً على القيمة 0", textEn: "A line always fixed at 0", correct: true },
+                { id: 'b', textAr: "خط يبقى دائماً 1", textEn: "A line always fixed at 1", correct: false },
+                { id: 'c', textAr: "خط يعمل بشكل طبيعي", textEn: "A normally working line", correct: false }
+              ],
+              explanationAr: "Stuck-at-0 عطل يجعل الخط ثابتاً على 0 مهما كان المدخل.",
+              explanationEn: "Stuck-at-0 is a fault fixing the line at 0 regardless of input."
+            },
+            { stageId: 92, domainId: 7, type: 'choice',
+              titleAr: "التشخيص والتصميم", titleEn: "Design & Diagnosis",
+              promptAr: "ما هو عطل Stuck-at-1؟",
+              promptEn: "What is a Stuck-at-1 fault?",
+              options: [
+                { id: 'a', textAr: "خط في الدائرة يبقى دائماً على القيمة 1", textEn: "A line always fixed at 1", correct: true },
+                { id: 'b', textAr: "خط يبقى دائماً 0", textEn: "A line always fixed at 0", correct: false },
+                { id: 'c', textAr: "خط متذبذب", textEn: "A fluctuating line", correct: false }
+              ],
+              explanationAr: "Stuck-at-1 عطل يجعل الخط ثابتاً على 1 مهما كان المدخل.",
+              explanationEn: "Stuck-at-1 is a fault fixing the line at 1 regardless of input."
+            },
+            { stageId: 93, domainId: 7, type: 'choice',
+              titleAr: "التشخيص والتصميم", titleEn: "Design & Diagnosis",
+              promptAr: "لماذا نختبر الأعطال في الدوائر الرقمية؟",
+              promptEn: "Why test faults in digital circuits?",
+              options: [
+                { id: 'a', textAr: "لضمان الموثوقية والجودة الصناعية", textEn: "To ensure reliability and industrial quality", correct: true },
+                { id: 'b', textAr: "لزيادة سرعة الدائرة", textEn: "To increase circuit speed", correct: false },
+                { id: 'c', textAr: "لتقليل التكلفة فقط", textEn: "Only to reduce cost", correct: false }
+              ],
+              explanationAr: "اختبار الأعطال ضروري لضمان عمل الدائرة بشكل صحيح وموثوق.",
+              explanationEn: "Fault testing is essential to ensure correct and reliable circuit operation."
+            },
+            { stageId: 94, domainId: 7, type: 'choice',
+              titleAr: "التشخيص والتصميم", titleEn: "Design & Diagnosis",
+              promptAr: "ما هي خطوات تصميم دائرة توافقية (Combinational Circuit)؟",
+              promptEn: "What are the steps for designing a combinational circuit?",
+              options: [
+                { id: 'a', textAr: "تحديد المتطلبات → جدول الحقيقة → التبسيط → التنفيذ", textEn: "Spec → Truth Table → Simplification → Implementation", correct: true },
+                { id: 'b', textAr: "التنفيذ أولاً ثم التصميم", textEn: "Implementation first then design", correct: false },
+                { id: 'c', textAr: "لا توجد خطوات محددة", textEn: "No specific steps", correct: false }
+              ],
+              explanationAr: "التصميم المنهجي يمر بمراحل: تحليل → تمثيل → تبسيط → تنفيذ.",
+              explanationEn: "Systematic design goes: analysis → representation → simplification → implementation."
+            },
+            { stageId: 95, domainId: 7, type: 'choice',
+              titleAr: "التشخيص والتصميم", titleEn: "Design & Diagnosis",
+              promptAr: "ما هي أفضل طريقة لتقليل عدد البوابات في دائرة رقمية؟",
+              promptEn: "Best way to reduce gate count in a digital circuit?",
+              options: [
+                { id: 'a', textAr: "استخدام K-Map أو الجبر البولياني للتبسيط", textEn: "Use K-Map or Boolean algebra for simplification", correct: true },
+                { id: 'b', textAr: "استخدام بوابات أكثر", textEn: "Use more gates", correct: false },
+                { id: 'c', textAr: "زيادة المدخلات", textEn: "Increase inputs", correct: false }
+              ],
+              explanationAr: "التبسيط باستخدام K-Map أو القوانين البوليانية يقلل عدد البوابات المطلوبة.",
+              explanationEn: "Simplification using K-Map or Boolean laws reduces required gate count."
+            },
+            { stageId: 96, domainId: 7, type: 'choice',
+              titleAr: "التشخيص والتصميم", titleEn: "Design & Diagnosis",
+              promptAr: "ما الفرق بين الدوائر التوافقية (Combinational) والدوائر المتسلسلة (Sequential)؟",
+              promptEn: "Difference between combinational and sequential circuits?",
+              options: [
+                { id: 'a', textAr: "التوافقية تعتمد فقط على المدخلات الحالية، بينما المتسلسلة تعتمد على الحالة السابقة", textEn: "Combinational depends only on current inputs, sequential depends on previous state", correct: true },
+                { id: 'b', textAr: "لا يوجد فرق", textEn: "No difference", correct: false },
+                { id: 'c', textAr: "المتسلسلة أسرع", textEn: "Sequential is faster", correct: false }
+              ],
+              explanationAr: "الدوائر التوافقية لا تحتوي ذاكرة، أما المتسلسلة فتعتمد على الحالة السابقة (Flip-Flops).",
+              explanationEn: "Combinational circuits have no memory, sequential ones depend on previous state (Flip-Flops)."
+            },
+            { stageId: 97, domainId: 7, type: 'choice',
+              titleAr: "التشخيص والتصميم", titleEn: "Design & Diagnosis",
+              promptAr: "ما هو الـ Decoder في الدوائر الرقمية؟",
+              promptEn: "What is a Decoder in digital circuits?",
+              options: [
+                { id: 'a', textAr: "دائرة تحوّل رمزاً ثنائياً إلى تفعيل خط واحد من عدة خطوط", textEn: "Circuit converting binary code to activate one of several lines", correct: true },
+                { id: 'b', textAr: "دائرة تضاعف الإشارة", textEn: "Circuit that doubles the signal", correct: false },
+                { id: 'c', textAr: "دائرة تُخزّن البيانات", textEn: "Data storage circuit", correct: false }
+              ],
+              explanationAr: "Decoder يستقبل n بت ويُفعّل خطاً واحداً من 2ⁿ خطوط.",
+              explanationEn: "Decoder receives n bits and activates one of 2ⁿ output lines."
+            },
+            { stageId: 98, domainId: 7, type: 'choice',
+              titleAr: "التشخيص والتصميم", titleEn: "Design & Diagnosis",
+              promptAr: "ما هو الـ Multiplexer (MUX)؟",
+              promptEn: "What is a Multiplexer (MUX)?",
+              options: [
+                { id: 'a', textAr: "دائرة تختار مدخلاً واحداً من عدة مدخلات حسب خط التحديد", textEn: "Circuit that selects one input from many based on selector lines", correct: true },
+                { id: 'b', textAr: "دائرة تُضيف الأرقام", textEn: "Circuit that adds numbers", correct: false },
+                { id: 'c', textAr: "دائرة عكس الإشارة", textEn: "Signal inverter circuit", correct: false }
+              ],
+              explanationAr: "MUX هو مُحدِّد متعدد: 2ⁿ مدخل و n خط تحديد ومخرج واحد.",
+              explanationEn: "MUX is a selector: 2ⁿ inputs, n selector lines, one output."
+            },
+            { stageId: 99, domainId: 7, type: 'choice',
+              titleAr: "التشخيص والتصميم", titleEn: "Design & Diagnosis",
+              promptAr: "ما هي أهمية اختبار الحدود (Boundary Scan) في الشرائح الإلكترونية؟",
+              promptEn: "Importance of Boundary Scan in electronic chips?",
+              options: [
+                { id: 'a', textAr: "يسمح باختبار الشرائح بعد التجميع بدون لمس فيزيائي", textEn: "Allows testing chips after assembly without physical contact", correct: true },
+                { id: 'b', textAr: "يزيد سرعة الشريحة", textEn: "Increases chip speed", correct: false },
+                { id: 'c', textAr: "يقلل حجم الشريحة", textEn: "Reduces chip size", correct: false }
+              ],
+              explanationAr: "Boundary Scan (IEEE 1149.1 JTAG) يسمح باختبار الشرائح بعد اللحام على اللوحة.",
+              explanationEn: "Boundary Scan (IEEE 1149.1 JTAG) allows testing chips after soldering on board."
+            },
+            { stageId: 100, domainId: 7, type: 'choice',
+              titleAr: "التشخيص والتصميم", titleEn: "Design & Diagnosis",
+              promptAr: "ما هي المعايير الأساسية لتصميم دائرة رقمية فعّالة؟",
+              promptEn: "Key criteria for efficient digital circuit design?",
+              options: [
+                { id: 'a', textAr: "أقل عدد بوابات، أقل استهلاك طاقة، أعلى موثوقية", textEn: "Fewest gates, least power, highest reliability", correct: true },
+                { id: 'b', textAr: "أكبر عدد بوابات", textEn: "Most gates", correct: false },
+                { id: 'c', textAr: "أعلى تكلفة", textEn: "Highest cost", correct: false }
+              ],
+              explanationAr: "التصميم الجيد يوازن بين الأداء، التكلفة، استهلاك الطاقة، والموثوقية.",
+              explanationEn: "Good design balances performance, cost, power, and reliability."
             }
         ];
 
-        // Modules Data Structure for Student Practice
+        const lecturerModulesData = [
+            { id: 1, nameAr: "المجال 01: مقدمة في المنطق الرقمي", nameEn: "Module 01: Introduction to Digital Logic", subtitleAr: "Digital Logic Foundations & Binary Systems", subtitleEn: "Digital Logic Foundations & Binary Systems",
+              content: { definitionAr: "المنطق الرقمي هو فرع من الهندسة الكهربائية وعلوم الكمبيوتر يتعامل مع معالجة الإشارات المنفصلة الممثلة بقيمتين ثنائيتين: 0 و 1.", definitionEn: "Digital logic deals with discrete signals represented by binary values: 0 and 1.", keyObservationAr: "تعتمد الدوائر الرقمية على ترانزستورات كمفاتيح مما يوفر مناعة ضد التشويش.", keyObservationEn: "Digital circuits use transistors as switches providing noise immunity.", teachingObjectiveAr: "توضيح الفرق بين الأنظمة التناظرية والرقمية.", teachingObjectiveEn: "Clarify analog vs digital systems.", commonMisconceptionAr: "الاعتقاد بأن الجهد 0V أو 5V تماماً.", commonMisconceptionEn: "Believing voltage is strictly 0V or 5V.", classroomDiscussionAr: "لماذا تحولت الحوسبة إلى الرقمية؟", classroomDiscussionEn: "Why did computing shift to digital?" } },
+            { id: 2, nameAr: "المجال 02: البوابات المنطقية", nameEn: "Module 02: Logic Gates", subtitleAr: "Logic Gates, Symbols, Truth Tables", subtitleEn: "Logic Gates, Symbols, Truth Tables",
+              gates: [
+                  { nameAr: "بوابة AND", nameEn: "AND Gate", expr: "Y = A · B", descAr: "ناتج 1 فقط إذا كانت جميع المدخلات 1.", descEn: "Outputs 1 only if all inputs are 1.", truth: "0·0=0, 0·1=0, 1·0=0, 1·1=1" },
+                  { nameAr: "بوابة OR", nameEn: "OR Gate", expr: "Y = A + B", descAr: "ناتج 1 إذا كان مدخل واحد على الأقل 1.", descEn: "Outputs 1 if at least one input is 1.", truth: "0+0=0, 0+1=1, 1+0=1, 1+1=1" },
+                  { nameAr: "بوابة NOT", nameEn: "NOT Gate", expr: "Y = A'", descAr: "تعكس حالة المدخل.", descEn: "Inverts the input.", truth: "0→1, 1→0" },
+                  { nameAr: "بوابة NAND", nameEn: "NAND Gate", expr: "Y = (A · B)'", descAr: "عكس AND - بوابة عالمية.", descEn: "Inverse of AND - universal.", truth: "0·0=1, 0·1=1, 1·0=1, 1·1=0" },
+                  { nameAr: "بوابة NOR", nameEn: "NOR Gate", expr: "Y = (A + B)'", descAr: "عكس OR - بوابة عالمية.", descEn: "Inverse of OR - universal.", truth: "0+0=1, 0+1=0, 1+0=0, 1+1=0" },
+                  { nameAr: "بوابة XOR", nameEn: "XOR Gate", expr: "Y = A ⊕ B", descAr: "1 عند اختلاف المدخلات.", descEn: "1 when inputs differ.", truth: "0⊕0=0, 0⊕1=1, 1⊕0=1, 1⊕1=0" }
+              ],
+              content: { teachingObjectiveAr: "فهم الخصائص المنطقية للبوابات.", teachingObjectiveEn: "Understand gate characteristics.", commonMisconceptionAr: "الخلط بين NAND و NOR.", commonMisconceptionEn: "Confusing NAND and NOR." } },
+            { id: 3, nameAr: "المجال 03: جداول الحقيقة", nameEn: "Module 03: Truth Tables", subtitleAr: "Truth Table Construction & Analysis", subtitleEn: "Truth Table Construction & Analysis",
+              content: { definitionAr: "جدول الحقيقة يعرض جميع القيم الممكنة للمدخلات ونواتجها.", definitionEn: "A truth table shows all possible input combinations and outputs.", keyObservationAr: "عدد الأسطر = 2ⁿ حيث n عدد المتغيرات.", keyObservationEn: "Rows = 2ⁿ where n is variables count.", teachingObjectiveAr: "بناء جداول الحقيقة واستخلاص SOP/POS.", teachingObjectiveEn: "Build truth tables and derive SOP/POS." } },
+            { id: 4, nameAr: "المجال 04: الجبر البولياني", nameEn: "Module 04: Boolean Algebra", subtitleAr: "Boolean Identities & De Morgan's Laws", subtitleEn: "Boolean Identities & De Morgan's Laws",
+              laws: [
+                  { nameAr: "قانون الهوية", nameEn: "Identity Law", formula: "A · 1 = A, A + 0 = A", descAr: "لا يغير القيمة." },
+                  { nameAr: "قانون الامتصاص", nameEn: "Absorption Law", formula: "A + AB = A, A(A + B) = A", descAr: "المتغير الإضافي يُمتص." },
+                  { nameAr: "قانون ديمورغان", nameEn: "De Morgan's Laws", formula: "(A + B)' = A' · B' , (A · B)' = A' + B'", descAr: "النفي يعكس العملية." }
+              ],
+              content: { teachingObjectiveAr: "إتقان تبسيط التعبيرات المنطقية.", teachingObjectiveEn: "Master algebraic simplification." } },
+            { id: 5, nameAr: "المجال 05: المينترم والماكسترْم", nameEn: "Module 05: Minterms & Maxterms", subtitleAr: "Canonical Expressions SOP/POS", subtitleEn: "Canonical Expressions SOP/POS",
+              content: { definitionAr: "المينترم حاصل ضرب يعطي 1 لسطر واحد (SOP). الماكسترم مجموع يعطي 0 لسطر واحد (POS).", definitionEn: "Minterm yields 1 for one row (SOP). Maxterm yields 0 for one row (POS)." } },
+            { id: 6, nameAr: "المجال 06: خرائط كارنو", nameEn: "Module 06: Karnaugh Maps", subtitleAr: "K-Map Simplification & Edge Wrapping", subtitleEn: "K-Map Simplification & Edge Wrapping",
+              content: { definitionAr: "خريطة كارنو تمثيل رسومي لجدول الحقيقة لتبسيط التعبيرات بالاعتماد على كود جراي.", definitionEn: "K-Map is a graphical representation enabling rapid Boolean minimization via Gray code.", keyObservationAr: "خاصية الالتفاف تجعل خلايا الأطراف المتقابلة متجاورة منطقياً.", keyObservationEn: "Edge wrapping makes opposite borders logically adjacent." } },
+            { id: 7, nameAr: "المجال 07: التشخيص والتصميم", nameEn: "Module 07: Design & Fault Diagnosis", subtitleAr: "Combinational Design & Fault Models", subtitleEn: "Combinational Design & Fault Models",
+              content: { definitionAr: "تصميم الدوائر واختبار الأعطال (Stuck-at-0 و Stuck-at-1) لضمان الموثوقية.", definitionEn: "Circuit design and fault testing (Stuck-at-0/1) for reliability." } }
+        ];
+
         const studentModulesData = [
             { id: 1, nameAr: "المجال 01: الأساسيات", nameEn: "Module 01: Foundations", stages: 10, range: [1, 10] },
             { id: 2, nameAr: "المجال 02: البوابات", nameEn: "Module 02: Logic Gates", stages: 15, range: [11, 25] },
@@ -445,74 +1432,49 @@
             { id: 7, nameAr: "المجال 07: التشخيص والتصميم", nameEn: "Module 07: Design & Faults", stages: 10, range: [91, 100] }
         ];
 
-        // Application State
         let appState = {
-            lang: 'ar', // 'ar' or 'en'
-            mode: 'student', // 'student' or 'lecturer'
-            currentStage: 71,
-            lecturerActiveModuleId: 1,
-            caseId: 'DL-KMAP-2026-9281',
-            solvedCount: 0,
-            totalAttempts: 0,
-            correctAttempts: 0,
-            domainStats: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 },
+            lang: 'ar', mode: 'student', currentStage: 1, lecturerActiveModuleId: 1,
+            caseId: 'DL-2026-0001',
+            solvedCount: 0, totalAttempts: 0, correctAttempts: 0,
+            domainStats: { 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0 },
             currentCaseData: null
         };
 
-        // Initialize on window load
-        window.onload = function() {
-            loadProgress();
-            applyLanguage();
-            renderActiveMode();
-        };
+        window.onload = function() { loadProgress(); applyLanguage(); renderActiveMode(); };
 
-        // Load progress from localStorage
         function loadProgress() {
             const saved = localStorage.getItem('tamara_dl_lab_state');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    appState.solvedCount = parsed.solvedCount || 0;
-                    appState.totalAttempts = parsed.totalAttempts || 0;
-                    appState.correctAttempts = parsed.correctAttempts || 0;
-                    appState.domainStats = parsed.domainStats || appState.domainStats;
-                } catch(e) { console.error(e); }
-            }
+            if (saved) { try { const p = JSON.parse(saved);
+                appState.solvedCount = p.solvedCount || 0;
+                appState.totalAttempts = p.totalAttempts || 0;
+                appState.correctAttempts = p.correctAttempts || 0;
+                appState.domainStats = p.domainStats || appState.domainStats;
+            } catch(e) { console.error(e); } }
         }
-
         function saveProgress() {
             localStorage.setItem('tamara_dl_lab_state', JSON.stringify({
-                solvedCount: appState.solvedCount,
-                totalAttempts: appState.totalAttempts,
-                correctAttempts: appState.correctAttempts,
-                domainStats: appState.domainStats
+                solvedCount: appState.solvedCount, totalAttempts: appState.totalAttempts,
+                correctAttempts: appState.correctAttempts, domainStats: appState.domainStats
             }));
         }
 
-        // Language Switcher Function
         function switchLanguage(lang) {
             appState.lang = lang;
             const htmlRoot = document.getElementById('htmlRoot');
             const btnAr = document.getElementById('btnLangAr');
             const btnEn = document.getElementById('btnLangEn');
-
             if (lang === 'ar') {
-                htmlRoot.setAttribute('dir', 'rtl');
-                htmlRoot.setAttribute('lang', 'ar');
+                htmlRoot.setAttribute('dir', 'rtl'); htmlRoot.setAttribute('lang', 'ar');
                 btnAr.className = "px-2.5 py-1 rounded font-medium transition bg-gold text-darkText shadow";
                 btnEn.className = "px-2.5 py-1 rounded font-medium transition text-sage hover:text-white";
             } else {
-                htmlRoot.setAttribute('dir', 'ltr');
-                htmlRoot.setAttribute('lang', 'en');
+                htmlRoot.setAttribute('dir', 'ltr'); htmlRoot.setAttribute('lang', 'en');
                 btnEn.className = "px-2.5 py-1 rounded font-medium transition bg-gold text-darkText shadow";
                 btnAr.className = "px-2.5 py-1 rounded font-medium transition text-sage hover:text-white";
             }
-
-            applyLanguage();
-            renderActiveMode();
+            applyLanguage(); renderActiveMode();
         }
 
-        // Apply UI translations based on active dictionary
         function applyLanguage() {
             const dict = i18n[appState.lang];
             document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -521,12 +1483,10 @@
             });
         }
 
-        // Switch Mode (Student vs Lecturer)
         function switchMode(mode) {
             appState.mode = mode;
             const btnStudent = document.getElementById('btnStudentMode');
             const btnLecturer = document.getElementById('btnLecturerMode');
-
             if (mode === 'lecturer') {
                 btnLecturer.className = "px-3 py-1 rounded font-medium transition bg-academicGreen text-white shadow";
                 btnStudent.className = "px-3 py-1 rounded font-medium transition text-sage hover:text-white";
@@ -534,23 +1494,16 @@
                 btnStudent.className = "px-3 py-1 rounded font-medium transition bg-academicGreen text-white shadow";
                 btnLecturer.className = "px-3 py-1 rounded font-medium transition text-sage hover:text-white";
             }
-
             renderActiveMode();
         }
 
-        // Render Active Mode (Student Workspace vs Lecturer Theory Platform)
         function renderActiveMode() {
             renderSidebar();
-            if (appState.mode === 'lecturer') {
-                renderLecturerWorkspace();
-            } else {
-                if (!appState.currentCaseData) generateNewStudentCase();
-                renderStudentWorkspace();
-            }
+            if (appState.mode === 'lecturer') { renderLecturerWorkspace(); }
+            else { if (!appState.currentCaseData) generateNewStudentCase(); renderStudentWorkspace(); }
             updateDashboardUI();
         }
 
-        // Render Sidebar Navigation
         function renderSidebar() {
             const listContainer = document.getElementById('moduleList');
             listContainer.innerHTML = '';
@@ -561,30 +1514,18 @@
                 quickCard.innerHTML = `
                     <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">${appState.lang === 'ar' ? 'تحكم العرض الصفي' : 'Presentation Controls'}</h3>
                     <button onclick="openPresentationMode()" class="w-full bg-academicGreen hover:bg-academicGreen-dark text-white py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm">
-                        <i class="fa-solid fa-person-chalkboard"></i> ${appState.lang === 'ar' ? 'وضع العرض الصفي (Presentation)' : 'Classroom Presentation'}
-                    </button>
-                `;
-
+                        <i class="fa-solid fa-person-chalkboard"></i> ${appState.lang === 'ar' ? 'وضع العرض الصفي' : 'Classroom Presentation'}
+                    </button>`;
                 lecturerModulesData.forEach(mod => {
                     const isActive = appState.lecturerActiveModuleId === mod.id;
                     const item = document.createElement('div');
                     item.className = `p-2.5 rounded-xl text-xs cursor-pointer transition flex items-center justify-between ${isActive ? 'bg-darkText text-white font-bold shadow-sm' : 'bg-neutralLight hover:bg-sage/20 text-darkText'}`;
-                    item.innerHTML = `
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid ${isActive ? 'fa-bookmark text-gold' : 'fa-circle text-[6px] text-gray-400'}"></i>
-                            <span>${appState.lang === 'ar' ? mod.nameAr : mod.nameEn}</span>
-                        </div>
-                    `;
-                    item.onclick = () => {
-                        appState.lecturerActiveModuleId = mod.id;
-                        renderLecturerWorkspace();
-                        renderSidebar();
-                    };
+                    item.innerHTML = `<div class="flex items-center gap-2"><i class="fa-solid ${isActive ? 'fa-bookmark text-gold' : 'fa-circle text-[6px] text-gray-400'}"></i><span>${appState.lang === 'ar' ? mod.nameAr : mod.nameEn}</span></div>`;
+                    item.onclick = () => { appState.lecturerActiveModuleId = mod.id; renderLecturerWorkspace(); renderSidebar(); };
                     listContainer.appendChild(item);
                 });
-
             } else {
-                document.getElementById('modulesCountBadge').innerText = appState.lang === 'ar' ? "7 مجالات تدريبية" : "7 Training Domains";
+                document.getElementById('modulesCountBadge').innerText = appState.lang === 'ar' ? "7 مجالات • 100 مرحلة" : "7 Domains • 100 Stages";
                 quickCard.innerHTML = `
                     <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider" data-i18n="sessionControls">${i18n[appState.lang].sessionControls}</h3>
                     <button onclick="generateNewStudentCase()" class="w-full bg-gold hover:bg-gold-light text-darkText py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm">
@@ -595,9 +1536,7 @@
                     </button>
                     <button onclick="generateNewStudentCase()" class="w-full bg-neutralLight hover:bg-sage/20 text-darkText py-2 px-3 rounded-xl text-xs font-medium transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-rotate-right"></i> <span data-i18n="resetBtn">${i18n[appState.lang].resetBtn}</span>
-                    </button>
-                `;
-
+                    </button>`;
                 studentModulesData.forEach(mod => {
                     const isActive = appState.currentStage >= mod.range[0] && appState.currentStage <= mod.range[1];
                     const item = document.createElement('div');
@@ -607,26 +1546,18 @@
                             <i class="fa-solid ${isActive ? 'fa-chevron-left rtl:fa-chevron-right text-gold' : 'fa-circle text-[6px] text-gray-400'}"></i>
                             <span>${appState.lang === 'ar' ? mod.nameAr : mod.nameEn}</span>
                         </div>
-                        <span class="text-[10px] px-1.5 py-0.5 rounded ${isActive ? 'bg-gold text-darkText font-bold' : 'bg-sage/20 text-gray-600'}">${mod.range[0]}-${mod.range[1]}</span>
-                    `;
-                    item.onclick = () => {
-                        appState.currentStage = mod.range[0];
-                        generateNewStudentCase();
-                        renderSidebar();
-                    };
+                        <span class="text-[10px] px-1.5 py-0.5 rounded ${isActive ? 'bg-gold text-darkText font-bold' : 'bg-sage/20 text-gray-600'}">${mod.range[0]}-${mod.range[1]}</span>`;
+                    item.onclick = () => { appState.currentStage = mod.range[0]; generateNewStudentCase(); renderSidebar(); };
                     listContainer.appendChild(item);
                 });
             }
         }
 
-        // ================= LECTURER MODE IMPLEMENTATION =================
         function renderLecturerWorkspace() {
             const section = document.getElementById('mainWorkspaceSection');
             const mod = lecturerModulesData.find(m => m.id === appState.lecturerActiveModuleId) || lecturerModulesData[0];
             const dict = i18n[appState.lang];
-
             section.innerHTML = `
-                <!-- Lecturer Banner Card -->
                 <div class="bg-white rounded-2xl p-5 shadow-sm border border-sage/40 space-y-3">
                     <div class="flex flex-wrap justify-between items-start gap-2">
                         <div>
@@ -639,10 +1570,7 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Theoretical Content Presentation -->
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-                    <!-- Main Theory Panel -->
                     <div class="md:col-span-8 space-y-4">
                         <div class="bg-white rounded-2xl p-5 shadow-sm border border-sage/40 space-y-4">
                             <h3 class="text-sm font-bold text-darkText border-b border-neutralLight pb-2 flex items-center gap-2">
@@ -651,178 +1579,77 @@
                             <p class="text-sm text-gray-700 leading-relaxed bg-neutralLight p-4 rounded-xl border border-sage/20">
                                 ${appState.lang === 'ar' ? mod.content.definitionAr || mod.subtitleAr : mod.content.definitionEn || mod.subtitleEn}
                             </p>
-
                             ${mod.gates ? renderLecturerGatesTable(mod.gates) : ''}
                             ${mod.laws ? renderLecturerLawsTable(mod.laws) : ''}
-
                             <div class="space-y-2 pt-2">
                                 <h4 class="text-xs font-bold text-darkText uppercase tracking-wider">${dict.keyObservation}</h4>
                                 <div class="text-xs bg-gold/10 border border-gold/30 p-3 rounded-xl text-darkText leading-relaxed">
-                                    ${appState.lang === 'ar' ? (mod.content.keyObservationAr || "يعتمد هذا المجال على القواعد الرياضية الصارمة للمنطق الرقمي.") : (mod.content.keyObservationEn || "This domain relies on strict mathematical rules of digital logic.")}
+                                    ${appState.lang === 'ar' ? (mod.content.keyObservationAr || "يعتمد هذا المجال على القواعد الرياضية الصارمة للمنطق الرقمي.") : (mod.content.keyObservationEn || "This domain relies on strict mathematical rules.")}
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Lecturer Notes Panel -->
                     <div class="md:col-span-4 space-y-4">
                         <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 shadow-sm space-y-3">
                             <h3 class="text-xs font-bold text-amber-900 flex items-center gap-2">
                                 <i class="fa-solid fa-chalkboard-user text-amber-700"></i> ${dict.lecturerNotesTitle}
                             </h3>
                             <div class="space-y-2 text-xs text-amber-900 leading-relaxed">
-                                <div>
-                                    <strong class="block text-amber-800">${dict.teachingObjective}</strong>
-                                    <span>${appState.lang === 'ar' ? mod.content.teachingObjectiveAr : mod.content.teachingObjectiveEn}</span>
-                                </div>
-                                <div class="pt-2 border-t border-amber-200">
-                                    <strong class="block text-amber-800">${dict.commonMisconception}</strong>
-                                    <span>${appState.lang === 'ar' ? (mod.content.commonMisconceptionAr || "لا توجد أخطاء شائعة محددة.") : (mod.content.commonMisconceptionEn || "No specific misconceptions noted.")}</span>
-                                </div>
-                                <div class="pt-2 border-t border-amber-200">
-                                    <strong class="block text-amber-800">${dict.classroomDiscussion}</strong>
-                                    <span class="italic">${appState.lang === 'ar' ? (mod.content.classroomDiscussionAr || "ناقش مع الطلاب التطبيق العملي.") : (mod.content.classroomDiscussionEn || "Discuss practical application with students.")}</span>
-                                </div>
+                                <div><strong class="block text-amber-800">${dict.teachingObjective}</strong><span>${appState.lang === 'ar' ? mod.content.teachingObjectiveAr : mod.content.teachingObjectiveEn}</span></div>
+                                <div class="pt-2 border-t border-amber-200"><strong class="block text-amber-800">${dict.commonMisconception}</strong><span>${appState.lang === 'ar' ? (mod.content.commonMisconceptionAr || "لا توجد أخطاء شائعة محددة.") : (mod.content.commonMisconceptionEn || "No specific misconceptions noted.")}</span></div>
+                                <div class="pt-2 border-t border-amber-200"><strong class="block text-amber-800">${dict.classroomDiscussion}</strong><span class="italic">${appState.lang === 'ar' ? (mod.content.classroomDiscussionAr || "ناقش مع الطلاب التطبيق العملي.") : (mod.content.classroomDiscussionEn || "Discuss practical application.")}</span></div>
                             </div>
                         </div>
                     </div>
-                </div>
-            `;
+                </div>`;
         }
 
         function renderLecturerGatesTable(gates) {
             let html = `<div class="space-y-3 pt-2"><h4 class="text-xs font-bold text-darkText uppercase tracking-wider">${appState.lang === 'ar' ? 'جدول البوابات المنطقية' : 'Logic Gates Overview'}</h4><div class="grid grid-cols-1 sm:grid-cols-2 gap-3">`;
             gates.forEach(g => {
-                html += `
-                    <div class="bg-neutralLight p-3 rounded-xl border border-sage/30 space-y-1">
-                        <div class="flex justify-between items-center"><strong class="text-xs text-darkText">${appState.lang === 'ar' ? g.nameAr : g.nameEn}</strong><span class="font-mono text-[11px] bg-gold/20 text-darkText px-2 py-0.5 rounded font-bold">${g.expr}</span></div>
-                        <p class="text-[11px] text-gray-600">${appState.lang === 'ar' ? g.descAr : g.descEn}</p>
-                        <div class="text-[10px] font-mono text-academicGreen pt-1">Truth: ${g.truth}</div>
-                    </div>
-                `;
+                html += `<div class="bg-neutralLight p-3 rounded-xl border border-sage/30 space-y-1">
+                    <div class="flex justify-between items-center"><strong class="text-xs text-darkText">${appState.lang === 'ar' ? g.nameAr : g.nameEn}</strong><span class="font-mono text-[11px] bg-gold/20 text-darkText px-2 py-0.5 rounded font-bold">${g.expr}</span></div>
+                    <p class="text-[11px] text-gray-600">${appState.lang === 'ar' ? g.descAr : g.descEn}</p>
+                    <div class="text-[10px] font-mono text-academicGreen pt-1">Truth: ${g.truth}</div>
+                </div>`;
             });
-            html += `</div></div>`;
-            return html;
+            return html + `</div></div>`;
         }
 
         function renderLecturerLawsTable(laws) {
             let html = `<div class="space-y-3 pt-2"><h4 class="text-xs font-bold text-darkText uppercase tracking-wider">${appState.lang === 'ar' ? 'قوانين الجبر البولياني' : 'Boolean Laws'}</h4><div class="space-y-2">`;
             laws.forEach(l => {
-                html += `
-                    <div class="bg-neutralLight p-3 rounded-xl border border-sage/30 flex justify-between items-center">
-                        <div>
-                            <strong class="text-xs text-darkText block">${appState.lang === 'ar' ? l.nameAr : l.nameEn}</strong>
-                            <span class="text-[11px] text-gray-600">${appState.lang === 'ar' ? l.descAr : l.descEn}</span>
-                        </div>
-                        <span class="font-mono text-xs bg-gold/20 text-darkText px-2 py-1 rounded font-bold">${l.formula}</span>
-                    </div>
-                `;
+                html += `<div class="bg-neutralLight p-3 rounded-xl border border-sage/30 flex justify-between items-center">
+                    <div><strong class="text-xs text-darkText block">${appState.lang === 'ar' ? l.nameAr : l.nameEn}</strong><span class="text-[11px] text-gray-600">${appState.lang === 'ar' ? l.descAr : l.descEn}</span></div>
+                    <span class="font-mono text-xs bg-gold/20 text-darkText px-2 py-1 rounded font-bold">${l.formula}</span>
+                </div>`;
             });
-            html += `</div></div>`;
-            return html;
+            return html + `</div></div>`;
         }
 
         function openPresentationMode() {
             const mod = lecturerModulesData.find(m => m.id === appState.lecturerActiveModuleId) || lecturerModulesData[0];
             const dict = i18n[appState.lang];
-            const modal = document.getElementById('modalAlert');
             document.getElementById('modalAlertTitle').innerHTML = `<i class="fa-solid fa-person-chalkboard text-academicGreen"></i> ${dict.presentationModeBtn} — ${appState.lang === 'ar' ? mod.nameAr : mod.nameEn}`;
             document.getElementById('modalAlertBody').innerHTML = `
                 <div class="space-y-3 text-xs leading-relaxed">
                     <p class="font-bold text-darkText">${appState.lang === 'ar' ? mod.subtitleAr : mod.subtitleEn}</p>
-                    <div class="bg-neutralLight p-3 rounded-xl border border-sage/30">
-                        ${appState.lang === 'ar' ? mod.content.definitionAr : mod.content.definitionEn}
-                    </div>
-                    <p class="text-gray-600 italic">اضغط على موافق للعودة للمنصة العادية.</p>
-                </div>
-            `;
+                    <div class="bg-neutralLight p-3 rounded-xl border border-sage/30">${appState.lang === 'ar' ? mod.content.definitionAr : mod.content.definitionEn}</div>
+                    <p class="text-gray-600 italic">اضغط على موافق للعودة.</p>
+                </div>`;
             openModal('modalAlert');
         }
 
-
-        // ================= STUDENT MODE IMPLEMENTATION =================
+        // ===== الطالب: توليد الحالة من بنك الأسئلة =====
         function generateNewStudentCase() {
-            appState.caseId = 'DL-KMAP-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
-            
-            if (appState.currentStage >= 71 && appState.currentStage <= 90) {
-                appState.currentCaseData = generateKMapCase();
-            } else if (appState.currentStage >= 41 && appState.currentStage <= 55) {
-                appState.currentCaseData = generateBooleanLawCase();
-            } else {
-                appState.currentCaseData = generateFoundationCase();
+            const q = questionBank.find(item => item.stageId === appState.currentStage);
+            if (!q) { console.error('No question for stage', appState.currentStage); return; }
+            appState.caseId = 'DL-' + new Date().getFullYear() + '-' + String(appState.currentStage).padStart(4, '0');
+            appState.currentCaseData = JSON.parse(JSON.stringify(q)); // نسخة مستقلة
+            if (q.type === 'choice') {
+                appState.currentCaseData.selectedOption = null;
             }
-
             renderStudentWorkspace();
-            
-            // Safely update explanation content if the element exists in the DOM
-            const explanationContent = document.getElementById('explanationContent');
-            if (explanationContent) {
-                explanationContent.innerHTML = `<div class="text-gray-400 italic text-center py-6">${i18n[appState.lang].explanationPlaceholder}</div>`;
-            }
-        }
-
-        function generateKMapCase() {
-            const varsCount = Math.random() > 0.5 ? 3 : 4;
-            const totalCells = Math.pow(2, varsCount);
-            const mintermsCount = Math.floor(Math.random() * 4) + (varsCount === 3 ? 3 : 5);
-            let minterms = [];
-            while(minterms.length < mintermsCount) {
-                let m = Math.floor(Math.random() * totalCells);
-                if(!minterms.includes(m)) minterms.push(m);
-            }
-            minterms.sort((a,b) => a-b);
-
-            let gridCells = {};
-            for(let i=0; i<totalCells; i++) {
-                gridCells[i] = minterms.includes(i) ? 1 : 0;
-            }
-
-            return {
-                type: 'kmap',
-                varsCount: varsCount,
-                minterms: minterms,
-                gridCells: gridCells,
-                titleAr: varsCount === 3 ? "خريطة كارنو 3 متغيرات" : "خريطة كارنو 4 متغيرات",
-                titleEn: varsCount === 3 ? "3-Variable Karnaugh Map" : "4-Variable Karnaugh Map",
-                promptAr: `قم بتبسيط التعبير البولياني باستخدام خريطة كارنو (${varsCount} متغيرات) للمينترمات التالية: F = Σ(${minterms.join(', ')}). انقر على الخلايا للتعديل والتجميع.`,
-                promptEn: `Simplify the Boolean expression using a ${varsCount}-variable K-Map for minterms: F = Σ(${minterms.join(', ')}). Click cells to toggle.`,
-                explanationAr: `تمثل خريطة كارنو (${varsCount} متغيرات) طريقة بصرية لتبسيط التعبيرات البوليانية. المينترمات المفعلة هي [${minterms.join(', ')}].`,
-                explanationEn: `The ${varsCount}-variable K-Map visually minimizes Boolean expressions for active minterms [${minterms.join(', ')}].`
-            };
-        }
-
-        function generateBooleanLawCase() {
-            return {
-                type: 'choice',
-                titleAr: "تبسيط الجبر البولياني",
-                titleEn: "Boolean Algebra Simplification",
-                promptAr: "ما هو ناتج تبسيط التعبير البولياني التالي حسب قوانين الجبر: F = A + AB ؟",
-                promptEn: "What is the simplified result of the Boolean expression: F = A + AB ?",
-                options: [
-                    { id: 'b1', textAr: "F = A (قانون الامتصاص)", textEn: "F = A (Absorption Law)", correct: true },
-                    { id: 'b2', textAr: "F = B", textEn: "F = B", correct: false },
-                    { id: 'b3', textAr: "F = AB", textEn: "F = AB", correct: false }
-                ],
-                explanationAr: "حسب قانون الامتصاص (Absorption Law): A + AB = A. بإخراج A عامل مشترك يصبح F = A(1 + B) = A.",
-                explanationEn: "According to the Absorption Law: A + AB = A. Factoring out A yields F = A(1 + B) = A."
-            };
-        }
-
-        function generateFoundationCase() {
-            return {
-                type: 'choice',
-                titleAr: "أساسيات المنطق الثنائي",
-                titleEn: "Binary Logic Foundations",
-                promptAr: "إذا كان المدخل A = 1 والمدخل B = 0، فما هو ناتج بوابة AND وبوابة OR على التوالي؟",
-                promptEn: "If input A = 1 and input B = 0, what are the outputs of AND and OR gates respectively?",
-                options: [
-                    { id: 'f1', textAr: "AND = 0, OR = 1", textEn: "AND = 0, OR = 1", correct: true },
-                    { id: 'f2', textAr: "AND = 1, OR = 0", textEn: "AND = 1, OR = 0", correct: false },
-                    { id: 'f3', textAr: "AND = 1, OR = 1", textEn: "AND = 1, OR = 1", correct: false }
-                ],
-                explanationAr: "بوابة AND تعطي 1 فقط إذا تساوت جميع المدخلات 1 (1·0=0). بوابة OR تعطي 1 إذا كان مدخل واحد على الأقل 1 (1+0=1).",
-                explanationEn: "AND outputs 1 only when all inputs are 1 (1·0=0). OR outputs 1 if at least one input is 1 (1+0=1)."
-            };
         }
 
         function renderStudentWorkspace() {
@@ -831,26 +1658,31 @@
             const dict = i18n[appState.lang];
 
             section.innerHTML = `
-                <!-- Stage Header Card -->
                 <div class="bg-white rounded-2xl p-5 shadow-sm border border-sage/40 space-y-3">
                     <div class="flex justify-between items-start gap-2">
                         <div>
                             <span class="text-xs font-semibold bg-gold/20 text-darkText px-3 py-1 rounded-lg">Case ID: ${appState.caseId}</span>
                             <h2 class="text-lg font-bold text-darkText mt-2">${appState.lang === 'ar' ? data.titleAr : data.titleEn}</h2>
                         </div>
-                        <span class="text-xs font-mono bg-academicGreen/10 text-academicGreen px-3 py-1 rounded-lg border border-academicGreen/30">Stage ${appState.currentStage}</span>
+                        <div class="flex items-center gap-1 bg-academicGreen/10 border border-academicGreen/30 rounded-lg px-2 py-1">
+                            <button onclick="goToPrevStage()" class="text-academicGreen hover:bg-academicGreen/20 rounded p-1 transition" title="${appState.lang === 'ar' ? 'السابق' : 'Previous'}">
+                                <i class="fa-solid fa-chevron-right rtl:fa-chevron-right ltr:fa-chevron-left text-[10px]"></i>
+                            </button>
+                            <span class="text-xs font-mono text-academicGreen px-1">Stage ${appState.currentStage} / 100</span>
+                            <button onclick="goToNextStage()" class="text-academicGreen hover:bg-academicGreen/20 rounded p-1 transition" title="${appState.lang === 'ar' ? 'التالي' : 'Next'}">
+                                <i class="fa-solid fa-chevron-left rtl:fa-chevron-left ltr:fa-chevron-right text-[10px]"></i>
+                            </button>
+                        </div>
                     </div>
                     <p class="text-sm text-gray-700 bg-neutralLight p-4 rounded-xl border border-sage/30 leading-relaxed">
                         ${appState.lang === 'ar' ? data.promptAr : data.promptEn}
                     </p>
                 </div>
 
-                <!-- Interactive Workspace Area -->
                 <div id="interactiveWorkspace" class="bg-white rounded-2xl p-5 shadow-sm border border-sage/40 min-h-[300px] flex flex-col justify-between">
-                    ${data.type === 'kmap' ? renderKMapWorkspaceHTML(data) : renderChoiceWorkspaceHTML(data)}
+                    ${renderChoiceWorkspaceHTML(data)}
                 </div>
 
-                <!-- Submission & Explanation Toolbar -->
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
                     <div class="md:col-span-8 bg-white rounded-2xl p-4 shadow-sm border border-sage/40 space-y-2">
                         <h3 class="text-xs font-bold text-darkText flex items-center gap-2 border-b border-neutralLight pb-2">
@@ -864,70 +1696,32 @@
                         <button onclick="verifyStudentAnswer()" class="w-full bg-academicGreen hover:bg-academicGreen-dark text-white py-3 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm">
                             <i class="fa-solid fa-check"></i> ${dict.verifyBtn}
                         </button>
+                        <button onclick="goToNextStage()" class="w-full bg-gold hover:bg-gold-light text-darkText py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-arrow-left rtl:fa-arrow-left ltr:fa-arrow-right"></i> ${appState.lang === 'ar' ? 'المرحلة التالية' : 'Next Stage'}
+                        </button>
                         <button onclick="generateNewStudentCase()" class="w-full bg-neutralLight hover:bg-sage/20 text-darkText py-2.5 px-4 rounded-xl text-xs font-medium transition flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-dice"></i> ${dict.newCaseBtn}
+                            <i class="fa-solid fa-rotate-right"></i> ${dict.resetBtn}
                         </button>
                     </div>
-                </div>
-            `;
-        }
-
-        function renderKMapWorkspaceHTML(data) {
-            const varsCount = data.varsCount;
-            let html = `<div class="flex flex-col items-center space-y-4 my-2">`;
-            html += `<div class="text-xs text-darkText font-semibold bg-gold/10 px-3 py-1.5 rounded-xl border border-gold/30 text-center">Active Minterms: [${data.minterms.join(', ')}]</div>`;
-            html += `<div class="grid gap-2 p-3 bg-neutralLight rounded-xl border border-sage/30 shadow-inner" style="grid-template-columns: repeat(5, minmax(0, 1fr));">`;
-
-            if (varsCount === 3) {
-                html += `<div class="text-xs font-bold text-gray-400 text-center p-2">A \\ BC</div>`;
-                ['00', '01', '11', '10'].forEach(col => {
-                    html += `<div class="text-xs font-bold text-darkText text-center p-2 bg-gold/20 rounded">${col}</div>`;
-                });
-                [['0', [0,1,3,2]], ['1', [4,5,7,6]]].forEach(([rVal, mArr]) => {
-                    html += `<div class="text-xs font-bold text-darkText flex items-center justify-center bg-gold/20 rounded">${rVal}</div>`;
-                    mArr.forEach(mIdx => {
-                        let val = data.gridCells[mIdx];
-                        html += `<div onclick="toggleKMapCell(${mIdx})" class="kmap-cell h-14 rounded-xl flex flex-col items-center justify-center border font-mono text-sm shadow-sm ${val === 1 ? 'bg-gold text-darkText font-bold border-gold' : 'bg-white text-darkText border-sage/30'}"><span class="text-[10px] opacity-70">m${mIdx}</span><span class="text-base">${val}</span></div>`;
-                    });
-                });
-            } else {
-                html += `<div class="text-xs font-bold text-gray-400 text-center p-2">AB \\ CD</div>`;
-                ['00', '01', '11', '10'].forEach(col => {
-                    html += `<div class="text-xs font-bold text-darkText text-center p-2 bg-gold/20 rounded">${col}</div>`;
-                });
-                const rMap = {'00': [0,1,3,2], '01': [4,5,7,6], '11': [12,13,15,14], '10': [8,9,11,10]};
-                Object.entries(rMap).forEach(([rCode, mArr]) => {
-                    html += `<div class="text-xs font-bold text-darkText flex items-center justify-center bg-gold/20 rounded">${rCode}</div>`;
-                    mArr.forEach(mIdx => {
-                        let val = data.gridCells[mIdx];
-                        html += `<div onclick="toggleKMapCell(${mIdx})" class="kmap-cell h-14 rounded-xl flex flex-col items-center justify-center border font-mono text-sm shadow-sm ${val === 1 ? 'bg-gold text-darkText font-bold border-gold' : 'bg-white text-darkText border-sage/30'}"><span class="text-[10px] opacity-70">m${mIdx}</span><span class="text-base">${val}</span></div>`;
-                    });
-                });
-            }
-
-            html += `</div></div>`;
-            return html;
-        }
-
-        function toggleKMapCell(idx) {
-            if (appState.currentCaseData && appState.currentCaseData.gridCells) {
-                appState.currentCaseData.gridCells[idx] = appState.currentCaseData.gridCells[idx] === 1 ? 0 : 1;
-                renderStudentWorkspace();
-            }
+                </div>`;
         }
 
         function renderChoiceWorkspaceHTML(data) {
             let html = `<div class="space-y-3 my-2"><div class="space-y-2">`;
             data.options.forEach(opt => {
+                const isSelected = data.selectedOption === opt.id;
                 html += `
-                    <label class="flex items-center gap-3 p-3.5 bg-neutralLight hover:bg-sage/20 rounded-xl border border-sage/30 cursor-pointer transition">
-                        <input type="radio" name="studentOption" value="${opt.id}" class="text-gold focus:ring-gold h-4 w-4">
+                    <label class="flex items-center gap-3 p-3.5 ${isSelected ? 'bg-gold/20 border-gold' : 'bg-neutralLight hover:bg-sage/20 border-sage/30'} rounded-xl border cursor-pointer transition">
+                        <input type="radio" name="studentOption" value="${opt.id}" ${isSelected ? 'checked' : ''} onchange="selectOption('${opt.id}')" class="text-gold focus:ring-gold h-4 w-4">
                         <span class="text-xs font-medium text-darkText">${appState.lang === 'ar' ? opt.textAr : opt.textEn}</span>
-                    </label>
-                `;
+                    </label>`;
             });
             html += `</div></div>`;
             return html;
+        }
+
+        function selectOption(optId) {
+            if (appState.currentCaseData) appState.currentCaseData.selectedOption = optId;
         }
 
         function verifyStudentAnswer() {
@@ -936,18 +1730,15 @@
             const data = appState.currentCaseData;
             const dict = i18n[appState.lang];
 
-            if (data.type === 'kmap') {
-                let match = true;
-                for (let k in data.gridCells) {
-                    let expected = data.minterms.includes(parseInt(k)) ? 1 : 0;
-                    if (data.gridCells[k] !== expected) { match = false; break; }
-                }
-                isCorrect = match;
-            } else {
+            if (data.type === 'choice') {
                 const selected = document.querySelector('input[name="studentOption"]:checked');
                 if (selected) {
                     const opt = data.options.find(o => o.id === selected.value);
                     if (opt && opt.correct) isCorrect = true;
+                } else {
+                    showAlertModal(dict.academicNotice, appState.lang === 'ar' ? 'الرجاء اختيار إجابة أولاً.' : 'Please select an answer first.');
+                    appState.totalAttempts--;
+                    return;
                 }
             }
 
@@ -955,7 +1746,8 @@
             if (isCorrect) {
                 appState.correctAttempts++;
                 appState.solvedCount++;
-                appState.domainStats[6]++;
+                const domainId = data.domainId || 1;
+                appState.domainStats[domainId] = (appState.domainStats[domainId] || 0) + 1;
                 saveProgress();
                 updateDashboardUI();
 
@@ -963,23 +1755,38 @@
                     <div class="bg-academicGreen/10 border border-academicGreen/30 p-3 rounded-xl text-academicGreen space-y-1">
                         <div class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-circle-check"></i> ${dict.correctVerification}</div>
                         <p class="text-xs text-darkText">${appState.lang === 'ar' ? data.explanationAr : data.explanationEn}</p>
-                    </div>
-                `;
+                    </div>`;
             } else {
                 saveProgress();
                 updateDashboardUI();
-
                 expBox.innerHTML = `
                     <div class="bg-red-50 border border-red-200 p-3 rounded-xl text-burgundy space-y-1">
                         <div class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark"></i> ${dict.incorrectVerification}</div>
-                        <p class="text-xs text-darkText">${appState.lang === 'ar' ? "راجع المدخلات وقواعد التبسيط المنطقي وتجربة الحالة مرة أخرى." : "Review your inputs and logic simplification rules, then retry."}</p>
-                    </div>
-                `;
+                        <p class="text-xs text-darkText">${appState.lang === 'ar' ? 'راجع المفاهيم وأعد المحاولة.' : 'Review concepts and try again.'}</p>
+                    </div>`;
             }
         }
 
         function requestStudentHint() {
-            showAlertModal(i18n[appState.lang].hintBtn, appState.lang === 'ar' ? "تلميح: تأكد من تجميع أكبر عدد ممكن من الواحدات المضاعفة للأس 2 في خريطة كارنو ومراعاة الأطراف." : "Hint: Ensure grouping largest possible powers of 2 (1, 2, 4, 8) in the K-map with edge wrapping.");
+            const data = appState.currentCaseData;
+            if (!data) return;
+            // التلميح من الشرح
+            showAlertModal(i18n[appState.lang].hintBtn, appState.lang === 'ar' ? ('تلميح: ' + data.explanationAr) : ('Hint: ' + data.explanationEn));
+        }
+
+        function goToNextStage() {
+            if (appState.currentStage < 100) {
+                appState.currentStage++;
+                generateNewStudentCase();
+                renderSidebar();
+            }
+        }
+        function goToPrevStage() {
+            if (appState.currentStage > 1) {
+                appState.currentStage--;
+                generateNewStudentCase();
+                renderSidebar();
+            }
         }
 
         function updateDashboardUI() {
@@ -999,22 +1806,20 @@
             domainList.innerHTML = '';
             studentModulesData.forEach(mod => {
                 let solved = appState.domainStats[mod.id] || 0;
-                let pct = Math.min(100, Math.round((solved / 5) * 100));
-                domainList.innerHTML = domainList.innerHTML + `
+                let pct = Math.min(100, Math.round((solved / mod.stages) * 100));
+                domainList.innerHTML += `
                     <div class="flex items-center justify-between bg-neutralLight p-2.5 rounded-xl border border-sage/30">
                         <span class="text-darkText font-medium">${appState.lang === 'ar' ? mod.nameAr : mod.nameEn}</span>
                         <div class="flex items-center gap-2 w-1/3">
                             <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
                                 <div class="bg-academicGreen h-full" style="width: ${pct}%"></div>
                             </div>
-                            <span class="font-mono text-[10px] text-gray-500">${solved}</span>
+                            <span class="font-mono text-[10px] text-gray-500">${solved}/${mod.stages}</span>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
         }
 
-        // Modals Utility
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
         function showAlertModal(title, msg) {
